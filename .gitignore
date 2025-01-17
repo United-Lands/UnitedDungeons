@@ -1,3 +1,8 @@
+# User-specific stuff
+target/
+.vscode/
+compile.bat
+
 # Compiled class file
 *.class
 
