@@ -1,10 +1,13 @@
 package org.unitedlands.commands;
 
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Dungeon;
@@ -45,9 +48,58 @@ public class GlobalCommands implements CommandExecutor {
             case "info":
                 handleDungeonInfo(player, args);
                 break;
+            case "warp":
+                handleDungeonWarp(player, args);
         }
 
         return true;
+    }
+
+    private void handleDungeonWarp(Player player, String[] args) {
+        if (args.length != 2)
+            return;
+
+        var dungeon = plugin.getDungeon(args[1]);
+        if (dungeon == null) {
+            player.sendMessage(
+                    MessageFormatter.getWithPrefix(ChatColor.RED + "No dungeon with name " + args[0] + " found!"));
+            return;
+        }
+
+        if (!dungeon.isPublicWarp && !player.hasPermission("united.dungeons.admin")) {
+            player.sendMessage(MessageFormatter.getWithPrefix(ChatColor.RED + "You cannot warp to this dungeon!"));
+            return;
+        }
+
+        player.sendMessage(MessageFormatter.getWithPrefix("Teleporting in 3 seconds. Move to cancel."));
+        new BukkitRunnable() {
+            int counter = 0;
+            int maxExecutions = 3;
+
+            Location startBlock = player.getLocation().getBlock().getLocation();
+
+            @Override
+            public void run() {
+                counter++;
+
+                if (counter <= maxExecutions) {
+                    player.sendMessage(MessageFormatter.getWithPrefix((maxExecutions - counter + 1) + "..."));
+                }
+
+                if (!player.getLocation().getBlock().getLocation().equals(startBlock)) {
+                    player.sendMessage(MessageFormatter.getWithPrefix("Teleportation cancelled."));
+                    this.cancel();
+                }
+
+                if (counter > maxExecutions) {
+                    player.teleport(dungeon.exitLocation);
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+        return;
+
     }
 
     private void handleDungeonInfo(Player player, String[] args) {

@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.unitedlands.UnitedDungeons;
 
-public class SpawnCommandTabCompleter implements TabCompleter {
+public class SpawnerCommandTabCompleter implements TabCompleter {
 
     private final UnitedDungeons plugin;
     private List<String> spawnerSubcommands = Arrays.asList(
@@ -19,15 +19,16 @@ public class SpawnCommandTabCompleter implements TabCompleter {
             "info",
             "set");
     private List<String> spawnerSetcommands = Arrays.asList(
-            "mob",
-            "radius",
-            "maxmobs",
-            "mythicmob",
-            "groupspawn",
-            "frequency",
-            "killstocomplete");
+        "radius",
+        "mobType",
+        "isMythicMob",
+        "maxMobs",
+        "spawnFrequency",
+        "isGroupSpawn",
+        "killsToComplete"
+    );
 
-    public SpawnCommandTabCompleter(UnitedDungeons plugin) {
+    public SpawnerCommandTabCompleter(UnitedDungeons plugin) {
         this.plugin = plugin;
     }
 

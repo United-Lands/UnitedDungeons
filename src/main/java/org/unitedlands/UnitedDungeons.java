@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,8 +20,7 @@ import org.unitedlands.listeners.MobDeathListener;
 import org.unitedlands.managers.MobManager;
 import org.unitedlands.tabcompleters.DungeonCommandTabCompleter;
 import org.unitedlands.tabcompleters.GlobalCommandsTabCompleter;
-import org.unitedlands.tabcompleters.SpawnCommandTabCompleter;
-
+import org.unitedlands.tabcompleters.SpawnerCommandTabCompleter;
 
 public class UnitedDungeons extends JavaPlugin {
 
@@ -39,11 +39,11 @@ public class UnitedDungeons extends JavaPlugin {
         getCommand("ud").setExecutor(new GlobalCommands(this));
         getCommand("ud").setTabCompleter(new GlobalCommandsTabCompleter(this));
 
-        getCommand("dungeon").setExecutor(new DungeonCommands(this));
-        getCommand("dungeon").setTabCompleter(new DungeonCommandTabCompleter(this));
+        getCommand("uddungeon").setExecutor(new DungeonCommands(this));
+        getCommand("uddungeon").setTabCompleter(new DungeonCommandTabCompleter(this));
 
-        getCommand("spawner").setExecutor(new SpawnerCommands(this));
-        getCommand("spawner").setTabCompleter(new SpawnCommandTabCompleter(this));
+        getCommand("udspawner").setExecutor(new SpawnerCommands(this));
+        getCommand("udspawner").setTabCompleter(new SpawnerCommandTabCompleter(this));
 
         saveDefaultConfig();
         loadDungeons();
@@ -66,6 +66,10 @@ public class UnitedDungeons extends JavaPlugin {
 
     public List<String> getDungeonNames() {
         return new ArrayList<String>(Dungeons.keySet());
+    }
+
+    public List<String> getPublicDungeonNames() {
+        return Dungeons.values().stream().filter(d -> d.isPublicWarp).map(d -> d.name).collect(Collectors.toList());
     }
 
     public Collection<Dungeon> getDungeons() {
@@ -119,12 +123,13 @@ public class UnitedDungeons extends JavaPlugin {
                     if (dungeon.isSleeping || dungeon.isOnCooldown) {
                         continue;
                     } else {
-                        if (dungeon.Spawners != null && !dungeon.Spawners.isEmpty()) {
+                        var spawners = dungeon.getSpawners();
+                        if (spawners != null && !spawners.isEmpty()) {
                             boolean allComplete = true;
-                            for (Spawner s : dungeon.Spawners.values()) {
+                            for (Spawner s : spawners.values()) {
                                 s.checkCompletion();
-                                allComplete = allComplete && s.complete;
-                                if (!s.complete) {
+                                allComplete = allComplete && s.isComplete;
+                                if (!s.isComplete) {
                                     if (s.isPlayerNearby()) {
                                         s.prepareSpawn();
                                     }
@@ -144,8 +149,9 @@ public class UnitedDungeons extends JavaPlugin {
     public void stopChecks() {
         getLogger().info("Clearing dungeon mobs...");
         for (Dungeon dungeon : Dungeons.values()) {
-            if (dungeon.Spawners != null) {
-                for (Spawner s : dungeon.Spawners.values()) {
+            var spawners = dungeon.getSpawners();
+            if (spawners != null) {
+                for (Spawner s : spawners.values()) {
                     mobManager.removeAllSpawnerMobs(s);
                 }
             }

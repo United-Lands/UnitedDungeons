@@ -30,7 +30,7 @@ public class MobManager {
     }
 
     public void createMob(Spawner spawner) {
-        org.bukkit.World world = Bukkit.getWorld(spawner.world);
+        org.bukkit.World world = Bukkit.getWorld(spawner.getWorld());
         if (world == null)
             return;
 
@@ -39,13 +39,13 @@ public class MobManager {
             if (spawner.isMythicMob) {
                 var mmob = MythicBukkit.inst().getMobManager().getMythicMob(spawner.mobType).orElse(null);
                 if (mmob != null) {
-                    ActiveMob ammob = MythicBukkit.inst().getMobManager().spawnMob(spawner.mobType, spawner.location);
+                    ActiveMob ammob = MythicBukkit.inst().getMobManager().spawnMob(spawner.mobType, spawner.getLocation());
                     ammob.setDespawnMode(DespawnMode.NEVER);
 
                     registerMob(ammob.getUniqueId(), spawner);
                 }
             } else {
-                mob = world.spawnEntity(spawner.location, EntityType.valueOf(spawner.mobType));
+                mob = world.spawnEntity(spawner.getLocation(), EntityType.valueOf(spawner.mobType));
                 ((LivingEntity) mob).setPersistent(true);
                 ((LivingEntity) mob).setRemoveWhenFarAway(false);
 

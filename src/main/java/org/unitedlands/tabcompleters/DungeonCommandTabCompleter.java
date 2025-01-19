@@ -27,20 +27,19 @@ public class DungeonCommandTabCompleter implements TabCompleter {
     private List<String> dungeonSetcommands = Arrays.asList(
             "description",
             "location",
-            "exitlocation",
-            "lockable",
-            "lockseconds",
+            "exitLocation",
+            "isPublicWarp",
+            "isLockable",
             "width",
             "length",
             "height",
-            "chestpos",
-            "platepos",
-            "cooldownseconds",
-            "dorewards",
-            "doplate",
-            "staticrewards",
-            "randomrewards",
-            "randomrewardscount");
+            "doRewardDrop",
+            "staticRewards",
+            "randomRewards",
+            "randomRewardsCount",
+            "doPressurePlate",
+            "cooldownTime",
+            "lockTime");
 
     public DungeonCommandTabCompleter(UnitedDungeons plugin) {
         this.plugin = plugin;

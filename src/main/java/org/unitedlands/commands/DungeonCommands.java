@@ -1,7 +1,9 @@
 package org.unitedlands.commands;
 
 import java.io.File;
-import java.util.HashMap;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -101,23 +103,12 @@ public class DungeonCommands implements CommandExecutor {
             return;
 
         switch (args[2]) {
-            case "description":
-                handleDungeonSetDescription(player, dungeon, args);
-                break;
+
             case "location":
                 handleDungeonSetLocation(player, dungeon);
                 break;
             case "exitlocation":
                 handleDungeonSetExitLocation(player, dungeon);
-                break;
-            case "width":
-                handleDungeonSetWidth(player, dungeon, args);
-                break;
-            case "length":
-                handleDungeonSetLength(player, dungeon, args);
-                break;
-            case "height":
-                handleDungeonSetHeight(player, dungeon, args);
                 break;
             case "chestpos":
                 handleDungeonSetChestPos(player, dungeon);
@@ -125,32 +116,19 @@ public class DungeonCommands implements CommandExecutor {
             case "platepos":
                 handleDungeonSetPlatePos(player, dungeon);
                 break;
-            case "cooldownseconds":
-                handleDungeonSetCooldown(player, dungeon, args);
+            case "description":
+                handleDungeonSetDescription(player, dungeon, args);
                 break;
-            case "lockseconds":
-                handleDungeonSetLocktime(player, dungeon, args);
+            default:
+                if (args.length < 4)
+                    return;
+                handleDungeonSetField(player, dungeon, args[2], args[3]);
                 break;
-            case "lockable":
-                handleDungeonSetLockable(player, dungeon, args);
-                break;
-            case "dorewards":
-                handleDungeonSetDoRewards(player, dungeon, args);
-                break;
-            case "doplate":
-                handleDungeonSetDoPlate(player, dungeon, args);
-                break;
-            case "staticrewards":
-                handleDungeonSetStaticRewards(player, dungeon, args);
-                break;
-            case "randomrewards":
-                handleDungeonSetRandomRewards(player, dungeon, args);
-                break;
-            case "randomrewardscount":
-                handleDungeonSetRandomRewardsCount(player, dungeon, args);
-                break;
-
         }
+    }
+
+    private void handleDungeonSetField(Player player, Dungeon dungeon, String field, String value) {
+        setDungeonField(player, dungeon, field, value);
     }
 
     private void handleDungeonSetDescription(Player player, Dungeon dungeon, String[] args) {
@@ -161,11 +139,7 @@ public class DungeonCommands implements CommandExecutor {
         for (int i = 3; i < args.length; i++)
             desc += " " + args[i];
 
-        dungeon.description = desc.trim();
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter
-                .getWithPrefix("Dungeon descripton set"));
+        setDungeonField(player, dungeon, "description", desc);
     }
 
     private void handleDungeonRename(Player player, Dungeon dungeon, String[] args) {
@@ -208,196 +182,6 @@ public class DungeonCommands implements CommandExecutor {
                 .getWithPrefix("Exit location for dungeon " + dungeon.name + " set."));
     }
 
-    private void handleDungeonSetRandomRewardsCount(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        int rewardscount = 0;
-        try {
-            rewardscount = Integer.parseInt(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Random rewards count must be a valid number."));
-            return;
-        }
-
-        dungeon.randomRewardsCount = rewardscount;
-        dungeon.save();
-
-        player.sendMessage(
-                MessageFormatter.getWithPrefix("Random rewards count for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetRandomRewards(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        dungeon.randomRewards = args[3];
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Random rewards for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetStaticRewards(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        dungeon.staticRewards = args[3];
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Static rewards for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetDoPlate(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        boolean dopressureplate = false;
-        try {
-            dopressureplate = Boolean.parseBoolean(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Do pressure plate must be true or false."));
-            return;
-        }
-
-        dungeon.doPressurePlate = dopressureplate;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Do pressure plate for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetDoRewards(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        boolean dorewarddrop = false;
-        try {
-            dorewarddrop = Boolean.parseBoolean(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(MessageFormatter.getWithPrefix("Do reward drop must be true or false."));
-            return;
-        }
-
-        dungeon.doRewardDrop = dorewarddrop;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Do reward drop for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetWidth(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        int width = 0;
-        try {
-            width = Integer.parseInt(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Width must be a valid number."));
-            return;
-        }
-
-        dungeon.width = width;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Width for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetLength(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        int length = 0;
-        try {
-            length = Integer.parseInt(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Length must be a valid number."));
-            return;
-        }
-
-        dungeon.length = length;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Length for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetHeight(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        int height = 0;
-        try {
-            height = Integer.parseInt(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Height must be a valid number."));
-            return;
-        }
-
-        dungeon.height = height;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Height for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetCooldown(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        int cooldown = 0;
-        try {
-            cooldown = Integer.parseInt(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Cooldown time must be a valid number."));
-            return;
-        }
-
-        dungeon.cooldownTime = cooldown;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Cooldown for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetLocktime(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        int locktime = 0;
-        try {
-            locktime = Integer.parseInt(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix("Lock time must be a valid number."));
-            return;
-        }
-
-        dungeon.lockTime = locktime;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Lock time for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
-    private void handleDungeonSetLockable(Player player, Dungeon dungeon, String[] args) {
-        if (args.length < 4)
-            return;
-        boolean lockable = false;
-        try {
-            lockable = Boolean.parseBoolean(args[3]);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(MessageFormatter.getWithPrefix("Lockable must be true or false."));
-            return;
-        }
-
-        dungeon.isLockable = lockable;
-        dungeon.save();
-
-        player.sendMessage(MessageFormatter.getWithPrefix("Lockable for dungeon " + dungeon.name + " set."));
-        return;
-    }
-
     private void handleDungeonSetPlatePos(Player player, Dungeon dungeon) {
         dungeon.setPressurePlateLocation(player.getLocation());
         dungeon.save();
@@ -418,8 +202,8 @@ public class DungeonCommands implements CommandExecutor {
         dungeon.save();
 
         if (!dungeon.isActive) {
-            if (dungeon.Spawners != null) {
-                for (Spawner s : dungeon.Spawners.values()) {
+            if (dungeon.getSpawners() != null) {
+                for (Spawner s : dungeon.getSpawners().values()) {
                     plugin.getMobManager().removeAllSpawnerMobs(s);
                 }
             }
@@ -466,19 +250,62 @@ public class DungeonCommands implements CommandExecutor {
     }
 
     private void handleDungeonInfo(Player player, Dungeon dungeon) {
+
+        List<String> fieldValues = new ArrayList<>();
+        for (Field field : Dungeon.class.getFields()) {
+            try {
+                if (field.canAccess(dungeon)) {
+                    if (!field.getType().equals(Location.class))
+                        fieldValues.add(ChatColor.WHITE + field.getName() + ": " + ChatColor.GRAY + field.get(dungeon));
+                }
+            } catch (IllegalAccessException ex) {
+                plugin.getLogger().severe("Illegal access to field " + field.getName());
+            }
+        }
+
+        player.sendMessage(MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + dungeon.name));
+        player.sendMessage(MessageFormatter.getWithPrefix(String.join(ChatColor.DARK_GRAY + " | ", fieldValues)));
+    }
+
+    private void handleDungeonList(Player player) {
         player.sendMessage(
-                MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + dungeon.name));
-        player.sendMessage(
-                MessageFormatter.getWithPrefix(
-                        "Active: " + dungeon.isActive + " | On cooldown: " + dungeon.isOnCooldown
-                                + " | Cooldown time (seconds): " + dungeon.cooldownTime + " | Width: " + dungeon.width
-                                + " | Length: " + dungeon.length + " | Height: " + dungeon.height
-                                + " | Do reward drops: " + dungeon.doRewardDrop)
-                        + " | Static rewards: " + dungeon.staticRewards + " | Random rewards: " + dungeon.randomRewards
-                        + " | Random rewards count: " + dungeon.randomRewardsCount +
-                        " | Do pressure plate: " + dungeon.doPressurePlate +
-                        " | Lockable: " + dungeon.isLockable +
-                        " | Lock time: " + dungeon.lockTime + " | Description: \"" + dungeon.description + "\"");
+                MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + "Registered Dungeons:"));
+        for (Dungeon dungeon : plugin.getDungeons()) {
+            player.sendMessage(MessageFormatter
+                    .getWithPrefix(dungeon.name + " (" + dungeon.getSpawners().size() + " spawners)"));
+        }
+    }
+
+    private void handleDungeonCreate(Player player, String[] args) {
+
+        if (args.length != 2) {
+            player.sendMessage(
+                    MessageFormatter.getWithPrefix(ChatColor.RED + "You must provide a name for the new dungeon."));
+            return;
+        }
+
+        if (plugin.Dungeons.containsKey(args[1])) {
+            player.sendMessage(
+                    MessageFormatter.getWithPrefix(ChatColor.RED + "A dungeon with that name already exists."));
+            return;
+        }
+
+        Dungeon dungeon = new Dungeon(player.getLocation());
+        dungeon.uuid = UUID.randomUUID();
+        dungeon.name = args[1];
+        dungeon.isActive = false;
+
+        if (dungeon.save()) {
+            player.sendMessage(MessageFormatter
+                    .getWithPrefix("New dungeon " + dungeon.name + " created successfully."));
+
+            plugin.addDungeon(dungeon);
+            return;
+        } else {
+            player.sendMessage(MessageFormatter
+                    .getWithPrefix(ChatColor.RED + "Error saving new dungeon " + dungeon.name));
+            return;
+        }
     }
 
     private void handleDungeonShowmarkers(Player player, Dungeon dungeon) {
@@ -492,7 +319,7 @@ public class DungeonCommands implements CommandExecutor {
 
         new BukkitRunnable() {
             int counter = 0;
-            int maxExecutions = 60;
+            int maxExecutions = 120;
 
             @Override
             public void run() {
@@ -534,15 +361,23 @@ public class DungeonCommands implements CommandExecutor {
                             .spawn();
                 }
 
-                if (dungeon.Spawners != null && !dungeon.Spawners.isEmpty()) {
-                    for (var spawner : dungeon.Spawners.values()) {
+                var spawners = dungeon.getSpawners();
+                if (spawners != null && !spawners.isEmpty()) {
+
+                    for (var spawner : spawners.values()) {
+                        
+                        // spawnCubeEdges(spawner.getLocation(), (int) spawner.radius, (int) spawner.radius,
+                        //         (int) spawner.radius, location -> {
+                        //             player.spawnParticle(Particle.RAID_OMEN, location, 0, 0, 0, 0, 0.05);
+                        //         });
+
                         new ParticleBuilder(Particle.RAID_OMEN)
-                                .location(spawner.location)
-                                .offset(0.15, 0.15, 0.15)
+                                .location(spawner.getLocation())
                                 .count(5)
                                 .receivers(player)
                                 .spawn();
                     }
+
                 }
 
                 spawnCubeEdges(dungeon.location, dungeon.width, dungeon.height, dungeon.length, location -> {
@@ -557,50 +392,8 @@ public class DungeonCommands implements CommandExecutor {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(plugin, 0L, 20L);
+        }.runTaskTimer(plugin, 0L, 10L);
         return;
-    }
-
-    private void handleDungeonList(Player player) {
-        player.sendMessage(
-                MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + "Registered Dungeons:"));
-        for (Dungeon dungeon : plugin.getDungeons()) {
-            player.sendMessage(MessageFormatter
-                    .getWithPrefix(dungeon.name + " (" + dungeon.Spawners.size() + " spawners)"));
-        }
-    }
-
-    private void handleDungeonCreate(Player player, String[] args) {
-
-        if (args.length != 2) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix(ChatColor.RED + "You must provide a name for the new dungeon."));
-            return;
-        }
-
-        if (plugin.Dungeons.containsKey(args[1])) {
-            player.sendMessage(
-                    MessageFormatter.getWithPrefix(ChatColor.RED + "A dungeon with that name already exists."));
-            return;
-        }
-
-        Dungeon dungeon = new Dungeon(player.getLocation());
-        dungeon.uuid = UUID.randomUUID();
-        dungeon.name = args[1];
-        dungeon.isActive = false;
-        dungeon.Spawners = new HashMap<>();
-
-        if (dungeon.save()) {
-            player.sendMessage(MessageFormatter
-                    .getWithPrefix("New dungeon " + dungeon.name + " created successfully."));
-
-            plugin.addDungeon(dungeon);
-            return;
-        } else {
-            player.sendMessage(MessageFormatter
-                    .getWithPrefix(ChatColor.RED + "Error saving new dungeon " + dungeon.name));
-            return;
-        }
     }
 
     private void spawnCubeEdges(Location center, int width, int height, int length,
@@ -640,6 +433,39 @@ public class DungeonCommands implements CommandExecutor {
                 particleBuilder.accept(new Location(center.getWorld(), minX, y, z));
                 particleBuilder.accept(new Location(center.getWorld(), maxX, y, z));
             }
+        }
+    }
+
+    private void setDungeonField(Player player, Dungeon dungeon, String fieldName, String arg) {
+        try {
+            Field field = Dungeon.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+
+            Class<?> fieldType = field.getType();
+
+            Object value;
+            if (fieldType == int.class) {
+                value = Integer.parseInt(arg);
+            } else if (fieldType == double.class) {
+                value = Double.parseDouble(arg);
+            } else if (fieldType == long.class) {
+                value = Long.parseLong(arg);
+            } else if (fieldType == boolean.class) {
+                value = Boolean.parseBoolean(arg);
+            } else {
+                value = arg;
+            }
+
+            field.set(dungeon, value);
+            dungeon.save();
+            player.sendMessage(MessageFormatter.getWithPrefix(
+                    "Successfully updated " + fieldName + " to " + value + " in dungeon " + dungeon.name));
+        } catch (NoSuchFieldException e) {
+            plugin.getLogger().severe("Field " + fieldName + " does not exist.");
+        } catch (IllegalAccessException e) {
+            plugin.getLogger().severe("Unable to access field " + fieldName + ".");
+        } catch (NumberFormatException e) {
+            player.sendMessage(MessageFormatter.getWithPrefix("Invalid value for field " + fieldName + "."));
         }
     }
 

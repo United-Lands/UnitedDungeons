@@ -49,6 +49,7 @@ public class Dungeon {
     public String description;
     public Location location;
     public Location exitLocation;
+    public boolean isPublicWarp;
     public boolean isActive = false;
     public boolean isSleeping = true;
     public boolean isLocked = false;
@@ -71,7 +72,7 @@ public class Dungeon {
     public double cooldownTime = 120;
     public double lockTime = 120;
 
-    public Map<UUID, Spawner> Spawners;
+    private Map<UUID, Spawner> spawners = new HashMap<>();
 
     private double cooldownStart;
     private int cyclesWithoutPlayers = Integer.MAX_VALUE;
@@ -119,6 +120,7 @@ public class Dungeon {
             fileConfig.set("uuid", this.uuid.toString());
             fileConfig.set("name", this.name);
             fileConfig.set("description", this.description);
+            fileConfig.set("public", this.isPublicWarp);
             fileConfig.set("active", this.isActive);
             fileConfig.set("width", this.width);
             fileConfig.set("length", this.length);
@@ -162,16 +164,18 @@ public class Dungeon {
                 plateSection.set("z", this.pressurePlateLocation.getZ());
             }
 
-            if (this.Spawners != null && !this.Spawners.isEmpty()) {
+            if (this.spawners != null && !this.spawners.isEmpty()) {
                 var spawnerList = fileConfig.createSection("spawners");
                 int count = 0;
-                for (Spawner s : this.Spawners.values()) {
+                for (Spawner s : this.spawners.values()) {
                     var spawnerSection = spawnerList.createSection("spawner" + count);
                     spawnerSection.set("uuid", s.uuid.toString());
-                    spawnerSection.set("world", s.world);
-                    spawnerSection.set("x", s.location.getX());
-                    spawnerSection.set("y", s.location.getY());
-                    spawnerSection.set("z", s.location.getZ());
+                    spawnerSection.set("world", s.getWorld());
+                    spawnerSection.set("x", s.getLocation().getX());
+                    spawnerSection.set("y", s.getLocation().getY());
+                    spawnerSection.set("z", s.getLocation().getZ());
+                    spawnerSection.set("yaw", s.getLocation().getYaw());
+                    spawnerSection.set("pitch", s.getLocation().getPitch());
                     spawnerSection.set("mobtype", s.mobType);
                     spawnerSection.set("radius", s.radius);
                     spawnerSection.set("frequency", s.spawnFrequency);
@@ -199,6 +203,7 @@ public class Dungeon {
             this.uuid = UUID.fromString(fileConfig.getString("uuid"));
             this.name = fileConfig.getString("name");
             this.description = fileConfig.getString("description");
+            this.isPublicWarp = fileConfig.getBoolean("public", false);
             this.isActive = fileConfig.getBoolean("active", false);
             this.width = fileConfig.getInt("width", 64);
             this.length = fileConfig.getInt("length", 64);
@@ -245,7 +250,7 @@ public class Dungeon {
                         plateSection.getDouble("z"));
             }
 
-            this.Spawners = new HashMap<UUID, Spawner>();
+            this.spawners = new HashMap<UUID, Spawner>();
             ConfigurationSection spawerList = fileConfig.getConfigurationSection("spawners");
             if (spawerList != null) {
                 for (String key : spawerList.getKeys(false)) {
@@ -253,12 +258,11 @@ public class Dungeon {
                     if (spawnerSection != null) {
                         var spawner = new Spawner();
                         spawner.uuid = UUID.fromString(spawnerSection.getString("uuid"));
-                        spawner.world = spawnerSection.getString("world");
-                        spawner.location = new Location(Bukkit.getWorld(spawner.world), spawnerSection.getDouble("x"),
-                                spawnerSection.getDouble("y"), spawnerSection.getDouble("z"));
-                        spawner.block = spawner.location.getBlock();
+                        spawner.setWorld(spawnerSection.getString("world"));
+                        spawner.setLocation(new Location(Bukkit.getWorld(spawner.getWorld()), spawnerSection.getDouble("x"),
+                                spawnerSection.getDouble("y"), spawnerSection.getDouble("z"), (float)spawnerSection.getDouble("yaw", 0), (float)spawnerSection.getDouble("pitch", 0)));
+                        spawner.setDungeon(this);
                         spawner.mobType = spawnerSection.getString("mobtype");
-                        spawner.dungeon = this;
                         spawner.radius = spawnerSection.getInt("radius", 16);
                         spawner.spawnFrequency = spawnerSection.getDouble("frequency", 5.0);
                         spawner.maxMobs = spawnerSection.getInt("maxmobs", 1);
@@ -279,9 +283,9 @@ public class Dungeon {
     }
 
     public void addSpawner(Spawner spawner) {
-        if (this.Spawners == null)
-            this.Spawners = new HashMap<UUID, Spawner>();
-        this.Spawners.put(spawner.uuid, spawner);
+        if (this.spawners == null)
+            this.spawners = new HashMap<UUID, Spawner>();
+        this.spawners.put(spawner.uuid, spawner);
     }
 
     public void setLocation(Location location) {
@@ -289,7 +293,8 @@ public class Dungeon {
     }
 
     public void setExitLocation(Location location) {
-        this.exitLocation = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
+        var center = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
+        this.exitLocation = new Location(center.getWorld(), center.getX(), center.getY(), center.getZ(), location.getYaw(), location.getPitch());
     }
 
     public Location getBoundingBoxOrigin() {
@@ -461,8 +466,8 @@ public class Dungeon {
                     .getWithPrefix(ChatColor.WHITE + "Area cleared, well done! No new monsters will arrive."));
         }
 
-        if (this.Spawners != null && !this.Spawners.isEmpty()) {
-            for (Spawner spawner : this.Spawners.values())
+        if (this.spawners != null && !this.spawners.isEmpty()) {
+            for (Spawner spawner : this.spawners.values())
                 plugin.getMobManager().removeAllSpawnerMobs(spawner);
         }
 
@@ -552,8 +557,8 @@ public class Dungeon {
         if (this.pressurePlateLocation != null)
             pressurePlateLocation.getBlock().setType(Material.AIR);
 
-        if (this.Spawners != null && !this.Spawners.isEmpty()) {
-            for (Spawner spawner : this.Spawners.values())
+        if (this.spawners != null && !this.spawners.isEmpty()) {
+            for (Spawner spawner : this.spawners.values())
                 spawner.resetCompletion();
         }
 
@@ -596,6 +601,15 @@ public class Dungeon {
             }
         }
         return result;
+    }
+
+    public Map<UUID, Spawner> getSpawners() {
+        return this.spawners;
+    }
+
+    public void removeSpawner(UUID uuid) {
+        if (this.spawners.containsKey(uuid))
+            this.spawners.remove(uuid);
     }
 
     public String getCleanName() {

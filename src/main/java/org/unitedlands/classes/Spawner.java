@@ -10,28 +10,27 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 
-
 public class Spawner {
 
     public UUID uuid;
 
-    public String world;
-    public Dungeon dungeon;
-    public Location location;
-    public Block block;
-   
+    private String world;
+    private Dungeon dungeon;
+    private Location location;
+    private Block block;
+
     public double radius = 16;
     public String mobType = "ZOMBIE";
     public boolean isMythicMob = false;
     public int maxMobs = 1;
     public double spawnFrequency = 1;
     public boolean isGroupSpawn = false;
-    
+
     public int killsToComplete = Integer.MAX_VALUE;
-    public boolean complete = false;
+    public boolean isComplete = false;
 
     private double lastSpawnTime;
-    private int currentKillCount;
+    public int currentKillCount;
 
     private final UnitedDungeons plugin = getPlugin();
 
@@ -55,13 +54,13 @@ public class Spawner {
 
     public void checkCompletion() {
         if (currentKillCount >= this.killsToComplete) {
-            this.complete = true;
+            this.isComplete = true;
         }
     }
 
     public void resetCompletion() {
         currentKillCount = 0;
-        this.complete = false;
+        this.isComplete = false;
     }
 
     public void prepareSpawn() {
@@ -82,13 +81,44 @@ public class Spawner {
     }
 
     public boolean isPlayerNearby() {
-        Collection<Entity> nearbyEntities = Bukkit.getWorld(this.world).getNearbyEntities(this.location, this.radius, this.radius, this.radius);
+        Collection<Entity> nearbyEntities = Bukkit.getWorld(this.world).getNearbyEntities(this.location, this.radius,
+                this.radius, this.radius);
         for (Entity entity : nearbyEntities) {
             if (entity instanceof Player) {
                 return true;
             }
         }
         return false;
+    }
+
+    public Location getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+        this.block = location.getBlock();
+    }
+
+
+    public Dungeon getDungeon() {
+        return this.dungeon;
+    }
+
+    public void setDungeon(Dungeon dungeon) {
+        this.dungeon = dungeon;
+    }
+
+    public String getWorld() {
+        return this.world;
+    }
+
+    public void setWorld(String world) {
+        this.world = world;
+    }
+
+    public Block getBlock() {
+        return this.block;
     }
 
     private UnitedDungeons getPlugin() {
