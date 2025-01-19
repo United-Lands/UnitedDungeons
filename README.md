@@ -12,14 +12,14 @@ All admin commands need the permission `united.dungeons.admin`. Player commands 
 
 `/ud` is the main command to use for players. The following subcommands for available by default:
 
-**Available from anywhere: **
+**Available from anywhere:**
 - `/ud warp <dungeonname>` - teleports the player to the dungeon of that name. If not an admin, players can only warp to dungeons that are toggled public.
 
 **Available when inside of a dungeon:**
-- `/ud info` - Shows information on the current dungeon
-- `/ud start` - Locks the dungeon. The players currently within its boundaries become the dungeon party. No other player can enter the dungeon until the lock timer expires, the dungeon is completed, the last party member leaves, or an admin overrides the lock. (*Note: the dungeon needs to be lockable, not already locked, and not on cooldown.*)
-- `/ud leave` - Lets players leave the dungeon party. When the last player leaves, the dungeon is unlocked.
-- `/ud entrance` - Instantly teleports the player to the current dungeon's entrance/exit location.
+- `/ud info` - shows information on the current dungeon
+- `/ud start` - locks the dungeon. The players currently within its boundaries become the dungeon party. No other player can enter the dungeon until the lock timer expires, the dungeon is completed, the last party member leaves, or an admin overrides the lock. (*Note: the dungeon needs to be lockable, not already locked, and not on cooldown*)
+- `/ud leave` - lets players leave the dungeon party. When the last player leaves, the dungeon is unlocked
+- `/ud entrance` - instantly teleports the player to the current dungeon's entrance/exit location
 
 ## Admin commands
 
@@ -29,21 +29,21 @@ All admin commands need the permission `united.dungeons.admin`. Player commands 
 
 **General commands:**
 
-- `/udd list` - list all registered dungeons.
-- `/udd create <name>` - created a new dungeon at the current location.
+- `/udd list` - lists all registered dungeons.
+- `/udd create <name>` - creates a new dungeon at the current location
 
 **Dungeon commands**
 
 `/udd <dungeon_name> ...`
 
-- `info` - displays information on a dungeon.
-- `rename <new_name>` - renames a dungeon.
-- `delete` - deletes a dungeon.
-- `toggle` - toggles a dungeon between active and inactive.
-- `complete` - triggers the completion of a dungeon (removes all spawned mobs and activates rewards).
-- `reset` - resets a dungeon (removes all mobs & rewards, unlocks the dungeon).
-- `unlock` - removes the lock on a dungeon.
-- `showmarkers` - shows particles for the location of spawners, POIs, and the dungeon bounding box.
+- `info` - displays information on a dungeon
+- `rename <new_name>` - renames a dungeon
+- `delete` - deletes a dungeon
+- `toggle` - toggles a dungeon between active and inactive
+- `complete` - triggers the completion of a dungeon (removes all spawned mobs and activates rewards)
+- `reset` - resets a dungeon (removes all mobs & rewards, unlocks the dungeon)
+- `unlock` - removes the lock on a dungeon
+- `showmarkers` - shows particles for the location of spawners, POIs, and the dungeon bounding box
 
 **Dungeon setter commands**
 
