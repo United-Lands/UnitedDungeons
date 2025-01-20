@@ -28,6 +28,8 @@ public class DungeonCommandTabCompleter implements TabCompleter {
             "description",
             "location",
             "exitLocation",
+            "chestPosition",
+            "platePosition",
             "isPublicWarp",
             "isLockable",
             "width",

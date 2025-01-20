@@ -107,13 +107,13 @@ public class DungeonCommands implements CommandExecutor {
             case "location":
                 handleDungeonSetLocation(player, dungeon);
                 break;
-            case "exitlocation":
+            case "exitLocation":
                 handleDungeonSetExitLocation(player, dungeon);
                 break;
-            case "chestpos":
+            case "chestPosition":
                 handleDungeonSetChestPos(player, dungeon);
                 break;
-            case "platepos":
+            case "platePosition":
                 handleDungeonSetPlatePos(player, dungeon);
                 break;
             case "description":

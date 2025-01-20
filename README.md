@@ -51,9 +51,9 @@ All admin commands need the permission `united.dungeons.admin`. Player commands 
 
 These four commands use the current player position:
 - `location` - moves the dungeon center location 
-- `exitlocation` - sets the dungeon entrance/exit location at the player's position. Also sets the direction the player will be looking after `/ud warp`
-- `chestpos` - sets the position where a reward chest will spawn when the dungeon is completed 
-- `platepos` - sets the position where a pressure plate will spawn when the dungeon is completed
+- `exitLocation` - sets the dungeon entrance/exit location at the player's position. Also sets the direction the player will be looking after `/ud warp`
+- `chestPosition` - sets the position where a reward chest will spawn when the dungeon is completed 
+- `platePosition` - sets the position where a pressure plate will spawn when the dungeon is completed
 
 These commands are independent of the player's position:
 - `description <text>` - sets the description of the dungeon.
