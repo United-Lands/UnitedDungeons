@@ -10,7 +10,7 @@ All admin commands need the permission `united.dungeons.admin`. Player commands 
 
 ## Player commands
 
-`/ud` is the main command to use for players. The following subcommands for available by default:
+`/ud` is the main command to use for players. The following subcommands are available by default:
 
 **Available from anywhere:**
 - `/ud warp <dungeonname>` - teleports the player to the dungeon of that name. If not an admin, players can only warp to dungeons that are toggled public.
