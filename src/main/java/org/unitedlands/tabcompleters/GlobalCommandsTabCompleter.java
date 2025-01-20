@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -17,6 +18,7 @@ public class GlobalCommandsTabCompleter implements TabCompleter {
     private List<String> globalCommands = Arrays.asList(
             "start",
             "leave",
+            "invite",
             "entrance",
             "warp",
             "info");
@@ -38,20 +40,23 @@ public class GlobalCommandsTabCompleter implements TabCompleter {
                 options = globalCommands;
                 break;
             case 2:
-                if (args[0].equals("warp")) {
+                if (args[0].equals("warp") || args[0].equals("info")) {
                     if (player.hasPermission("united.dungeons.admin"))
                         options = plugin.getDungeonNames();
                     else
                         options = plugin.getPublicDungeonNames();
                 }
-
+                if (args[0].equals("invite")) {
+                    options = Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).collect(Collectors.toList());
+                }
+                break;
         }
 
         String input = args[args.length - 1];
 
         List<String> completions = null;
         if (options != null) {
-            completions = options.stream().filter(s -> s.startsWith(input)).collect(Collectors.toList());
+            completions = options.stream().filter(s -> s.toLowerCase().startsWith(input.toLowerCase())).collect(Collectors.toList());
             Collections.sort(completions);
         }
         return completions;

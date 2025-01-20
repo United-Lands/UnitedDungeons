@@ -1,5 +1,6 @@
 package org.unitedlands.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -48,11 +49,43 @@ public class GlobalCommands implements CommandExecutor {
             case "info":
                 handleDungeonInfo(player, args);
                 break;
+            case "invite":
+                handleDungeonInvite(player, args);
+                break;
             case "warp":
                 handleDungeonWarp(player, args);
         }
 
         return true;
+    }
+
+    private void handleDungeonInvite(Player player, String[] args) {
+        if (args.length != 2)
+            return;
+
+        Dungeon playerDungeon = getPlayerDungeon(player);
+        if (playerDungeon == null) {
+            player.sendMessage(MessageFormatter
+                    .getWithPrefix(ChatColor.RED + "You're not in a dungeon!"));
+            return;
+        }
+
+        if (!playerDungeon.isPlayerLockedInDungeon(player) && !player.hasPermission("united.dungeons.admin")) {
+            player.sendMessage(MessageFormatter
+                    .getWithPrefix(ChatColor.RED + "You're not in the dungeon party!"));
+            return;
+        }
+
+        var playerToInvite = Bukkit.getPlayer(args[1]);
+        if (playerToInvite == null) {
+            player.sendMessage(MessageFormatter
+                    .getWithPrefix(ChatColor.RED + "Player could not be found!"));
+            return;
+        }
+
+        playerDungeon.invitePlayer(playerToInvite);
+        player.sendMessage(MessageFormatter
+                .getWithPrefix("Player " + args[1] + " has been added to the dungeon party."));
     }
 
     private void handleDungeonWarp(Player player, String[] args) {
@@ -103,36 +136,48 @@ public class GlobalCommands implements CommandExecutor {
     }
 
     private void handleDungeonInfo(Player player, String[] args) {
-        Dungeon playerDungeon = getPlayerDungeon(player);
-        if (playerDungeon == null) {
-            player.sendMessage(MessageFormatter
-                    .getWithPrefix(ChatColor.RED + "You're not in a dungeon!"));
+
+        Dungeon dungeon = null;
+
+        if (args.length == 1) {
+            dungeon = getPlayerDungeon(player);
+            if (dungeon == null) {
+                player.sendMessage(MessageFormatter
+                        .getWithPrefix(ChatColor.RED + "You're not in a dungeon!"));
+                return;
+            }
+        } else {
+            dungeon = plugin.getDungeon(args[1]);
+            if (dungeon == null) {
+                MessageFormatter.getWithPrefix(ChatColor.RED + "No dungeon with name " + args[1] + " found!");
+                return;
+            }
         }
 
-        if (!playerDungeon.isActive)
-            return;
-
         player.sendMessage(MessageFormatter.getWithPrefix(
-                ChatColor.WHITE + "" + ChatColor.BOLD + playerDungeon.getCleanName()));
-        if (playerDungeon.isOnCooldown) {
+                ChatColor.WHITE + "" + ChatColor.BOLD + dungeon.getCleanName()));
+        if (!dungeon.isActive) {
+            player.sendMessage(MessageFormatter.getWithPrefix(
+                    "This dungeon is currently " + ChatColor.RED + "deactivated" + ChatColor.GRAY + "."));
+        } else if (dungeon.isOnCooldown) {
             player.sendMessage(MessageFormatter.getWithPrefix(
                     "This dungeon is on " + ChatColor.YELLOW + "cooldown" + ChatColor.GRAY
-                            + ". It will be open again in " + ChatColor.BOLD + playerDungeon.getCooldownTimeString()
+                            + ". It will be open again in " + ChatColor.BOLD + dungeon.getCooldownTimeString()
                             + "."));
-        } else if (playerDungeon.isLocked) {
+        } else if (dungeon.isLocked) {
             player.sendMessage(MessageFormatter.getWithPrefix(
                     "This dungeon is " + ChatColor.RED + "locked" + ChatColor.GRAY
                             + " by a party. It will be open again in " + ChatColor.BOLD
-                            + playerDungeon.getLockTimeString()
+                            + dungeon.getLockTimeString()
                             + "."));
         } else {
-
-            if (!playerDungeon.isLockable) {
+            if (!dungeon.isLockable) {
                 player.sendMessage(MessageFormatter.getWithPrefix(
-                        ChatColor.RED + "This dungeon cannot be locked for dungeon parties."));
+                        "This dungeon is " + ChatColor.GREEN + "open" + ChatColor.GRAY + " for all players."));
             } else {
                 player.sendMessage(MessageFormatter.getWithPrefix(
-                        "This dungeon is " + ChatColor.GREEN + "open" + ChatColor.GRAY
+                        "This dungeon is " + ChatColor.GREEN + "open" + ChatColor.GRAY + " and " + ChatColor.GREEN
+                                + "lockable" + ChatColor.GRAY
                                 + ". Use \"/ud start\" to lock it when your party is gathered in the dungeon."));
             }
         }

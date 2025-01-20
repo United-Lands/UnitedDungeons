@@ -77,7 +77,7 @@ public class DungeonCommandTabCompleter implements TabCompleter {
 
         List<String> completions = null;
         if (options != null) {
-            completions = options.stream().filter(s -> s.startsWith(input)).collect(Collectors.toList());
+            completions = options.stream().filter(s -> s.toLowerCase().startsWith(input.toLowerCase())).collect(Collectors.toList());
             Collections.sort(completions);
         }
         return completions;

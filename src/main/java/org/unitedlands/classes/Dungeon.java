@@ -423,6 +423,16 @@ public class Dungeon {
         isLocked = true;
     }
 
+    public void invitePlayer(Player player) {
+        if (!isLocked)
+            return;
+
+        if (!lockedPlayersInDungeon.contains(player))
+            lockedPlayersInDungeon.add(player);
+        
+        player.sendMessage(MessageFormatter.getWithPrefix("You have been added to the dungeon party of " + getCleanName()));
+    }
+
     public void removeLockedPlayer(Player player) {
         if (!isLocked)
             return;

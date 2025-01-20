@@ -1,5 +1,5 @@
 name: UnitedDungeons
-version: 1.0.2
+version: 1.0.3
 main: org.unitedlands.UnitedDungeons
 api-version: 1.21
 description: A custom United Lands plugin for dungeon management.
