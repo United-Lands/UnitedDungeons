@@ -13,11 +13,13 @@ All admin commands need the permission `united.dungeons.admin`. Player commands 
 `/ud` is the main command to use for players. The following subcommands are available by default:
 
 **Available from anywhere:**
-- `/ud warp <dungeonname>` - teleports the player to the dungeon of that name. If not an admin, players can only warp to dungeons that are toggled public.
+- `/ud warp <dungeon_name>` - teleports the player to the dungeon of that name. If not an admin, players can only warp to dungeons that are toggled public.
 
 **Available when inside of a dungeon:**
-- `/ud info` - shows information on the current dungeon
+- `/ud info` - shows information on the dungeon the player is currently in
+- `/ud info <dungeon_name>` - shows information on a specific dungeon (from anywhere)
 - `/ud start` - locks the dungeon. The players currently within its boundaries become the dungeon party. No other player can enter the dungeon until the lock timer expires, the dungeon is completed, the last party member leaves, or an admin overrides the lock. (*Note: the dungeon needs to be lockable, not already locked, and not on cooldown*)
+- `/ud invite <player_name>` - lets a player of a dungeon party add another player to the locked dungeon
 - `/ud leave` - lets players leave the dungeon party. When the last player leaves, the dungeon is unlocked
 - `/ud entrance` - instantly teleports the player to the current dungeon's entrance/exit location
 
