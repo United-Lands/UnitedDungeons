@@ -47,7 +47,7 @@ public class SpawnerCommandTabCompleter implements TabCompleter {
                 break;
             case 2:
                 if (args[0].equals("create")) {
-                    options = plugin.getDungeonNames();
+                    options = plugin.getDungeonManager().getDungeonNames();
                 }
                 if (args[0].equals("set")) {
                     options = spawnerSetcommands;

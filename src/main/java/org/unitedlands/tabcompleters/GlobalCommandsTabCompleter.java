@@ -42,9 +42,9 @@ public class GlobalCommandsTabCompleter implements TabCompleter {
             case 2:
                 if (args[0].equals("warp") || args[0].equals("info")) {
                     if (player.hasPermission("united.dungeons.admin"))
-                        options = plugin.getDungeonNames();
+                        options = plugin.getDungeonManager().getDungeonNames();
                     else
-                        options = plugin.getPublicDungeonNames();
+                        options = plugin.getDungeonManager().getPublicDungeonNames();
                 }
                 if (args[0].equals("invite")) {
                     options = Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).collect(Collectors.toList());

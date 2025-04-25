@@ -59,7 +59,7 @@ public class DungeonCommandTabCompleter implements TabCompleter {
         switch (args.length) {
             case 1:
                 options = new ArrayList<>(Arrays.asList("create", "list"));
-                options.addAll(plugin.getDungeonNames());
+                options.addAll(plugin.getDungeonManager().getDungeonNames());
                 break;
             case 2:
                 if (!args[0].equals("create"))

@@ -84,7 +84,7 @@ public class SpawnerCommands implements CommandExecutor {
         if (args.length < 2)
             return;
 
-        var dungeon = plugin.getDungeon(args[1]);
+        var dungeon = plugin.getDungeonManager().getDungeon(args[1]);
         if (dungeon == null) {
             MessageFormatter.getWithPrefix(ChatColor.RED + "No dungeon with name " + args[0] + " found!");
             return;
@@ -99,7 +99,7 @@ public class SpawnerCommands implements CommandExecutor {
     }
 
     private void handleSpawnerInfo(Player player, Spawner spawner) {
-        
+
         List<String> fieldValues = new ArrayList<>();
         for (Field field : Spawner.class.getFields()) {
             try {
@@ -113,7 +113,7 @@ public class SpawnerCommands implements CommandExecutor {
         }
 
         player.sendMessage(
-            MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + "Spawner Info"));
+                MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + "Spawner Info"));
         player.sendMessage(MessageFormatter.getWithPrefix(String.join(ChatColor.DARK_GRAY + " | ", fieldValues)));
     }
 
@@ -153,15 +153,13 @@ public class SpawnerCommands implements CommandExecutor {
 
     private Spawner findSpawner(Player player) {
         Block block = player.getLocation().getBlock();
-        if (plugin.Dungeons != null) {
-            for (Dungeon dungeon : plugin.Dungeons.values()) {
-                var spawners = dungeon.getSpawners();
-                if (spawners != null)
-                    for (Spawner spawner : spawners.values()) {
-                        if (spawner.getBlock().equals(block))
-                            return spawner;
-                    }
-            }
+        for (Dungeon dungeon : plugin.getDungeonManager().getDungeons()) {
+            var spawners = dungeon.getSpawners();
+            if (spawners != null)
+                for (Spawner spawner : spawners.values()) {
+                    if (spawner.getBlock().equals(block))
+                        return spawner;
+                }
         }
         return null;
     }

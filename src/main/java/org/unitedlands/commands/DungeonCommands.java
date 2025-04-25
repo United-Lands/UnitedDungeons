@@ -61,7 +61,7 @@ public class DungeonCommands implements CommandExecutor {
         if (args.length == 1)
             return;
 
-        var dungeon = plugin.getDungeon(args[0]);
+        var dungeon = plugin.getDungeonManager().getDungeon(args[0]);
         if (dungeon == null) {
             MessageFormatter.getWithPrefix(ChatColor.RED + "No dungeon with name " + args[0] + " found!");
             return;
@@ -146,10 +146,7 @@ public class DungeonCommands implements CommandExecutor {
         if (args.length < 3)
             return;
 
-        plugin.Dungeons.remove(dungeon.name);
-        dungeon.name = args[2];
-        plugin.Dungeons.put(dungeon.name, dungeon);
-
+        plugin.getDungeonManager().renameDungeon(dungeon, args[2]);
         dungeon.save();
 
         player.sendMessage(MessageFormatter
@@ -236,7 +233,7 @@ public class DungeonCommands implements CommandExecutor {
         if (dungeonFile.exists()) {
             dungeonFile.delete();
 
-            plugin.loadDungeons();
+            plugin.getDungeonManager().loadDungeons();
 
             player.sendMessage(MessageFormatter
                     .getWithPrefix(
@@ -270,7 +267,7 @@ public class DungeonCommands implements CommandExecutor {
     private void handleDungeonList(Player player) {
         player.sendMessage(
                 MessageFormatter.getWithPrefix(ChatColor.WHITE + "" + ChatColor.BOLD + "Registered Dungeons:"));
-        for (Dungeon dungeon : plugin.getDungeons()) {
+        for (Dungeon dungeon : plugin.getDungeonManager().getDungeons()) {
             player.sendMessage(MessageFormatter
                     .getWithPrefix(dungeon.name + " (" + dungeon.getSpawners().size() + " spawners)"));
         }
@@ -284,22 +281,24 @@ public class DungeonCommands implements CommandExecutor {
             return;
         }
 
-        if (plugin.Dungeons.containsKey(args[1])) {
+        var dungeonName = args[1].trim();
+        Dungeon dungeon = plugin.getDungeonManager().getDungeon(dungeonName);
+        if (dungeon != null) {
             player.sendMessage(
                     MessageFormatter.getWithPrefix(ChatColor.RED + "A dungeon with that name already exists."));
             return;
         }
 
-        Dungeon dungeon = new Dungeon(player.getLocation());
+        dungeon = new Dungeon(player.getLocation());
         dungeon.uuid = UUID.randomUUID();
-        dungeon.name = args[1];
+        dungeon.name = dungeonName;
         dungeon.isActive = false;
 
         if (dungeon.save()) {
             player.sendMessage(MessageFormatter
                     .getWithPrefix("New dungeon " + dungeon.name + " created successfully."));
 
-            plugin.addDungeon(dungeon);
+            plugin.getDungeonManager().addDungeon(dungeon);
             return;
         } else {
             player.sendMessage(MessageFormatter
@@ -365,12 +364,6 @@ public class DungeonCommands implements CommandExecutor {
                 if (spawners != null && !spawners.isEmpty()) {
 
                     for (var spawner : spawners.values()) {
-                        
-                        // spawnCubeEdges(spawner.getLocation(), (int) spawner.radius, (int) spawner.radius,
-                        //         (int) spawner.radius, location -> {
-                        //             player.spawnParticle(Particle.RAID_OMEN, location, 0, 0, 0, 0, 0.05);
-                        //         });
-
                         new ParticleBuilder(Particle.RAID_OMEN)
                                 .location(spawner.getLocation())
                                 .count(5)

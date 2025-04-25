@@ -92,7 +92,7 @@ public class GlobalCommands implements CommandExecutor {
         if (args.length != 2)
             return;
 
-        var dungeon = plugin.getDungeon(args[1]);
+        var dungeon = plugin.getDungeonManager().getDungeon(args[1]);
         if (dungeon == null) {
             player.sendMessage(
                     MessageFormatter.getWithPrefix(ChatColor.RED + "No dungeon with name " + args[0] + " found!"));
@@ -147,7 +147,7 @@ public class GlobalCommands implements CommandExecutor {
                 return;
             }
         } else {
-            dungeon = plugin.getDungeon(args[1]);
+            dungeon = plugin.getDungeonManager().getDungeon(args[1]);
             if (dungeon == null) {
                 MessageFormatter.getWithPrefix(ChatColor.RED + "No dungeon with name " + args[1] + " found!");
                 return;
@@ -248,7 +248,7 @@ public class GlobalCommands implements CommandExecutor {
 
     private Dungeon getPlayerDungeon(Player player) {
         Dungeon playerDungeon = null;
-        for (Dungeon dungeon : plugin.Dungeons.values()) {
+        for (Dungeon dungeon : plugin.getDungeonManager().getDungeons()) {
             if (dungeon.isPlayerInDungeon(player))
                 playerDungeon = dungeon;
         }
@@ -257,7 +257,7 @@ public class GlobalCommands implements CommandExecutor {
 
     private Dungeon getPlayerLockedDungeon(Player player) {
         Dungeon playerDungeon = null;
-        for (Dungeon dungeon : plugin.Dungeons.values()) {
+        for (Dungeon dungeon : plugin.getDungeonManager().getDungeons()) {
             if (dungeon.isPlayerLockedInDungeon(player))
                 playerDungeon = dungeon;
         }
