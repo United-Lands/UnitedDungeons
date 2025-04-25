@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,7 +27,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.events.PlayerEnterDungeonEvent;
+import org.unitedlands.events.PlayerExitDungeonEvent;
 import org.unitedlands.utils.MessageFormatter;
 
 import com.destroystokyo.paper.ParticleBuilder;
@@ -77,9 +81,9 @@ public class Dungeon {
     private double cooldownStart;
     private int cyclesWithoutPlayers = Integer.MAX_VALUE;
 
-    private List<Player> playersInDungeon = new ArrayList<Player>();
+    private Collection<Player> playersInDungeon = new ArrayList<Player>();
 
-    private List<Player> lockedPlayersInDungeon = new ArrayList<Player>();
+    private Collection<Player> lockedPlayersInDungeon = new ArrayList<Player>();
     private double lockStartTime;
 
     private final UnitedDungeons plugin = getPlugin();
@@ -259,8 +263,11 @@ public class Dungeon {
                         var spawner = new Spawner();
                         spawner.uuid = UUID.fromString(spawnerSection.getString("uuid"));
                         spawner.setWorld(spawnerSection.getString("world"));
-                        spawner.setLocation(new Location(Bukkit.getWorld(spawner.getWorld()), spawnerSection.getDouble("x"),
-                                spawnerSection.getDouble("y"), spawnerSection.getDouble("z"), (float)spawnerSection.getDouble("yaw", 0), (float)spawnerSection.getDouble("pitch", 0)));
+                        spawner.setLocation(
+                                new Location(Bukkit.getWorld(spawner.getWorld()), spawnerSection.getDouble("x"),
+                                        spawnerSection.getDouble("y"), spawnerSection.getDouble("z"),
+                                        (float) spawnerSection.getDouble("yaw", 0),
+                                        (float) spawnerSection.getDouble("pitch", 0)));
                         spawner.setDungeon(this);
                         spawner.mobType = spawnerSection.getString("mobtype");
                         spawner.radius = spawnerSection.getInt("radius", 16);
@@ -294,7 +301,8 @@ public class Dungeon {
 
     public void setExitLocation(Location location) {
         var center = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
-        this.exitLocation = new Location(center.getWorld(), center.getX(), center.getY(), center.getZ(), location.getYaw(), location.getPitch());
+        this.exitLocation = new Location(center.getWorld(), center.getX(), center.getY(), center.getZ(),
+                location.getYaw(), location.getPitch());
     }
 
     public Location getBoundingBoxOrigin() {
@@ -343,42 +351,37 @@ public class Dungeon {
     }
 
     public void updatePlayersInDungeon() {
-        Collection<Entity> nearbyEntities = this.location.getWorld().getNearbyEntities(this.location, this.width / 2,
-                this.height / 2, this.length / 2);
 
-        var currentPlayersInDungeon = new ArrayList<Player>();
-        for (Entity entity : nearbyEntities) {
-            if (entity instanceof Player) {
-                currentPlayersInDungeon.add((Player) entity);
-            }
-        }
+        var bbox = new BoundingBox(
+                this.location.getX() - this.width / 2,
+                this.location.getY() - this.height / 2,
+                this.location.getZ() - this.length / 2,
+                this.location.getX() + this.width / 2,
+                this.location.getY() + this.height / 2,
+                this.location.getZ() + this.length / 2);
+
+        Collection<Player> currentPlayersInDungeon = this.location.getWorld()
+                .getNearbyEntities(bbox, entity -> entity instanceof Player)
+                .stream()
+                .map(entity -> (Player) entity)
+                .collect(Collectors.toList());
 
         var pastPlayers = new ArrayList<>(playersInDungeon);
         pastPlayers.removeAll(currentPlayersInDungeon);
 
-        for (Player player : pastPlayers)
-            player.sendMessage(MessageFormatter.getWithPrefix("You have left " + getCleanName()));
+        for (Player player : pastPlayers) {
+            var exitEvent = new PlayerExitDungeonEvent(this, player);
+            exitEvent.callEvent();
+        }
 
         var newPlayers = new ArrayList<>(currentPlayersInDungeon);
         newPlayers.removeAll(playersInDungeon);
 
-        var title = Title.title(
-                Component.text(getCleanName()).color(NamedTextColor.DARK_RED),
-                Component.text(this.description != null ? this.description : ""),
-                Times.times(Duration.ofMillis(1000), Duration.ofMillis(3000), Duration.ofMillis(2000)));
-
         for (Player player : newPlayers) {
-            player.showTitle(title);
-            player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 1, 1);
-
-            if (isOnCooldown) {
-                player.sendMessage(MessageFormatter.getWithPrefix(
-                        "This dungeon is on " + ChatColor.YELLOW + "cooldown" + ChatColor.GRAY
-                                + ". It will be open again in " + ChatColor.BOLD + getCooldownTimeString()
-                                + "."));
-            }
+            var enterEvent = new PlayerEnterDungeonEvent(this, player);
+            enterEvent.callEvent();
         }
-
+        
         playersInDungeon = currentPlayersInDungeon;
     }
 
@@ -390,7 +393,7 @@ public class Dungeon {
         return lockedPlayersInDungeon.contains(player);
     }
 
-    public List<Player> getPlayersInDungeon() {
+    public Collection<Player> getPlayersInDungeon() {
         return playersInDungeon;
     }
 
@@ -429,8 +432,9 @@ public class Dungeon {
 
         if (!lockedPlayersInDungeon.contains(player))
             lockedPlayersInDungeon.add(player);
-        
-        player.sendMessage(MessageFormatter.getWithPrefix("You have been added to the dungeon party of " + getCleanName()));
+
+        player.sendMessage(
+                MessageFormatter.getWithPrefix("You have been added to the dungeon party of " + getCleanName()));
     }
 
     public void removeLockedPlayer(Player player) {
