@@ -70,9 +70,6 @@ public class Dungeon {
     public String randomRewards;
     public int randomRewardsCount;
 
-    public boolean doPressurePlate;
-    public Location pressurePlateLocation;
-
     public boolean isOnCooldown = false;
     public double cooldownTime = 120;
     public double lockTime = 120;
@@ -132,7 +129,6 @@ public class Dungeon {
             fileConfig.set("height", this.height);
             fileConfig.set("cooldowntime", this.cooldownTime);
             fileConfig.set("dorewarddrop", this.doRewardDrop);
-            fileConfig.set("dopressureplate", this.doPressurePlate);
             fileConfig.set("staticrewards", this.staticRewards);
             fileConfig.set("randomrewards", this.randomRewards);
             fileConfig.set("randomrewardscount", this.randomRewardsCount);
@@ -159,14 +155,6 @@ public class Dungeon {
                 dropSection.set("x", this.rewardDropLocation.getX());
                 dropSection.set("y", this.rewardDropLocation.getY());
                 dropSection.set("z", this.rewardDropLocation.getZ());
-            }
-
-            if (this.pressurePlateLocation != null) {
-                var plateSection = fileConfig.createSection("pressureplate");
-                plateSection.set("world", this.pressurePlateLocation.getWorld().getName());
-                plateSection.set("x", this.pressurePlateLocation.getX());
-                plateSection.set("y", this.pressurePlateLocation.getY());
-                plateSection.set("z", this.pressurePlateLocation.getZ());
             }
 
             if (this.spawners != null && !this.spawners.isEmpty()) {
@@ -218,7 +206,6 @@ public class Dungeon {
             this.lockTime = fileConfig.getDouble("locktime", 120.0);
             this.isLockable = fileConfig.getBoolean("lockable", true);
             this.doRewardDrop = fileConfig.getBoolean("dorewarddrop", false);
-            this.doPressurePlate = fileConfig.getBoolean("dopressureplate", false);
             this.staticRewards = fileConfig.getString("staticrewards");
             this.randomRewards = fileConfig.getString("randomrewards");
             this.randomRewardsCount = fileConfig.getInt("randomrewardscount", 0);
@@ -245,14 +232,6 @@ public class Dungeon {
                         rewardSection.getDouble("x"),
                         rewardSection.getDouble("y"),
                         rewardSection.getDouble("z"));
-            }
-
-            ConfigurationSection plateSection = fileConfig.getConfigurationSection("pressureplate");
-            if (plateSection != null) {
-                this.pressurePlateLocation = new Location(Bukkit.getWorld(plateSection.getString("world")),
-                        plateSection.getDouble("x"),
-                        plateSection.getDouble("y"),
-                        plateSection.getDouble("z"));
             }
 
             this.spawners = new HashMap<UUID, Spawner>();
@@ -308,10 +287,6 @@ public class Dungeon {
 
     public void setRewardDropLocation(Location location) {
         this.rewardDropLocation = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
-    }
-
-    public void setPressurePlateLocation(Location location) {
-        this.pressurePlateLocation = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
     }
 
     public void checkPlayerActivity() {
@@ -530,25 +505,6 @@ public class Dungeon {
             }, 1L);
         }
 
-        if (this.doPressurePlate && this.pressurePlateLocation != null) {
-
-            Block block = this.pressurePlateLocation.getBlock();
-            block.setType(Material.BIRCH_PRESSURE_PLATE);
-
-            new ParticleBuilder(Particle.WAX_OFF)
-                    .location(pressurePlateLocation)
-                    .offset(0.5, 0.5, 0.5)
-                    .receivers(64)
-                    .count(24)
-                    .spawn();
-
-            for (var player : playersInDungeon) {
-                ((Player) player).playSound(pressurePlateLocation, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-                player.sendMessage(MessageFormatter
-                        .getWithPrefix(ChatColor.WHITE + "A new path has opened up!"));
-            }
-        }
-
         resetLock();
 
         cooldownStart = System.currentTimeMillis();
@@ -562,8 +518,6 @@ public class Dungeon {
 
         if (this.rewardDropLocation != null)
             this.rewardDropLocation.getBlock().setType(Material.AIR);
-        if (this.pressurePlateLocation != null)
-            pressurePlateLocation.getBlock().setType(Material.AIR);
 
         if (this.spawners != null && !this.spawners.isEmpty()) {
             for (Spawner spawner : this.spawners.values())

@@ -110,11 +110,8 @@ public class DungeonCommands implements CommandExecutor {
             case "exitLocation":
                 handleDungeonSetExitLocation(player, dungeon);
                 break;
-            case "chestPosition":
-                handleDungeonSetChestPos(player, dungeon);
-                break;
-            case "platePosition":
-                handleDungeonSetPlatePos(player, dungeon);
+            case "rewardDropLocation":
+                handleDungeonSetRewardDropPos(player, dungeon);
                 break;
             case "description":
                 handleDungeonSetDescription(player, dungeon, args);
@@ -179,14 +176,7 @@ public class DungeonCommands implements CommandExecutor {
                 .getWithPrefix("Exit location for dungeon " + dungeon.name + " set."));
     }
 
-    private void handleDungeonSetPlatePos(Player player, Dungeon dungeon) {
-        dungeon.setPressurePlateLocation(player.getLocation());
-        dungeon.save();
-        player.sendMessage(MessageFormatter
-                .getWithPrefix("Pressure plate location for dungeon " + dungeon.name + " set."));
-    }
-
-    private void handleDungeonSetChestPos(Player player, Dungeon dungeon) {
+    private void handleDungeonSetRewardDropPos(Player player, Dungeon dungeon) {
         dungeon.setRewardDropLocation(player.getLocation());
         dungeon.save();
 
@@ -312,7 +302,6 @@ public class DungeonCommands implements CommandExecutor {
         player.sendMessage(MessageFormatter.getWithPrefix("Showing dungeon markers: " +
                 ChatColor.GREEN + "Bounding Box " +
                 ChatColor.YELLOW + "Reward Chest " +
-                ChatColor.DARK_GRAY + "Pressure Plate " +
                 ChatColor.RED + "Mob Spawners " +
                 ChatColor.WHITE + "Exit"));
 
@@ -334,16 +323,6 @@ public class DungeonCommands implements CommandExecutor {
                     new ParticleBuilder(Particle.ENTITY_EFFECT)
                             .data(Color.YELLOW)
                             .location(dungeon.rewardDropLocation)
-                            .offset(0.15, 0.15, 0.15)
-                            .count(5)
-                            .receivers(player)
-                            .spawn();
-                }
-
-                if (dungeon.pressurePlateLocation != null) {
-                    new ParticleBuilder(Particle.ENTITY_EFFECT)
-                            .data(Color.GRAY)
-                            .location(dungeon.pressurePlateLocation)
                             .offset(0.15, 0.15, 0.15)
                             .count(5)
                             .receivers(player)

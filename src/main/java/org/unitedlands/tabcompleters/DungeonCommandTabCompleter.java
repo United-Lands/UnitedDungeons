@@ -28,8 +28,7 @@ public class DungeonCommandTabCompleter implements TabCompleter {
             "description",
             "location",
             "exitLocation",
-            "chestPosition",
-            "platePosition",
+            "rewardDropLocation",
             "isPublicWarp",
             "isLockable",
             "width",
@@ -39,7 +38,6 @@ public class DungeonCommandTabCompleter implements TabCompleter {
             "staticRewards",
             "randomRewards",
             "randomRewardsCount",
-            "doPressurePlate",
             "cooldownTime",
             "lockTime");
 

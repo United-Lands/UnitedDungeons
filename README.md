@@ -54,8 +54,7 @@ All admin commands need the permission `united.dungeons.admin`. Player commands 
 These four commands use the current player position:
 - `location` - moves the dungeon center location 
 - `exitLocation` - sets the dungeon entrance/exit location at the player's position. Also sets the direction the player will be looking after `/ud warp`
-- `chestPosition` - sets the position where a reward chest will spawn when the dungeon is completed 
-- `platePosition` - sets the position where a pressure plate will spawn when the dungeon is completed
+- `rewardDropLocation` - sets the position where a reward chest will spawn when the dungeon is completed 
 
 These commands are independent of the player's position:
 - `description <text>` - sets the description of the dungeon.
@@ -68,7 +67,6 @@ These commands are independent of the player's position:
 - `staticRewards <string>` - sets the rewards that will *always* be in the reward loot chest (if activated). Needs to be a string of the form ITEM#AMOUNT;ITEM#AMOUNT, e.g. GOLD_INGOT#32;IRON_INGOT#16
 - `randomRewards <string>`- sets the rewards from which random loot can be picked for the reward loot chest (if activated). Needs to be a string of the form ITEM#AMOUNT;ITEM#AMOUNT, e.g. GOLD_INGOT#32;IRON_INGOT#16
 - `randomRewardsCount <number>` - sets how many random items should be picked for the reward loot chest
-- `doPressurePlate <true|false>` - sets whether or not the dungeon will spawn a pressure plate when it is completed
 - `cooldownTime <seconds>` - sets the number of seconds that the dungeon will be on cooldown after it has been completed
 - `lockTime <seconds>` - sets the number of seconds after which a dungeon will automatically unlock again after being locked by a player party
 
