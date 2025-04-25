@@ -5,6 +5,7 @@ import org.unitedlands.commands.DungeonCommands;
 import org.unitedlands.commands.GlobalCommands;
 import org.unitedlands.commands.SpawnerCommands;
 import org.unitedlands.listeners.MobDeathListener;
+import org.unitedlands.listeners.SelfListener;
 import org.unitedlands.managers.DungeonManager;
 import org.unitedlands.managers.MobManager;
 import org.unitedlands.tabcompleters.DungeonCommandTabCompleter;
@@ -35,6 +36,7 @@ public class UnitedDungeons extends JavaPlugin {
         saveDefaultConfig();
 
         getServer().getPluginManager().registerEvents(new MobDeathListener(this), this);
+        getServer().getPluginManager().registerEvents(new SelfListener(this), this);
 
         dungeonManager.loadDungeons();
         dungeonManager.startChecks();

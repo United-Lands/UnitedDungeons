@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.events.DungeonOpenEvent;
 import org.unitedlands.events.PlayerEnterDungeonEvent;
 import org.unitedlands.events.PlayerExitDungeonEvent;
 import org.unitedlands.utils.MessageFormatter;
@@ -305,13 +306,6 @@ public class Dungeon {
                 location.getYaw(), location.getPitch());
     }
 
-    public Location getBoundingBoxOrigin() {
-        return new Location(this.location.getWorld(),
-                this.location.getX() - Math.floor(this.width / 2),
-                this.location.getY() - Math.floor(this.height / 2),
-                this.location.getZ() - Math.floor(this.length / 2));
-    }
-
     public void setRewardDropLocation(Location location) {
         this.rewardDropLocation = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
     }
@@ -381,7 +375,7 @@ public class Dungeon {
             var enterEvent = new PlayerEnterDungeonEvent(this, player);
             enterEvent.callEvent();
         }
-        
+
         playersInDungeon = currentPlayersInDungeon;
     }
 
@@ -412,7 +406,7 @@ public class Dungeon {
             player.sendMessage(MessageFormatter
                     .getWithPrefix("Dungeon " + getCleanName()
                             + " is now locked for your party. No other players can enter in the next "
-                            + Math.floor(this.lockTime / 60) + " minutes."));
+                            + MessageFormatter.formatDuration(getRemainingLockTime())));
         }
     }
 
@@ -580,6 +574,11 @@ public class Dungeon {
 
         resetLock();
 
+        if (isActive) {
+            var openEvent = new DungeonOpenEvent(this);
+            openEvent.callEvent();
+        }
+
         plugin.getLogger().info("Dungeon " + this.name + " reset");
     }
 
@@ -630,28 +629,18 @@ public class Dungeon {
         return this.name.replace("_", " ");
     }
 
-    public String getCooldownTimeString() {
+    public Long getRemainingCooldown() {
         if (!isOnCooldown)
-            return "-";
-
+            return 0L;
         var cooldownLeft = (cooldownTime * 1000) - (System.currentTimeMillis() - cooldownStart);
-        long seconds = (long) cooldownLeft / 1000;
-        long minutes = seconds / 60;
-        seconds = seconds % 60;
-
-        return minutes + "min " + seconds + "s";
+        return (long) cooldownLeft;
     }
 
-    public String getLockTimeString() {
+    public Long getRemainingLockTime() {
         if (!isLocked)
-            return "-";
-
+            return 0L;
         var lockLeft = (this.lockTime * 1000) - (System.currentTimeMillis() - lockStartTime);
-        long seconds = (long) lockLeft / 1000;
-        long minutes = seconds / 60;
-        seconds = seconds % 60;
-
-        return minutes + "min " + seconds + "s";
+        return (long) lockLeft;
     }
 
     private UnitedDungeons getPlugin() {

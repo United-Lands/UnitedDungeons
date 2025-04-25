@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Dungeon;
 import org.unitedlands.classes.Spawner;
+import org.unitedlands.events.DungeonCompleteEvent;
 
 public class DungeonManager {
 
@@ -88,6 +89,7 @@ public class DungeonManager {
         _checker = new BukkitRunnable() {
             @Override
             public void run() {
+
                 for (Dungeon dungeon : dungeons.values()) {
                     if (!dungeon.isActive)
                         continue;
@@ -112,8 +114,9 @@ public class DungeonManager {
                                 }
                             }
                             if (allComplete) {
-                                plugin.getLogger().info("Dungeon " + dungeon.name + " completed.");
                                 dungeon.complete();
+                                var completeEvent = new DungeonCompleteEvent(dungeon);
+                                completeEvent.callEvent();
                             }
                         }
                     }

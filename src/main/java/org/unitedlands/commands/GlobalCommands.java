@@ -104,6 +104,11 @@ public class GlobalCommands implements CommandExecutor {
             return;
         }
 
+        if (dungeon.exitLocation == null) {
+            player.sendMessage(MessageFormatter.getWithPrefix(ChatColor.RED + "You cannot warp to this dungeon because it does not have a warp point set."));
+            return;
+        }
+
         player.sendMessage(MessageFormatter.getWithPrefix("Teleporting in 3 seconds. Move to cancel."));
         new BukkitRunnable() {
             int counter = 0;
@@ -162,13 +167,14 @@ public class GlobalCommands implements CommandExecutor {
         } else if (dungeon.isOnCooldown) {
             player.sendMessage(MessageFormatter.getWithPrefix(
                     "This dungeon is on " + ChatColor.YELLOW + "cooldown" + ChatColor.GRAY
-                            + ". It will be open again in " + ChatColor.BOLD + dungeon.getCooldownTimeString()
+                            + ". It will be open again in "
+                            + MessageFormatter.formatDuration(dungeon.getRemainingCooldown())
                             + "."));
         } else if (dungeon.isLocked) {
             player.sendMessage(MessageFormatter.getWithPrefix(
                     "This dungeon is " + ChatColor.RED + "locked" + ChatColor.GRAY
                             + " by a party. It will be open again in " + ChatColor.BOLD
-                            + dungeon.getLockTimeString()
+                            + MessageFormatter.formatDuration(dungeon.getRemainingLockTime())
                             + "."));
         } else {
             if (!dungeon.isLockable) {
@@ -218,7 +224,7 @@ public class GlobalCommands implements CommandExecutor {
             player.sendMessage(MessageFormatter.getWithPrefix(
                     "This dungeon is " + ChatColor.RED + "locked" + ChatColor.GRAY
                             + " by a party. It will be open again in " + ChatColor.BOLD
-                            + playerDungeon.getLockTimeString()
+                            + MessageFormatter.formatDuration(playerDungeon.getRemainingLockTime())
                             + "."));
             return;
         }
