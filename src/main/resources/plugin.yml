@@ -1,21 +1,18 @@
 name: UnitedDungeons
-version: 1.0.3
+version: 2.0.0
 main: org.unitedlands.UnitedDungeons
 api-version: 1.21
 description: A custom United Lands plugin for dungeon management.
 author: Theriel_
+softdepend: [ItemsAdder, MythicMobs]
 commands:
-  ud:
+  uniteddungeons:
      description: Global UnitedDungeons player commands.
-     aliases: []
-  uddungeon:
-     description: Used to manage and play dungeons.
-     aliases: [udd]
-     permission: united.dungeons.admin
-  udspawner:
-     description: Used to manage dungeon spawners
-     aliases: [uds]
+     aliases: [ud]
+  udadmin:
+     description: UnitedDungeons admin commands.
+     aliases: [uda]
      permission: united.dungeons.admin
 permissions:
   united.dungeons.admin:
-    default: false
+     default: false

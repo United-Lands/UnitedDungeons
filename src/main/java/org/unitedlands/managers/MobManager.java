@@ -8,55 +8,28 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Spawner;
-
-import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.mythic.core.mobs.ActiveMob;
-import io.lumine.mythic.core.mobs.DespawnMode;
+import org.unitedlands.utils.Logger;
 
 public class MobManager {
 
     private final UnitedDungeons plugin;
 
-    private HashMap<UUID, Spawner> mobList;
+    private HashMap<UUID, Spawner> mobList = new HashMap<>();
 
     public MobManager(UnitedDungeons plugin) {
         this.plugin = plugin;
-        mobList = new HashMap<>();
     }
 
     public void createMob(Spawner spawner) {
-        org.bukkit.World world = Bukkit.getWorld(spawner.getWorld());
-        if (world == null)
-            return;
-
-        try {
-            Entity mob = null;
-            if (spawner.isMythicMob) {
-                var mmob = MythicBukkit.inst().getMobManager().getMythicMob(spawner.mobType).orElse(null);
-                if (mmob != null) {
-                    ActiveMob ammob = MythicBukkit.inst().getMobManager().spawnMob(spawner.mobType, spawner.getLocation());
-                    ammob.setDespawnMode(DespawnMode.NEVER);
-
-                    registerMob(ammob.getUniqueId(), spawner);
-                }
-            } else {
-                mob = world.spawnEntity(spawner.getLocation(), EntityType.valueOf(spawner.mobType));
-                ((LivingEntity) mob).setPersistent(true);
-                ((LivingEntity) mob).setRemoveWhenFarAway(false);
-
-                registerMob(mob.getUniqueId(), spawner);
-            }
-
-        } catch (Exception ex) {
-            plugin.getLogger().warning(ex.getMessage());
+        var newMobUuid = plugin.getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation());
+        if (newMobUuid == null)
+        {
+            Logger.logError("Error creating new mob for spawner " + spawner.getUuid());
             return;
         }
-
+        registerMob(newMobUuid, spawner);
     }
 
     public void removeAllSpawnerMobs(Spawner spawner) {

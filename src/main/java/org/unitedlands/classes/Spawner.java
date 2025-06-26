@@ -1,36 +1,51 @@
 package org.unitedlands.classes;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.utils.annotations.Info;
+
+import com.google.gson.annotations.Expose;
 
 public class Spawner {
 
-    public UUID uuid;
-
-    private String world;
-    private Dungeon dungeon;
+    @Expose
+    private UUID uuid;
+    @Expose
     private Location location;
-    private Block block;
 
-    public double radius = 16;
-    public String mobType = "ZOMBIE";
-    public boolean isMythicMob = false;
-    public int maxMobs = 1;
-    public double spawnFrequency = 1;
-    public boolean isGroupSpawn = false;
+    @Expose
+    @Info
+    private double radius = 16;
+    @Expose
+    @Info
+    private String mobType = "ZOMBIE";
+    @Expose
+    @Info
+    private int maxMobs = 1;
+    @Expose
+    @Info
+    private double spawnFrequency = 1;
+    @Expose
+    @Info
+    private boolean isGroupSpawn = false;
 
-    public int killsToComplete = Integer.MAX_VALUE;
-    public boolean isComplete = false;
+    @Expose
+    @Info
+    private int killsToComplete = Integer.MAX_VALUE;
+    @Expose
+    private boolean isComplete = false;
 
+    @Expose
     private double lastSpawnTime;
-    public int currentKillCount;
+    @Expose
+    private int currentKillCount;
 
     private final UnitedDungeons plugin = getPlugin();
 
@@ -38,14 +53,9 @@ public class Spawner {
 
     }
 
-    public Spawner(Location location, Dungeon dungeon) {
+    public Spawner(Location location) {
         this.uuid = UUID.randomUUID();
-
         this.location = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
-        this.world = location.getWorld().getName();
-        this.block = location.getBlock();
-
-        this.dungeon = dungeon;
     }
 
     public void registerKill() {
@@ -81,8 +91,7 @@ public class Spawner {
     }
 
     public boolean isPlayerNearby() {
-        Collection<Entity> nearbyEntities = Bukkit.getWorld(this.world).getNearbyEntities(this.location, this.radius,
-                this.radius, this.radius);
+        Collection<Entity> nearbyEntities = location.getNearbyEntities(this.radius, this.radius, this.radius);
         for (Entity entity : nearbyEntities) {
             if (entity instanceof Player) {
                 return true;
@@ -91,38 +100,110 @@ public class Spawner {
         return false;
     }
 
+    // #region Getters & Setters
+
+    private UnitedDungeons getPlugin() {
+        return (UnitedDungeons) Bukkit.getPluginManager().getPlugin("UnitedDungeons");
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     public Location getLocation() {
-        return this.location;
+        return location;
     }
 
     public void setLocation(Location location) {
         this.location = location;
-        this.block = location.getBlock();
     }
 
-
-    public Dungeon getDungeon() {
-        return this.dungeon;
+    public double getRadius() {
+        return radius;
     }
 
-    public void setDungeon(Dungeon dungeon) {
-        this.dungeon = dungeon;
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
 
-    public String getWorld() {
-        return this.world;
+    public String getMobType() {
+        return mobType;
     }
 
-    public void setWorld(String world) {
-        this.world = world;
+    public void setMobType(String mobType) {
+        this.mobType = mobType;
     }
 
-    public Block getBlock() {
-        return this.block;
+    public int getMaxMobs() {
+        return maxMobs;
     }
 
-    private UnitedDungeons getPlugin() {
-        return (UnitedDungeons) Bukkit.getPluginManager().getPlugin("UnitedDungeons");
+    public void setMaxMobs(int maxMobs) {
+        this.maxMobs = maxMobs;
+    }
+
+    public double getSpawnFrequency() {
+        return spawnFrequency;
+    }
+
+    public void setSpawnFrequency(double spawnFrequency) {
+        this.spawnFrequency = spawnFrequency;
+    }
+
+    public boolean isGroupSpawn() {
+        return isGroupSpawn;
+    }
+
+    public void setGroupSpawn(boolean isGroupSpawn) {
+        this.isGroupSpawn = isGroupSpawn;
+    }
+
+    public int getKillsToComplete() {
+        return killsToComplete;
+    }
+
+    public void setKillsToComplete(int killsToComplete) {
+        this.killsToComplete = killsToComplete;
+    }
+
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(boolean isComplete) {
+        this.isComplete = isComplete;
+    }
+
+    public double getLastSpawnTime() {
+        return lastSpawnTime;
+    }
+
+    public void setLastSpawnTime(double lastSpawnTime) {
+        this.lastSpawnTime = lastSpawnTime;
+    }
+
+    public int getCurrentKillCount() {
+        return currentKillCount;
+    }
+
+    public void setCurrentKillCount(int currentKillCount) {
+        this.currentKillCount = currentKillCount;
+    }
+
+    // #endregion
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Spawner s = (Spawner) o;
+        return Objects.equals(uuid, s.getUuid());
     }
 
 }

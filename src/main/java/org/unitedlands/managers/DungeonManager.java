@@ -1,43 +1,37 @@
 package org.unitedlands.managers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Dungeon;
+import org.unitedlands.classes.Room;
 import org.unitedlands.classes.Spawner;
-import org.unitedlands.events.DungeonCompleteEvent;
+import org.unitedlands.utils.JsonUtils;
+import org.unitedlands.utils.Logger;
 
 public class DungeonManager {
 
     private final UnitedDungeons plugin;
-    private Map<String, Dungeon> dungeons;
+    private Map<UUID, Dungeon> dungeons;
 
-    private final long _checkFrequency = 1L;
-    private BukkitTask _checker;
+    private BukkitTask dungeonCheckerTask;
 
     public DungeonManager(UnitedDungeons plugin) {
         this.plugin = plugin;
     }
 
-    public List<String> getDungeonNames() {
-        if (dungeons == null)
-            return new ArrayList<String>();
-        return new ArrayList<String>(dungeons.keySet());
-    }
-
-    public List<String> getPublicDungeonNames() {
-        if (dungeons == null)
-            return new ArrayList<String>();
-        return dungeons.values().stream().filter(d -> d.isPublicWarp).map(d -> d.name).collect(Collectors.toList());
-    }
+    // #region Public utility functions
 
     public Collection<Dungeon> getDungeons() {
         if (dungeons == null)
@@ -45,24 +39,82 @@ public class DungeonManager {
         return dungeons.values();
     }
 
+    public List<String> getDungeonNames() {
+        if (dungeons == null)
+            return new ArrayList<String>();
+        return dungeons.values().stream().map(d -> d.getName()).collect(Collectors.toList());
+    }
+
+    public List<String> getPublicDungeonNames() {
+        if (dungeons == null)
+            return new ArrayList<String>();
+        return dungeons.values().stream().filter(d -> d.isPublic()).map(d -> d.getName()).collect(Collectors.toList());
+    }
+
+    public Dungeon getDungeon(UUID uuid) {
+        if (dungeons == null)
+            return null;
+        return dungeons.getOrDefault(uuid, null);
+    }
+
     public Dungeon getDungeon(String name) {
-        if (this.dungeons.containsKey(name))
-            return this.dungeons.get(name);
+        if (dungeons == null)
+            return null;
+        return dungeons.values().stream().filter(d -> d.getName().equals(name)).findFirst().orElse(null);
+    }
+
+    public Dungeon getClosestDungeon(Location location) {
+
+        if (dungeons == null || dungeons.isEmpty())
+            return null;
+
+        Dungeon closestDungeon = null;
+        double closestDistanceSquared = Double.MAX_VALUE;
+
+        for (var dungeon : dungeons.values()) {
+            var dungeonLocation = dungeon.getLocation();
+            if (!dungeonLocation.getWorld().equals(location.getWorld()))
+                continue;
+            double distanceSquared = dungeonLocation.distanceSquared(location);
+            if (distanceSquared < closestDistanceSquared) {
+                closestDistanceSquared = distanceSquared;
+                closestDungeon = dungeon;
+            }
+        }
+
+        if (closestDungeon == null)
+            return null;
+
+        var maxRoomDistance = plugin.getConfig().getDouble("general.max-room-distance", 0);
+        var maxRoomEdgeLength = plugin.getConfig().getDouble("general.max-room-edge-lenth", 0);
+        if (closestDistanceSquared > (maxRoomDistance * maxRoomDistance) + (maxRoomEdgeLength * maxRoomEdgeLength)) {
+            return null;
+        } else {
+            return closestDungeon;
+        }
+    }
+
+    public Room getRoomAtLocation(Dungeon dungeon, Location location) {
+        for (Room room : dungeon.getRooms()) {
+            if (room.getBoundingBox().contains(location.getX(), location.getY(), location.getZ()))
+                return room;
+        }
         return null;
     }
 
+    // #endregion
+
     public void addDungeon(Dungeon dungeon) {
-        dungeons.put(dungeon.name, dungeon);
+        dungeons.put(dungeon.getUuid(), dungeon);
     }
 
     public void renameDungeon(Dungeon dungeon, String newName) {
-        dungeons.remove(dungeon.name);
-        dungeon.name = newName;
-        dungeons.put(dungeon.name, dungeon);
+        dungeon.setName(newName);
+        dungeons.put(dungeon.getUuid(), dungeon);
     }
 
     public void removeDungeon(Dungeon dungeon) {
-        dungeons.remove(dungeon.name);
+        dungeons.remove(dungeon.getUuid());
     }
 
     public void loadDungeons() {
@@ -76,67 +128,90 @@ public class DungeonManager {
 
         if (filesList != null) {
             for (File file : filesList) {
-                Dungeon dungeon = new Dungeon(file);
-                dungeons.put(dungeon.name, dungeon);
-
-                plugin.getLogger().info("Dungeon " + dungeon.name + " loaded.");
+                Dungeon dungeon = loadDungeon(file);
+                if (dungeon != null) {
+                    dungeons.put(dungeon.getUuid(), dungeon);
+                    dungeon.reset();
+                    Logger.log("Dungeon " + dungeon.getName() + " loaded.");
+                } else {
+                    Logger.logError("Error loading dungeon file " + file.getName());
+                }
             }
         }
     }
 
     public void startChecks() {
-        plugin.getLogger().info("Starting dungeon checks...");
-        _checker = new BukkitRunnable() {
+
+        Logger.log("Starting dungeon checks...");
+
+        var frequency = plugin.getConfig().getLong("general.tick-frequency", 1L);
+
+        dungeonCheckerTask = new BukkitRunnable() {
             @Override
             public void run() {
 
                 for (Dungeon dungeon : dungeons.values()) {
-                    if (!dungeon.isActive)
+
+                    if (!dungeon.isActive())
                         continue;
 
                     dungeon.checkPlayerActivity();
                     dungeon.checkLock();
                     dungeon.checkCooldown();
 
-                    if (dungeon.isSleeping || dungeon.isOnCooldown) {
+                    if (dungeon.isSleeping() || dungeon.isOnCooldown()) {
                         continue;
                     } else {
-                        var spawners = dungeon.getSpawners();
-                        if (spawners != null && !spawners.isEmpty()) {
-                            boolean allComplete = true;
-                            for (Spawner s : spawners.values()) {
-                                s.checkCompletion();
-                                allComplete = allComplete && s.isComplete;
-                                if (!s.isComplete) {
-                                    if (s.isPlayerNearby()) {
-                                        s.prepareSpawn();
-                                    }
-                                }
-                            }
-                            if (allComplete) {
-                                dungeon.complete();
-                                var completeEvent = new DungeonCompleteEvent(dungeon);
-                                completeEvent.callEvent();
-                            }
-                        }
+                        dungeon.checkRooms();
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0L, _checkFrequency * 20L);
+        }.runTaskTimer(plugin, 0L, frequency * 20L);
     }
 
     public void stopChecks() {
-        plugin.getLogger().info("Clearing dungeon mobs...");
+        Logger.log("Clearing dungeon mobs...");
         for (Dungeon dungeon : dungeons.values()) {
             var spawners = dungeon.getSpawners();
             if (spawners != null) {
-                for (Spawner s : spawners.values()) {
+                for (Spawner s : spawners) {
                     plugin.getMobManager().removeAllSpawnerMobs(s);
                 }
             }
-            dungeon.resetCompletion();
         }
-        plugin.getLogger().info("Stopping dungeon checks...");
-        _checker.cancel();
+        Logger.log("Stopping dungeon checks...");
+        dungeonCheckerTask.cancel();
+    }
+
+    public boolean saveDungeon(Dungeon dungeon) {
+        var uuid = dungeon.getUuid();
+        var filePath = File.separator + "dungeons" + File.separator + uuid + ".json";
+
+        File dungeonFile = new File(plugin.getDataFolder(), filePath);
+        if (!dungeonFile.exists()) {
+            dungeonFile.getParentFile().mkdirs();
+            try {
+                dungeonFile.createNewFile();
+            } catch (IOException ex) {
+                plugin.getLogger().severe(ex.getMessage());
+            }
+        }
+
+        try {
+            JsonUtils.saveObjectToFile(dungeon, dungeonFile);
+            return true;
+        } catch (IOException ex) {
+            plugin.getLogger().severe(ex.getMessage());
+            return false;
+        }
+    }
+
+    public Dungeon loadDungeon(File file) {
+        try {
+            return JsonUtils.loadObjectFromFile(file, Dungeon.class);
+        } catch (IOException ex) {
+            Logger.logError(ex.getMessage());
+            return null;
+        }
     }
 }

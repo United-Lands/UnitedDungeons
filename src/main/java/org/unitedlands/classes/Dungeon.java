@@ -1,308 +1,151 @@
 package org.unitedlands.classes;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.ShulkerBox;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.events.DungeonCompleteEvent;
 import org.unitedlands.events.DungeonOpenEvent;
 import org.unitedlands.events.PlayerEnterDungeonEvent;
+import org.unitedlands.events.PlayerEnterRoomEvent;
 import org.unitedlands.events.PlayerExitDungeonEvent;
-import org.unitedlands.utils.MessageFormatter;
+import org.unitedlands.events.PlayerExitRoomEvent;
+import org.unitedlands.utils.Formatter;
+import org.unitedlands.utils.Logger;
+import org.unitedlands.utils.Messenger;
+import org.unitedlands.utils.annotations.Info;
 
-import com.destroystokyo.paper.ParticleBuilder;
-
-import dev.lone.itemsadder.api.CustomStack;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
-import net.kyori.adventure.title.Title.Times;
-
-import net.md_5.bungee.api.ChatColor;
+import com.google.gson.annotations.Expose;
 
 public class Dungeon {
 
-    private final int CYCLES_BEFORE_SLEEP = 300;
+    @Expose
+    private UUID uuid;
+    @Expose
+    @Info
+    private String name;
+    @Expose
+    @Info
+    private String description;
 
-    public UUID uuid;
-    public String name;
-    public String description;
-    public Location location;
-    public Location exitLocation;
-    public boolean isPublicWarp;
-    public boolean isActive = false;
-    public boolean isSleeping = true;
-    public boolean isLocked = false;
-    public boolean isLockable = true;
+    @Expose
+    private Location location;
+    @Expose
+    private Location warpLocation;
 
-    public int width = 16;
-    public int length = 16;
-    public int height = 16;
+    @Expose
+    @Info
+    private boolean isPublic;
+    @Expose
+    @Info
+    private boolean isActive = false;
+    private boolean isSleeping = true;
+    private boolean isLocked = false;
+    @Expose
+    @Info
+    private boolean isLockable = true;
+    private boolean isOnCooldown = false;
+    @Expose
+    @Info
+    private long cooldownTime = 120;
+    @Expose
+    @Info
+    private long lockTime = 120;
+    private long cooldownStart;
 
-    public boolean doRewardDrop;
-    public Location rewardDropLocation;
-    public String staticRewards;
-    public String randomRewards;
-    public int randomRewardsCount;
+    @Expose
+    private Set<Room> rooms = new HashSet<>();
 
-    public boolean isOnCooldown = false;
-    public double cooldownTime = 120;
-    public double lockTime = 120;
+    @Expose
+    @Info
+    int ticksBeforeSleep = 300;
+    private int ticksWithoutPlayers = Integer.MAX_VALUE;
 
-    private Map<UUID, Spawner> spawners = new HashMap<>();
-
-    private double cooldownStart;
-    private int cyclesWithoutPlayers = Integer.MAX_VALUE;
+    @Expose
+    private ArrayList<HighScore> highscores = new ArrayList<>();
 
     private Collection<Player> playersInDungeon = new ArrayList<Player>();
 
+    private Player partyLeader;
     private Collection<Player> lockedPlayersInDungeon = new ArrayList<Player>();
-    private double lockStartTime;
-
-    private final UnitedDungeons plugin = getPlugin();
+    private long lockStartTime;
 
     public Dungeon() {
+        this.uuid = UUID.randomUUID();
+    }
 
+    public Dungeon(String name) {
+        this.name = name;
+        this.uuid = UUID.randomUUID();
     }
 
     public Dungeon(Location location) {
-        this.location = location;
+        setLocation(location);
+        this.uuid = UUID.randomUUID();
     }
 
-    public Dungeon(File file) {
-        load(file);
-    }
+    public void checkRooms() {
 
-    public boolean save() {
-
-        if (uuid == null || name == null)
-            return false;
-
-        var filePath = File.separator + "dungeons" + File.separator + this.uuid + ".yml";
-
-        File dungeonFile = new File(plugin.getDataFolder(), filePath);
-        if (!dungeonFile.exists()) {
-            dungeonFile.getParentFile().mkdirs();
-            try {
-                dungeonFile.createNewFile();
-            } catch (IOException ex) {
-                plugin.getLogger().severe(ex.getMessage());
-                return false;
-            }
-        }
-
-        FileConfiguration fileConfig = new YamlConfiguration();
-        try {
-            fileConfig.load(dungeonFile);
-            fileConfig.set("uuid", this.uuid.toString());
-            fileConfig.set("name", this.name);
-            fileConfig.set("description", this.description);
-            fileConfig.set("public", this.isPublicWarp);
-            fileConfig.set("active", this.isActive);
-            fileConfig.set("width", this.width);
-            fileConfig.set("length", this.length);
-            fileConfig.set("height", this.height);
-            fileConfig.set("cooldowntime", this.cooldownTime);
-            fileConfig.set("dorewarddrop", this.doRewardDrop);
-            fileConfig.set("staticrewards", this.staticRewards);
-            fileConfig.set("randomrewards", this.randomRewards);
-            fileConfig.set("randomrewardscount", this.randomRewardsCount);
-            fileConfig.set("lockable", this.isLockable);
-            fileConfig.set("locktime", this.lockTime);
-
-            var locationSection = fileConfig.createSection("location");
-            locationSection.set("world", this.location.getWorld().getName());
-            locationSection.set("x", this.location.getX());
-            locationSection.set("y", this.location.getY());
-            locationSection.set("z", this.location.getZ());
-
-            if (exitLocation != null) {
-                var exitLocationSection = fileConfig.createSection("exitlocation");
-                exitLocationSection.set("world", this.exitLocation.getWorld().getName());
-                exitLocationSection.set("x", this.exitLocation.getX());
-                exitLocationSection.set("y", this.exitLocation.getY());
-                exitLocationSection.set("z", this.exitLocation.getZ());
-            }
-
-            if (this.rewardDropLocation != null) {
-                var dropSection = fileConfig.createSection("rewarddrop");
-                dropSection.set("world", this.rewardDropLocation.getWorld().getName());
-                dropSection.set("x", this.rewardDropLocation.getX());
-                dropSection.set("y", this.rewardDropLocation.getY());
-                dropSection.set("z", this.rewardDropLocation.getZ());
-            }
-
-            if (this.spawners != null && !this.spawners.isEmpty()) {
-                var spawnerList = fileConfig.createSection("spawners");
-                int count = 0;
-                for (Spawner s : this.spawners.values()) {
-                    var spawnerSection = spawnerList.createSection("spawner" + count);
-                    spawnerSection.set("uuid", s.uuid.toString());
-                    spawnerSection.set("world", s.getWorld());
-                    spawnerSection.set("x", s.getLocation().getX());
-                    spawnerSection.set("y", s.getLocation().getY());
-                    spawnerSection.set("z", s.getLocation().getZ());
-                    spawnerSection.set("yaw", s.getLocation().getYaw());
-                    spawnerSection.set("pitch", s.getLocation().getPitch());
-                    spawnerSection.set("mobtype", s.mobType);
-                    spawnerSection.set("radius", s.radius);
-                    spawnerSection.set("frequency", s.spawnFrequency);
-                    spawnerSection.set("maxmobs", s.maxMobs);
-                    spawnerSection.set("mythicmob", s.isMythicMob);
-                    spawnerSection.set("groupspawn", s.isGroupSpawn);
-                    spawnerSection.set("killstocomplete", s.killsToComplete);
-                    count++;
-                }
-            }
-            fileConfig.save(dungeonFile);
-            return true;
-        } catch (IOException | InvalidConfigurationException ex) {
-            plugin.getLogger().severe(ex.getMessage());
-            return false;
-        }
-
-    }
-
-    public boolean load(File file) {
-
-        FileConfiguration fileConfig = new YamlConfiguration();
-        try {
-            fileConfig.load(file);
-            this.uuid = UUID.fromString(fileConfig.getString("uuid"));
-            this.name = fileConfig.getString("name");
-            this.description = fileConfig.getString("description");
-            this.isPublicWarp = fileConfig.getBoolean("public", false);
-            this.isActive = fileConfig.getBoolean("active", false);
-            this.width = fileConfig.getInt("width", 64);
-            this.length = fileConfig.getInt("length", 64);
-            this.height = fileConfig.getInt("height", 64);
-
-            this.cooldownTime = fileConfig.getDouble("cooldowntime", 120.0);
-            this.lockTime = fileConfig.getDouble("locktime", 120.0);
-            this.isLockable = fileConfig.getBoolean("lockable", true);
-            this.doRewardDrop = fileConfig.getBoolean("dorewarddrop", false);
-            this.staticRewards = fileConfig.getString("staticrewards");
-            this.randomRewards = fileConfig.getString("randomrewards");
-            this.randomRewardsCount = fileConfig.getInt("randomrewardscount", 0);
-
-            ConfigurationSection locationSection = fileConfig.getConfigurationSection("location");
-            if (locationSection != null) {
-                this.location = new Location(Bukkit.getWorld(locationSection.getString("world")),
-                        locationSection.getDouble("x"),
-                        locationSection.getDouble("y"),
-                        locationSection.getDouble("z"));
-            }
-
-            ConfigurationSection exitLocationSection = fileConfig.getConfigurationSection("exitlocation");
-            if (exitLocationSection != null) {
-                this.exitLocation = new Location(Bukkit.getWorld(exitLocationSection.getString("world")),
-                        exitLocationSection.getDouble("x"),
-                        exitLocationSection.getDouble("y"),
-                        exitLocationSection.getDouble("z"));
-            }
-
-            ConfigurationSection rewardSection = fileConfig.getConfigurationSection("rewarddrop");
-            if (rewardSection != null) {
-                this.rewardDropLocation = new Location(Bukkit.getWorld(rewardSection.getString("world")),
-                        rewardSection.getDouble("x"),
-                        rewardSection.getDouble("y"),
-                        rewardSection.getDouble("z"));
-            }
-
-            this.spawners = new HashMap<UUID, Spawner>();
-            ConfigurationSection spawerList = fileConfig.getConfigurationSection("spawners");
-            if (spawerList != null) {
-                for (String key : spawerList.getKeys(false)) {
-                    var spawnerSection = spawerList.getConfigurationSection(key);
-                    if (spawnerSection != null) {
-                        var spawner = new Spawner();
-                        spawner.uuid = UUID.fromString(spawnerSection.getString("uuid"));
-                        spawner.setWorld(spawnerSection.getString("world"));
-                        spawner.setLocation(
-                                new Location(Bukkit.getWorld(spawner.getWorld()), spawnerSection.getDouble("x"),
-                                        spawnerSection.getDouble("y"), spawnerSection.getDouble("z"),
-                                        (float) spawnerSection.getDouble("yaw", 0),
-                                        (float) spawnerSection.getDouble("pitch", 0)));
-                        spawner.setDungeon(this);
-                        spawner.mobType = spawnerSection.getString("mobtype");
-                        spawner.radius = spawnerSection.getInt("radius", 16);
-                        spawner.spawnFrequency = spawnerSection.getDouble("frequency", 5.0);
-                        spawner.maxMobs = spawnerSection.getInt("maxmobs", 1);
-                        spawner.isMythicMob = spawnerSection.getBoolean("mythicmob", false);
-                        spawner.isGroupSpawn = spawnerSection.getBoolean("groupspawn", false);
-                        spawner.killsToComplete = spawnerSection.getInt("killstocomplete", Integer.MAX_VALUE);
-
-                        addSpawner(spawner);
+        boolean allRoomsComplete = true;
+        for (var room : rooms) {
+            if (room.isComplete())
+                continue;
+            if (!room.getPlayersInRoom().isEmpty()) {
+                var spawners = room.getSpawners();
+                if (spawners != null && !spawners.isEmpty()) {
+                    boolean allSpawnersComplete = true;
+                    for (Spawner spawner : spawners) {
+                        spawner.checkCompletion();
+                        allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
+                        if (!spawner.isComplete()) {
+                            if (spawner.isPlayerNearby()) {
+                                spawner.prepareSpawn();
+                            }
+                        }
                     }
+                    if (room.mustBeCompleted()) {
+                        if (allSpawnersComplete)
+                            room.complete();
+                    }
+                } else {
+                    if (room.mustBeCompleted())
+                        room.complete();
                 }
             }
-
-            return true;
-        } catch (IOException | InvalidConfigurationException ex) {
-            plugin.getLogger().severe(ex.getMessage());
-            return false;
+            allRoomsComplete = allRoomsComplete && (room.isComplete() || !room.mustBeCompleted());
         }
-    }
-
-    public void addSpawner(Spawner spawner) {
-        if (this.spawners == null)
-            this.spawners = new HashMap<UUID, Spawner>();
-        this.spawners.put(spawner.uuid, spawner);
-    }
-
-    public void setLocation(Location location) {
-        this.location = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
-    }
-
-    public void setExitLocation(Location location) {
-        var center = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
-        this.exitLocation = new Location(center.getWorld(), center.getX(), center.getY(), center.getZ(),
-                location.getYaw(), location.getPitch());
-    }
-
-    public void setRewardDropLocation(Location location) {
-        this.rewardDropLocation = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
+        Logger.log("allRoomsComplete: " + allRoomsComplete);
+        if (allRoomsComplete)
+            this.complete();
     }
 
     public void checkPlayerActivity() {
+
         updatePlayersInDungeon();
 
         if (playersInDungeon.isEmpty()) {
-            if (cyclesWithoutPlayers < Integer.MAX_VALUE)
-                cyclesWithoutPlayers++;
-            if (cyclesWithoutPlayers >= CYCLES_BEFORE_SLEEP && !this.isSleeping) {
-                plugin.getLogger().info("Dungeon " + this.name + " going to sleep.");
+            if (ticksWithoutPlayers < Integer.MAX_VALUE)
+                ticksWithoutPlayers++;
+            if (ticksWithoutPlayers >= ticksBeforeSleep && !this.isSleeping) {
+                Logger.log("Dungeon " + this.name + " going to sleep.");
                 this.isSleeping = true;
             }
         } else {
             if (this.isSleeping) {
-                plugin.getLogger().info("Dungeon " + this.name + " waking up.");
-                cyclesWithoutPlayers = 0;
+                Logger.log("Dungeon " + this.name + " waking up.");
+                ticksWithoutPlayers = 0;
                 this.isSleeping = false;
             }
             if (this.isLocked) {
@@ -310,9 +153,10 @@ public class Dungeon {
                     if (player.hasPermission("united.dungeons.admin"))
                         continue;
                     if (!lockedPlayersInDungeon.contains(player)) {
-                        player.teleport(this.exitLocation);
-                        player.sendMessage(MessageFormatter.getWithPrefix(ChatColor.RED
-                                + "This dungeon is locked, and you are not part of the dungeon party. You have been teleported back to the entrance."));
+                        player.teleport(this.warpLocation);
+                        Messenger.sendMessageTemplate(player, "dungeon-status-locked",
+                                Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
+                                true);
                     }
                 }
             }
@@ -321,37 +165,63 @@ public class Dungeon {
 
     public void updatePlayersInDungeon() {
 
-        var bbox = new BoundingBox(
-                this.location.getX() - this.width / 2,
-                this.location.getY() - this.height / 2,
-                this.location.getZ() - this.length / 2,
-                this.location.getX() + this.width / 2,
-                this.location.getY() + this.height / 2,
-                this.location.getZ() + this.length / 2);
+        if (playersInDungeon == null)
+            playersInDungeon = new ArrayList<>();
 
-        Collection<Player> currentPlayersInDungeon = this.location.getWorld()
-                .getNearbyEntities(bbox, entity -> entity instanceof Player)
-                .stream()
-                .map(entity -> (Player) entity)
-                .collect(Collectors.toList());
+        updatePlayersInRooms();
 
-        var pastPlayers = new ArrayList<>(playersInDungeon);
+        Set<Player> currentPlayersInDungeon = rooms.stream().flatMap(r -> r.getPlayersInRoom().stream())
+                .collect(Collectors.toSet());
+
+        var pastPlayers = new HashSet<>(playersInDungeon);
         pastPlayers.removeAll(currentPlayersInDungeon);
-
         for (Player player : pastPlayers) {
-            var exitEvent = new PlayerExitDungeonEvent(this, player);
-            exitEvent.callEvent();
+            (new PlayerExitDungeonEvent(this, player)).callEvent();
         }
 
-        var newPlayers = new ArrayList<>(currentPlayersInDungeon);
+        var newPlayers = new HashSet<>(currentPlayersInDungeon);
         newPlayers.removeAll(playersInDungeon);
-
         for (Player player : newPlayers) {
-            var enterEvent = new PlayerEnterDungeonEvent(this, player);
-            enterEvent.callEvent();
+            (new PlayerEnterDungeonEvent(this, player)).callEvent();
         }
 
         playersInDungeon = currentPlayersInDungeon;
+    }
+
+    public void updatePlayersInRooms() {
+
+        if (playersInDungeon == null)
+            playersInDungeon = new ArrayList<>();
+
+        var uncheckedOnlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
+
+        for (Room room : rooms) {
+
+            Set<Player> currentPlayersInRoom = new HashSet<>();
+            for (Player player : uncheckedOnlinePlayers) {
+                var ploc = player.getLocation();
+                if (room.getBoundingBox().contains(ploc.getX(), ploc.getY(), ploc.getZ())) {
+                    currentPlayersInRoom.add(player);
+                }
+            }
+
+            Set<Player> pastPlayersInRoom = new HashSet<>(room.getPlayersInRoom());
+            pastPlayersInRoom.removeAll(currentPlayersInRoom);
+            for (Player pastPlayer : pastPlayersInRoom) {
+                (new PlayerExitRoomEvent(this, room, pastPlayer)).callEvent();
+            }
+
+            Set<Player> newPlayersInRoom = new HashSet<>(currentPlayersInRoom);
+            newPlayersInRoom.removeAll(room.getPlayersInRoom());
+            for (Player newPlayer : newPlayersInRoom) {
+                (new PlayerEnterRoomEvent(this, room, newPlayer)).callEvent();
+            }
+
+            room.setPlayersInRoom(currentPlayersInRoom);
+
+            uncheckedOnlinePlayers.removeAll(currentPlayersInRoom);
+        }
+
     }
 
     public boolean isPlayerInDungeon(Player player) {
@@ -366,6 +236,11 @@ public class Dungeon {
         return playersInDungeon;
     }
 
+    public void lockDungeon(Player lockingPlayer) {
+        partyLeader = lockingPlayer;
+        lockDungeon();
+    }
+
     public void lockDungeon() {
 
         if (isLocked || isOnCooldown || !isActive)
@@ -378,21 +253,9 @@ public class Dungeon {
         isLocked = true;
 
         for (Player player : lockedPlayersInDungeon) {
-            player.sendMessage(MessageFormatter
-                    .getWithPrefix("Dungeon " + getCleanName()
-                            + " is now locked for your party. No other players can enter in the next "
-                            + MessageFormatter.formatDuration(getRemainingLockTime())));
+            Messenger.sendMessageTemplate(player, "dungeon-status-lock",
+                    Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())), true);
         }
-    }
-
-    public void lockDungeonTest() {
-
-        if (isLocked || isOnCooldown || !isActive)
-            return;
-
-        lockedPlayersInDungeon = new ArrayList<>();
-        lockStartTime = System.currentTimeMillis();
-        isLocked = true;
     }
 
     public void invitePlayer(Player player) {
@@ -402,8 +265,8 @@ public class Dungeon {
         if (!lockedPlayersInDungeon.contains(player))
             lockedPlayersInDungeon.add(player);
 
-        player.sendMessage(
-                MessageFormatter.getWithPrefix("You have been added to the dungeon party of " + getCleanName()));
+        Messenger.sendMessageTemplate(player, "invitation-received",
+                Map.of("dungeon-name", this.getCleanName()), true);
     }
 
     public void removeLockedPlayer(Player player) {
@@ -421,7 +284,7 @@ public class Dungeon {
             return;
 
         if (System.currentTimeMillis() - cooldownStart >= cooldownTime * 1000) {
-            resetCompletion();
+            reset();
         }
     }
 
@@ -432,9 +295,8 @@ public class Dungeon {
         if (System.currentTimeMillis() - lockStartTime >= this.lockTime * 1000) {
 
             for (Player player : lockedPlayersInDungeon) {
-                player.sendMessage(MessageFormatter
-                        .getWithPrefix("Your lock on dungeon " + getCleanName()
-                                + " has expired. It is now open for all players again."));
+                Messenger.sendMessageTemplate(player, "dungeon-status-lock-expired",
+                        Map.of("dungeon-name", this.getCleanName()), true);
             }
             lockedPlayersInDungeon = new ArrayList<>();
             lockStartTime = 0;
@@ -443,140 +305,93 @@ public class Dungeon {
     }
 
     public void complete() {
-
-        for (var player : playersInDungeon) {
-            player.sendMessage(MessageFormatter
-                    .getWithPrefix(ChatColor.WHITE + "Area cleared, well done! No new monsters will arrive."));
-        }
-
-        if (this.spawners != null && !this.spawners.isEmpty()) {
-            for (Spawner spawner : this.spawners.values())
-                plugin.getMobManager().removeAllSpawnerMobs(spawner);
-        }
-
-        if (this.doRewardDrop && this.rewardDropLocation != null) {
-
-            Block block = this.rewardDropLocation.getBlock();
-            block.setType(Material.YELLOW_SHULKER_BOX);
-
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-
-                BlockState state = block.getState();
-                if (state instanceof ShulkerBox) {
-                    ShulkerBox shulker = (ShulkerBox) state;
-
-                    if (this.staticRewards != null) {
-                        var staticRewards = ParseRewards(this.staticRewards);
-                        if (staticRewards != null && !staticRewards.isEmpty()) {
-                            for (var item : staticRewards) {
-                                addRewardToShulker(shulker, item);
-                            }
-                        }
-                    }
-
-                    if (this.randomRewards != null && this.randomRewardsCount > 0) {
-                        var randomrewards = ParseRewards(this.randomRewards);
-                        if (randomrewards != null && !randomrewards.isEmpty()) {
-                            {
-                                Random random = new Random();
-                                for (var i = 0; i < this.randomRewardsCount; i++) {
-                                    int index = random.nextInt(randomrewards.size());
-                                    var item = randomrewards.get(index);
-                                    addRewardToShulker(shulker, item);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                new ParticleBuilder(Particle.WAX_OFF)
-                        .location(rewardDropLocation)
-                        .offset(0.6, 0.6, 0.6)
-                        .receivers(64)
-                        .count(24)
-                        .spawn();
-
-                for (var player : playersInDungeon) {
-                    ((Player) player).playSound(rewardDropLocation, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-                    player.sendMessage(MessageFormatter
-                            .getWithPrefix(ChatColor.WHITE + "A reward has appeared!"));
-                }
-
-            }, 1L);
-        }
-
+        updateHighscores();
         resetLock();
 
         cooldownStart = System.currentTimeMillis();
         isOnCooldown = true;
 
+        if (this.isPublic) {
+            (new DungeonCompleteEvent(this)).callEvent();
+        }
     }
 
-    public void resetCompletion() {
+    private void updateHighscores() {
+        if (!this.isLocked || this.lockStartTime == 0)
+            return;
+
+        if (this.lockedPlayersInDungeon == null || this.lockedPlayersInDungeon.isEmpty())
+            return;
+
+        Long timeToCompletion = System.currentTimeMillis() - (long) lockStartTime;
+        String playerNames = String.join(", ",
+                lockedPlayersInDungeon.stream().map(p -> p.getName()).collect(Collectors.toList()));
+
+        Logger.log("Generating highscore...");
+        var newHighscore = new HighScore(timeToCompletion, playerNames);
+
+        int index = Collections.binarySearch(highscores, newHighscore, Comparator.comparingLong(h -> h.getTime()));
+        if (index < 0)
+            index = -index - 1;
+        highscores.add(index, newHighscore);
+
+        Logger.log("i: " + index);
+
+        if (highscores.size() > 5) {
+            highscores.remove(highscores.size() - 1);
+        }
+
+        Logger.log("Highscores: " + highscores.size());
+
+        UnitedDungeons.getInstance().getDungeonManager().saveDungeon(this);
+    }
+
+    public void reset() {
+
+        var spawners = getSpawners();
+        if (spawners != null) {
+            for (Spawner s : spawners) {
+                UnitedDungeons.getInstance().getMobManager().removeAllSpawnerMobs(s);
+            }
+        }
+
         cooldownStart = 0;
         isOnCooldown = false;
 
-        if (this.rewardDropLocation != null)
-            this.rewardDropLocation.getBlock().setType(Material.AIR);
-
-        if (this.spawners != null && !this.spawners.isEmpty()) {
-            for (Spawner spawner : this.spawners.values())
-                spawner.resetCompletion();
-        }
-
-        playersInDungeon = new ArrayList<>();
-
         resetLock();
 
-        if (isActive) {
-            var openEvent = new DungeonOpenEvent(this);
-            openEvent.callEvent();
+        for (Room room : rooms) {
+            room.reset();
         }
 
-        plugin.getLogger().info("Dungeon " + this.name + " reset");
+        if (playersInDungeon.size() > 0) {
+            for (var player : playersInDungeon) {
+                if (player.hasPermission("united.dungeons.admin"))
+                    continue;
+                player.teleport(this.warpLocation);
+                Messenger.sendMessageTemplate(player, "dungeon-reset-teleport", null, true);
+            }
+        }
+        playersInDungeon = new ArrayList<>();
+
+        if (isActive && isPublic) {
+            (new DungeonOpenEvent(this)).callEvent();
+        }
+
+        Logger.log("Dungeon " + this.name + " reset");
     }
 
     public void resetLock() {
+        partyLeader = null;
         lockedPlayersInDungeon = new ArrayList<>();
         isLocked = false;
         lockStartTime = 0;
     }
 
-    private void addRewardToShulker(ShulkerBox shulker, Tuple<String, Integer> item) {
-        CustomStack customStack = CustomStack.getInstance(item.x);
-        if (customStack != null) {
-            var itemStack = customStack.getItemStack();
-            itemStack.setAmount(item.y);
-
-            shulker.getInventory().addItem(itemStack);
-        } else {
-            shulker.getInventory().addItem(new ItemStack(Material.getMaterial(item.x), item.y));
-        }
-    }
-
-    private List<Tuple<String, Integer>> ParseRewards(String rewards) {
-        var result = new ArrayList<Tuple<String, Integer>>();
-        if (rewards != null) {
-            var r1 = rewards.split(";");
-            if (r1.length > 0) {
-                for (var i = 0; i < r1.length; i++) {
-                    var r2 = r1[i].split("#");
-                    if (r2.length == 2) {
-                        result.add(new Tuple<String, Integer>(r2[0], Integer.parseInt(r2[1])));
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public Map<UUID, Spawner> getSpawners() {
-        return this.spawners;
-    }
-
-    public void removeSpawner(UUID uuid) {
-        if (this.spawners.containsKey(uuid))
-            this.spawners.remove(uuid);
+    public Set<Spawner> getSpawners() {
+        if (rooms == null || rooms.isEmpty())
+            return new HashSet<>();
+        return rooms.stream().flatMap(r -> r.getSpawners().stream()).collect(Collectors.toSet());
     }
 
     public String getCleanName() {
@@ -597,8 +412,247 @@ public class Dungeon {
         return (long) lockLeft;
     }
 
-    private UnitedDungeons getPlugin() {
-        return (UnitedDungeons) Bukkit.getPluginManager().getPlugin("UnitedDungeons");
+    // #region Room functions
+
+    public Set<Room> getRooms() {
+        if (rooms == null)
+            return new HashSet<Room>();
+        return rooms;
     }
+
+    public void addRoom(@NotNull Room room) {
+        if (rooms == null)
+            rooms = new HashSet<>();
+        if (!rooms.contains(room))
+            rooms.add(room);
+    }
+
+    public void removeRoom(@NotNull Room room) {
+        if (rooms == null)
+            return;
+        if (rooms.contains(room))
+            rooms.remove(room);
+    }
+
+    public void moveRoom(@NotNull Room room, @NotNull String axis, @NotNull Long distance) {
+        var bbox = room.getBoundingBox().clone();
+        Vector shiftVector = new Vector(0, 0, 0);
+
+        switch (axis) {
+            case "x":
+                shiftVector = new Vector(distance, 0, 0);
+                break;
+            case "y":
+                shiftVector = new Vector(0, distance, 0);
+                break;
+            case "z":
+                shiftVector = new Vector(0, 0, distance);
+                break;
+        }
+        bbox.shift(shiftVector);
+
+        room.setBoundingBox(bbox);
+        moveRoomContents(room, shiftVector);
+
+    }
+
+    public void shiftRoom(@NotNull Room room, @NotNull Location shift) {
+        var bbox = room.getBoundingBox().clone();
+        Vector shiftVector = new Vector(shift.getX(), shift.getY(), shift.getZ());
+        bbox.shift(shiftVector);
+
+        room.setBoundingBox(bbox);
+        moveRoomContents(room, shiftVector);
+    }
+
+    private void moveRoomContents(Room room, Vector shiftVector) {
+        for (Spawner spawner : room.getSpawners()) {
+            spawner.getLocation().add(shiftVector);
+        }
+        for (RewardChest chest : room.getChests()) {
+            chest.getLocation().add(shiftVector);
+        }
+        for (Barrier barrier : room.getBarriers()) {
+            barrier.getLocation().add(shiftVector);
+        }
+    }
+
+    public void expandRoom(@NotNull Room room, @NotNull String axis, @NotNull Long value) {
+        var bbox = room.getBoundingBox().clone();
+        switch (axis) {
+            case "x":
+                bbox.expand(value, 0, 0);
+                break;
+            case "y":
+                bbox.expand(0, value, 0);
+                break;
+            case "z":
+                bbox.expand(0, 0, value);
+                break;
+        }
+
+        Set<Spawner> spawnersToRemove = new HashSet<>();
+        for (Spawner spawner : room.getSpawners()) {
+            var spawnerLocation = new Vector(spawner.getLocation().getX(), spawner.getLocation().getY(),
+                    spawner.getLocation().getZ());
+            if (!bbox.contains(spawnerLocation)) {
+                spawnersToRemove.add(spawner);
+            }
+        }
+        for (var spawner : spawnersToRemove)
+            room.removeSpawner(spawner);
+
+        Set<RewardChest> chestsToRemove = new HashSet<>();
+        for (RewardChest chest : room.getChests()) {
+            var chestLocation = new Vector(chest.getLocation().getX(), chest.getLocation().getY(),
+                    chest.getLocation().getZ());
+            if (!bbox.contains(chestLocation)) {
+                chestsToRemove.add(chest);
+            }
+        }
+        for (var chest : chestsToRemove)
+            room.removeChest(chest);
+
+        Set<Barrier> barriersToRemove = new HashSet<>();
+        for (Barrier barrier : room.getBarriers()) {
+            var barrierLocation = new Vector(barrier.getLocation().getX(), barrier.getLocation().getY(),
+                    barrier.getLocation().getZ());
+            if (!bbox.contains(barrierLocation)) {
+                barriersToRemove.add(barrier);
+            }
+        }
+        for (var chest : barriersToRemove)
+            room.removeBarrier(chest);
+
+        room.setBoundingBox(bbox);
+    }
+
+    // #endregion
+
+    // #region Getters / Setters
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(@NotNull UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@NotNull String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(@NotNull String description) {
+        this.description = description;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(@NotNull Location location) {
+        this.location = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
+    }
+
+    public Location getWarpLocation() {
+        return warpLocation;
+    }
+
+    public void setWarpLocation(Location warpLocation) {
+        var center = warpLocation.getBlock().getLocation().add(0.5, 0.5, 0.5);
+        this.warpLocation = new Location(center.getWorld(), center.getX(), center.getY(), center.getZ(),
+                warpLocation.getYaw(), warpLocation.getPitch());
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public boolean isSleeping() {
+        return isSleeping;
+    }
+
+    public void setSleeping(boolean isSleeping) {
+        this.isSleeping = isSleeping;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+    }
+
+    public boolean isLockable() {
+        return isLockable;
+    }
+
+    public void setLockable(boolean isLockable) {
+        this.isLockable = isLockable;
+    }
+
+    public boolean isOnCooldown() {
+        return isOnCooldown;
+    }
+
+    public void setOnCooldown(boolean isOnCooldown) {
+        this.isOnCooldown = isOnCooldown;
+    }
+
+    public double getCooldownTime() {
+        return cooldownTime;
+    }
+
+    public double getLockTime() {
+        return lockTime;
+    }
+
+    public double getCooldownStart() {
+        return cooldownStart;
+    }
+
+    public int getTicksWithoutPlayers() {
+        return ticksWithoutPlayers;
+    }
+
+    public Collection<Player> getLockedPlayersInDungeon() {
+        return lockedPlayersInDungeon;
+    }
+
+    public double getLockStartTime() {
+        return lockStartTime;
+    }
+
+    public Player getPartyLeader() {
+        return partyLeader;
+    }
+
+    public ArrayList<HighScore> getHighscores() {
+        return highscores;
+    }
+
+    // #endregion
 
 }

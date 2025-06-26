@@ -1,0 +1,162 @@
+general:
+  tick-frequency: 1 # The plugin tick speed in seconds (e.g. for proximity checks, spawner actions...)
+  max-dungeons: -1 # maximum number of dungeons (-1 for unlimited)
+  min-dungeon-distance: 512 # minimum distance between two dungeons
+  max-room-distance: 128 # maximum distance of rooms from the dungeon center
+  max-room-edge-lenth: 128 # maximum length for room edges
+  max-barrier-height: 8 # maximum height for generated barriers
+
+visualisation:
+  dungeon-center:
+    particle: SOUL_FIRE_FLAME
+  room-edge:
+    particle: FLAME
+    density: 2
+  spawner:
+    particle: RAID_OMEN
+  chest:
+    particle: HAPPY_VILLAGER
+  barrier:
+    particle: CAMPFIRE_COSY_SMOKE
+  warp:
+    particle: WITCH
+
+###################################################
+# +---------------------------------------------+ #
+# |                  Messages                   | #
+# +---------------------------------------------+ #
+###################################################
+
+messages:
+  # Plugin prefix before every system message.
+  prefix: "§c§lU§f§lL §7§lDungeons §8§l» "
+  reload: "§2Plugin reloaded."
+  teleport: "Teleporting in 3 seconds. Move to cancel."
+  teleport-cancel: "Teleportation cancelled."
+  visualisation-on: "Dungeon visualisation switched on."
+  visualisation-off: "Dungeon visualisation switched off."
+  no-permission: "§cYou don't have permission to use this command."
+
+  # +---------------------------------------------+ #
+  # |           Command Usage Infos               | #
+  # +---------------------------------------------+ #
+
+  info-barrier-create: "Usage: /uda barrier create"
+  info-barrier-info: "Usage: /uda barrier info"
+  info-barrier-remove: "Usage: /uda barrier remove"
+  info-barrier-set: "Usage: /uda barrier set <property> <value>"
+  info-chest-create: "Usage: /uda chest create"
+  info-chest-info: "Usage: /uda chest info"
+  info-chest-remove: "Usage: /uda chest remove"
+  info-chest-set: "Usage: /uda chest set <property> <value>"
+  info-dungeon-create: "Usage: /uda dungeon create <new_dungeon_name>"
+  info-dungeon-delete: "Usage: /uda dungeon delete"
+  info-dungeon-info: "Usage: /uda dungeon info"
+  info-dungeon-set: "Usage: /uda dungeon set <location|warp|property_name> [property_value]"
+  info-dungeon-set-location: "Usage: /uda dungeon set location"
+  info-dungeon-set-warp: "Usage: /uda dungeon set warp"
+  info-dungeon-set-public: "Usage: /uda dungeon set public <true|false>"
+  info-dungeon-start: "Usage: /uda dungeon start [dungeon_name]"
+  info-dungeon-stop: "Usage: /uda dungeon stop [dungeon_name]"
+  info-dungeon-kick: "Usage: /uda dungeon kick <player_name>"
+  info-player-dungeon-list: "Usage: /ud list"
+  info-player-dungeon-start: "Usage: /ud start"
+  info-player-dungeon-warp: "Usage: /ud warp <dungeon_name>"
+  info-player-invite: "Usage: /ud invite <player_name>"
+  info-player-leave: "Usage: /ud leave"
+  info-player-highscores: "Usage: /ud highscores <dungeon_name>"
+  info-room-create: "Usage: /uda room create <new_room_name> [<width> <lentgh>]"
+  info-room-info: "Usage: /uda room info"
+  info-room-set: "Usage: /uda room set <property> <value>"
+  info-room-delete: "Usage: /uda room delete"
+  info-room-expand: "Usage: /uda room expand <x|y|z> <amount>"
+  info-room-move: "Usage: /uda room move <x|y|z> <distance>"
+  info-room-state: "Usage: /uda room state <edit|complete|reset>"
+  info-spawner-create: "Usage: /uda spawner create"
+  info-spawner-info: "Usage: /uda spawner info"
+  info-spawner-remove: "Usage: /uda spawner remove"
+  info-spawner-set: "Usage: /uda spawner set <property> <value>"
+
+  # +---------------------------------------------+ #
+  # |                 IO Messages                 | #
+  # +---------------------------------------------+ #
+
+  save-error: "§cError while saving changes."
+  save-success: "§2All changes saved."
+  file-delete-success: "§2Dungeon file deleted succesfully."
+  file-delete-error: "§cError while trying to delete dungeon file."
+
+  # +---------------------------------------------+ #
+  # |               Command Errors                | #
+  # +---------------------------------------------+ #
+
+  error-no-dungeon-found: "§cYou are not close to a dungeon."
+  error-no-dungeon-found-by-name: "§cThere is no dungeon with that name."
+  error-not-in-room: "§cThis command can only be used inside of a dungeon room."
+  error-in-room: "§cThis command can only be used outside of a dungeon room."
+  error-barrier-not-found: "§cThere is no barrier at this location."
+  error-chest-not-found: "§cThere is no chest at this location."
+  error-max-dungeons: "§cMaximum allowed dungeons reached, you can't create another one."
+  error-dungeon-too-close: "§cThis location is too close to another dungeon."
+  error-dungeon-with-same-name: "§cA dungeon with the same name already exists."
+  error-start-no-warp: "§cYou can't start a dungeon that doesn't have a warp location. Set one with /uda dungeon set warp."
+  error-public-no-warp: "§cYou can't set a dungeon to public that doesn't have a warp location. Set one with /uda dungeon set warp."
+  error-start-no-rooms: "§cYou can't start a dungeon that doesn't have any rooms."
+  error-public-no-rooms: "§cYou can't set a dungeon to public that doesn't have any rooms."
+  error-room-overlap: "§cOverlapping rooms are not allowed."
+  error-room-too-large: "§cThe room size is too large."
+  error-room-too-small: "§cThe room size is too small."
+  error-number-format: "§cInvalid number format."
+  error-spawner-not-found: "§cThere is no spawner at this location."
+  error-not-in-party: "§cYou're not part of a dungeon party!"
+  error-player-not-in-party: "§cPlayer is not part of a dungeon party."
+  error-player-not-found: "§cCouldn't find an online player by that name."
+  error-dungeon-not-locked: "§cThis dungeon isn't locked."
+
+  # +---------------------------------------------+ #
+  # |             Dungeon Status Info             | #
+  # +---------------------------------------------+ #
+
+  dungeon-status-lock: "This is now locked for your party. No other players can enter in the next {lock-time}, unless you invite them with /ud invite."
+  dungeon-status-locked: "This dungeon is §clocked §7by a party. It will be open again in {lock-time}."
+  dungeon-status-lock-expired: "Your lock on §6{dungeon-name} §7has expired. All players can enter again."
+  dungeon-status-not-lockable: "This dungeon cannot be locked for dungeon parties."
+  dungeon-room-not-lockable: "You cannot lock the dungeon from this room."
+  dungeon-status-not-public: "This dungeon isn't public."
+  dungeon-status-no-warp: "There is no location to teleport to."
+  dungeon-status-cooldown: "This dungeon is on §ecooldown§7. It will open again in {cooldown-time}."
+  dungeon-completed: "§6{dungeon-name} §7has been completed and is now on §ecooldown§7. It will open again in {cooldown-time}."
+  dungeon-reset-teleport: "The dungeon you were in has been reset. You have been teleported back to the entrance."
+  dungeon-started: "§2Dungeon started."
+  dungeon-stopped: "§cDungeon stopped."
+
+  # +---------------------------------------------+ #
+  # |                Dungeon Events               | #
+  # +---------------------------------------------+ #
+
+  dungeon-event-open: 
+  - "§c§m+|✦                    §r§c§l[§f§l Dungeon opened! §c§l]§c§m                     |✦+"
+  - "§6{dungeon-name} §8has opened and is ready to welcome players. Use /ud warp to teleport there."
+  - "§7§o{dungeon-description}"
+  - "§c§m+|✦                                 +✦+                                 |✦+"
+  dungeon-event-completed: 
+  - "§c§m+|✦                    §r§c§l[§f§l Dungeon completed! §c§l]§c§m                  |✦+"
+  - "§6{dungeon-name} §7has been completed and is now on cooldown. It will reopen in {cooldown-time}."
+  - "§c§m+|✦                                 +✦+                                 |✦+"
+
+  # +---------------------------------------------+ #
+  # |                      Misc                   | #
+  # +---------------------------------------------+ #
+
+  player-invited: "§3The player has been added to the dungeon party."
+  player-left: "§3You've left the dungeon party."
+  invitation-received: "§3You have been added to the dungeon party in §6{dungeon-name}§7."
+  dungeon-highscores: 
+  - "§c§m+|✦                   §r§c§l[§f§l Dungeon Highscores §c§l]§c§m                   |✦+"
+  - "§l§6{dungeon-name} §fTop 5:"
+  - "§l§f1. {time1} §r§7- {players1}"
+  - "§l§f2. {time2} §r§7- {players2}"
+  - "§l§f3. {time3} §r§7- {players3}"
+  - "§l§f4. {time4} §r§7- {players4}"
+  - "§l§f5. {time5} §r§7- {players5}"
+  - "§c§m+|✦                                 +✦+                                 |✦+"
