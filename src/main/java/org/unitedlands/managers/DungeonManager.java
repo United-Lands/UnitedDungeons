@@ -158,11 +158,12 @@ public class DungeonManager {
 
                     dungeon.checkPlayerProximity(detectionRange);
                     dungeon.checkCooldown();
+                    dungeon.checkPlayerLockCooldowns();
 
                     if (!dungeon.isSleeping()) {
 
                         dungeon.checkPlayerActivity();
-
+            
                         if (dungeon.isOnCooldown()) {
                             continue;
                         } else {
@@ -199,7 +200,7 @@ public class DungeonManager {
             try {
                 dungeonFile.createNewFile();
             } catch (IOException ex) {
-                plugin.getLogger().severe(ex.getMessage());
+                Logger.logError(ex.getMessage());
             }
         }
 
@@ -207,7 +208,7 @@ public class DungeonManager {
             JsonUtils.saveObjectToFile(dungeon, dungeonFile);
             return true;
         } catch (IOException ex) {
-            plugin.getLogger().severe(ex.getMessage());
+            Logger.logError(ex.getMessage());
             return false;
         }
     }

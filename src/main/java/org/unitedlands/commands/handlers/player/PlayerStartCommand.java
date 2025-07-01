@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.commands.base.BaseCommandHandler;
 import org.unitedlands.utils.Formatter;
+import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
 public class PlayerStartCommand extends BaseCommandHandler {
@@ -43,6 +44,18 @@ public class PlayerStartCommand extends BaseCommandHandler {
             return;
         }
 
+        if (dungeon.isOnCooldown()) {
+            Messenger.sendMessageTemplate(sender, "dungeon-status-lock-cooldown",
+                    Map.of("cooldown-time", Formatter.formatDuration(dungeon.getRemainingCooldown())), true);
+            return;
+        }
+
+        if (dungeon.isLocked()) {
+            Messenger.sendMessageTemplate(sender, "dungeon-status-locked",
+                    Map.of("lock-time", Formatter.formatDuration(dungeon.getRemainingLockTime())), true);
+            return;
+        }
+
         if (dungeon.isLocked()) {
             Messenger.sendMessageTemplate(sender, "dungeon-status-locked",
                     Map.of("lock-time", Formatter.formatDuration(dungeon.getRemainingLockTime())), true);
@@ -56,6 +69,14 @@ public class PlayerStartCommand extends BaseCommandHandler {
 
         if (!room.enableLocking()) {
             Messenger.sendMessageTemplate(sender, "dungeon-room-not-lockable", null, true);
+            return;
+        }
+
+        if (dungeon.isPlayerOnLockCooldown(player.getUniqueId())) {
+            Messenger.sendMessageTemplate(player, "error-leader-still-on-lock-cooldown",
+                    Map.of("cooldown",
+                            Formatter.formatDuration(dungeon.getPlayerRemainingLockCooldown(player.getUniqueId()))),
+                    true);
             return;
         }
 

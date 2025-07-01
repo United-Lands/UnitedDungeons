@@ -12,6 +12,8 @@ general:
   # How close a player needs to get to a dungeon for it to wake up and start detailed checks.
   # This should ideally be greater than maxroom-distance and smaller than min-dungeon-distance.
   player-detection-range: 16 
+  # time in minutes that players can't be part of a dungeon party again
+  player-lock-cooldown: 120
   # maximum height for barriers
   max-barrier-height: 8 
 
@@ -122,6 +124,8 @@ messages:
   error-player-not-in-party: "§cPlayer is not part of a dungeon party."
   error-player-not-found: "§cCouldn't find an online player by that name."
   error-dungeon-not-locked: "§cThis dungeon isn't locked."
+  error-player-still-on-lock-cooldown: "§cYou can't join this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
+  error-leader-still-on-lock-cooldown: "§cYou can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
 
   # +---------------------------------------------+ #
   # |             Dungeon Status Info             | #
@@ -135,6 +139,7 @@ messages:
   dungeon-status-not-public: "This dungeon isn't public."
   dungeon-status-no-warp: "There is no location to teleport to."
   dungeon-status-cooldown: "You've been teleported back to the entrance because this dungeon is on §ecooldown§7. It will open again in {cooldown-time}."
+  dungeon-status-lock-cooldown: "This can't be locked since it is on §ecooldown§7. It will open again in {cooldown-time}."
   dungeon-completed: "§6{dungeon-name} §7has been completed and is now on §ecooldown§7. It will open again in {cooldown-time}."
   dungeon-complete-countdown: "§fCongratulations on completing the dungeon. You will be teleported out in {countdown}, so get all the loot while you still can!"
   dungeon-reset-teleport: "The dungeon you were in has been reset. You have been teleported back to the entrance."

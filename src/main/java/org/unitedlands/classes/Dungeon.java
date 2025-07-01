@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +88,9 @@ public class Dungeon {
     private Player partyLeader;
     private Collection<Player> lockedPlayersInDungeon = new HashSet<Player>();
     private long lockStartTime;
+
+    @Expose
+    private Set<PlayerLockCooldown> playerLockCooldowns = new HashSet<>();
 
     public Dungeon() {
         this.uuid = UUID.randomUUID();
@@ -295,14 +299,62 @@ public class Dungeon {
 
         updatePlayersInDungeon();
 
-        lockedPlayersInDungeon = playersInDungeon;
+        var validPlayersForLocking = new HashSet<Player>();
+        for (Player player : playersInDungeon) {
+            if (!isPlayerOnLockCooldown(player.getUniqueId())) {
+                validPlayersForLocking.add(player);
+            } else {
+                Messenger.sendMessageTemplate(player, "error-player-still-on-lock-cooldown",
+                        Map.of("cooldown",
+                                Formatter.formatDuration(getPlayerRemainingLockCooldown(player.getUniqueId()))),
+                        true);
+            }
+        }
+
+        if (validPlayersForLocking.isEmpty()) {
+            return;
+        }
+
+        lockedPlayersInDungeon = validPlayersForLocking;
         lockStartTime = System.currentTimeMillis();
         isLocked = true;
 
         for (Player player : lockedPlayersInDungeon) {
+            playerLockCooldowns.add(new PlayerLockCooldown(System.currentTimeMillis(), player.getUniqueId()));
             Messenger.sendMessageTemplate(player, "dungeon-status-lock",
                     Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())), true);
         }
+
+        UnitedDungeons.getInstance().getDungeonManager().saveDungeon(this);
+    }
+
+    public boolean isPlayerOnLockCooldown(UUID playerId) {
+        if (playerLockCooldowns == null || playerLockCooldowns.isEmpty())
+            return false;
+        if (!playerLockCooldowns.stream().anyMatch(r -> r.getPlayer().equals(playerId)))
+            return false;
+
+        var record = playerLockCooldowns.stream().filter(r -> r.getPlayer().equals(playerId)).findFirst().orElse(null);
+        if (record == null)
+            return false;
+
+        var difference = System.currentTimeMillis() - record.getTime();
+        var cooldown = UnitedDungeons.getInstance().getConfig().getInt("general.player-lock-cooldown", 0);
+
+        if (difference < cooldown * 1000) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Long getPlayerRemainingLockCooldown(UUID playerId) {
+        var record = playerLockCooldowns.stream().filter(r -> r.getPlayer().equals(playerId)).findFirst().orElse(null);
+        if (record == null)
+            return null;
+
+        var cooldown = UnitedDungeons.getInstance().getConfig().getInt("general.player-lock-cooldown", 0);
+        return (cooldown * 1000) - (System.currentTimeMillis() - record.getTime());
     }
 
     public void invitePlayer(Player player) {
@@ -348,6 +400,22 @@ public class Dungeon {
             lockedPlayersInDungeon = new ArrayList<>();
             lockStartTime = 0;
             isLocked = false;
+        }
+    }
+
+    public void checkPlayerLockCooldowns() {
+        if (playerLockCooldowns == null || playerLockCooldowns.isEmpty())
+            return;
+        Set<PlayerLockCooldown> recordsToRemove = new HashSet<>();
+        for (var record : playerLockCooldowns) {
+            if (!isPlayerOnLockCooldown(record.getPlayer()))
+                recordsToRemove.add(record);
+        }
+        if (!recordsToRemove.isEmpty()) {
+            for (var record : recordsToRemove)
+                playerLockCooldowns.remove(record);
+
+            UnitedDungeons.getInstance().getDungeonManager().saveDungeon(this);
         }
     }
 
