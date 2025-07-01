@@ -20,7 +20,7 @@ public class DungeonSetCommand extends BaseCommandHandler {
         super(plugin);
     }
 
-    private List<String> propertyList = Arrays.asList("location", "warp", "isPublic", "isLockable", "name",
+    private List<String> propertyList = Arrays.asList("location", "warp", "isPublic", "isLockable", "name", "pulloutTime",
             "description", "cooldownTime", "lockTime", "ticksBeforeSleep");
 
     @Override

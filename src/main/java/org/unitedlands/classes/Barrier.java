@@ -16,10 +16,10 @@ public class Barrier {
 
     @Expose
     @Info
-    private String material;
+    private String material = "STONE";
     @Expose
     @Info
-    private Integer height;
+    private Integer height = 1;
     @Expose
     @Info
     private Integer maxHeight;
@@ -36,7 +36,6 @@ public class Barrier {
 
     public Barrier(Location location, Integer maxHeight) {
         this.uuid = UUID.randomUUID();
-        this.height = maxHeight;
         this.maxHeight = maxHeight;
         setLocation(location);
     }

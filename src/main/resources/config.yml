@@ -1,10 +1,19 @@
 general:
-  tick-frequency: 1 # The plugin tick speed in seconds (e.g. for proximity checks, spawner actions...)
-  max-dungeons: -1 # maximum number of dungeons (-1 for unlimited)
-  min-dungeon-distance: 512 # minimum distance between two dungeons
-  max-room-distance: 128 # maximum distance of rooms from the dungeon center
-  max-room-edge-lenth: 128 # maximum length for room edges
-  max-barrier-height: 8 # maximum height for generated barriers
+  # The plugin tick speed in seconds (e.g. for room checks, spawner actions...)
+  tick-frequency: 1 
+  # maximum number of dungeons (-1 for unlimited)
+  max-dungeons: -1 
+  # minimum distance between two dungeons
+  min-dungeon-distance: 512
+  # maximum distance of rooms from the dungeon center
+  max-room-distance: 128 
+  # maximum length for room edges
+  max-room-edge-lenth: 128 
+  # How close a player needs to get to a dungeon for it to wake up and start detailed checks.
+  # This should ideally be greater than maxroom-distance and smaller than min-dungeon-distance.
+  player-detection-range: 16 
+  # maximum height for barriers
+  max-barrier-height: 8 
 
 visualisation:
   dungeon-center:
@@ -62,6 +71,7 @@ messages:
   info-player-dungeon-list: "Usage: /ud list"
   info-player-dungeon-start: "Usage: /ud start"
   info-player-dungeon-warp: "Usage: /ud warp <dungeon_name>"
+  info-player-dungeon-info: "Usage: /ud info <dungeon_name>"
   info-player-invite: "Usage: /ud invite <player_name>"
   info-player-leave: "Usage: /ud leave"
   info-player-highscores: "Usage: /ud highscores <dungeon_name>"
@@ -117,18 +127,20 @@ messages:
   # |             Dungeon Status Info             | #
   # +---------------------------------------------+ #
 
-  dungeon-status-lock: "This is now locked for your party. No other players can enter in the next {lock-time}, unless you invite them with /ud invite."
+  dungeon-status-lock: "§fThis dungeon is now locked for your §3dungeon party§f. No other players can enter in the next {lock-time}, unless you invite them with /ud invite. Good luck, adventurers!"
   dungeon-status-locked: "This dungeon is §clocked §7by a party. It will be open again in {lock-time}."
   dungeon-status-lock-expired: "Your lock on §6{dungeon-name} §7has expired. All players can enter again."
   dungeon-status-not-lockable: "This dungeon cannot be locked for dungeon parties."
   dungeon-room-not-lockable: "You cannot lock the dungeon from this room."
   dungeon-status-not-public: "This dungeon isn't public."
   dungeon-status-no-warp: "There is no location to teleport to."
-  dungeon-status-cooldown: "This dungeon is on §ecooldown§7. It will open again in {cooldown-time}."
+  dungeon-status-cooldown: "You've been teleported back to the entrance because this dungeon is on §ecooldown§7. It will open again in {cooldown-time}."
   dungeon-completed: "§6{dungeon-name} §7has been completed and is now on §ecooldown§7. It will open again in {cooldown-time}."
+  dungeon-complete-countdown: "§fCongratulations on completing the dungeon. You will be teleported out in {countdown}, so get all the loot while you still can!"
   dungeon-reset-teleport: "The dungeon you were in has been reset. You have been teleported back to the entrance."
   dungeon-started: "§2Dungeon started."
   dungeon-stopped: "§cDungeon stopped."
+  dungeon-room-lockable: "§7You can use this room to start a §2dungeon party§7. Use \"/ud start\" to lock the dungeon for the current players and compete for the highscore (/ud highscores)."
 
   # +---------------------------------------------+ #
   # |                Dungeon Events               | #
@@ -148,15 +160,23 @@ messages:
   # |                      Misc                   | #
   # +---------------------------------------------+ #
 
+  player-party-start: "§fYou're now part of the dungeon party in §6{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
   player-invited: "§3The player has been added to the dungeon party."
   player-left: "§3You've left the dungeon party."
-  invitation-received: "§3You have been added to the dungeon party in §6{dungeon-name}§7."
+  new-highscore: "§aYour party's time of {time} is a Top 5 highscore - you've been placed on rank {placement}. Good job! §7Check \"/ud highscores\" to see your competition."
   dungeon-highscores: 
-  - "§c§m+|✦                   §r§c§l[§f§l Dungeon Highscores §c§l]§c§m                   |✦+"
+  - "§c§m+|✦                  §r§c§l[§f§l Dungeon Highscores §c§l]§c§m                  |✦+"
   - "§l§6{dungeon-name} §fTop 5:"
   - "§l§f1. {time1} §r§7- {players1}"
   - "§l§f2. {time2} §r§7- {players2}"
   - "§l§f3. {time3} §r§7- {players3}"
   - "§l§f4. {time4} §r§7- {players4}"
   - "§l§f5. {time5} §r§7- {players5}"
+  - "§c§m+|✦                                 +✦+                                 |✦+"
+  dungeon-info: 
+  - "§c§m+|✦                     §r§c§l[§f§l Dungeon Info §c§l]§c§m                      |✦+"
+  - "§6{dungeon-name}"
+  - "§7§o{dungeon-description}"
+  - "§lStatus:§r {status}"
+  - "§lPlayers in dungeon:§r {players}"
   - "§c§m+|✦                                 +✦+                                 |✦+"

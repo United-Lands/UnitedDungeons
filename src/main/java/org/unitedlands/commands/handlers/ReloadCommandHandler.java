@@ -25,7 +25,10 @@ public class ReloadCommandHandler extends BaseCommandHandler {
         if (args.length != 0)
             return;
 
+        plugin.getDungeonManager().stopChecks();
         plugin.reloadConfig();
+        plugin.getDungeonManager().startChecks();
+
         
         Messenger.sendMessageTemplate(sender, "reload", null, true);    
         Logger.log("Config reloaded.");

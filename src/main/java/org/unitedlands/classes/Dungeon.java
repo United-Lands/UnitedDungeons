@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.events.DungeonCompleteEvent;
 import org.unitedlands.events.DungeonOpenEvent;
+import org.unitedlands.events.HighscoreEvent;
 import org.unitedlands.events.PlayerEnterDungeonEvent;
 import org.unitedlands.events.PlayerEnterRoomEvent;
 import org.unitedlands.events.PlayerExitDungeonEvent;
@@ -59,6 +61,9 @@ public class Dungeon {
     private boolean isOnCooldown = false;
     @Expose
     @Info
+    private long pulloutTime = 30;
+    @Expose
+    @Info
     private long cooldownTime = 120;
     @Expose
     @Info
@@ -70,16 +75,17 @@ public class Dungeon {
 
     @Expose
     @Info
-    int ticksBeforeSleep = 300;
+    int ticksBeforeSleep = 60;
     private int ticksWithoutPlayers = Integer.MAX_VALUE;
 
     @Expose
     private ArrayList<HighScore> highscores = new ArrayList<>();
 
-    private Collection<Player> playersInDungeon = new ArrayList<Player>();
+    private Collection<Player> playersInDungeon = new HashSet<Player>();
+    private Collection<Player> playersInPullout = new HashSet<Player>();
 
     private Player partyLeader;
-    private Collection<Player> lockedPlayersInDungeon = new ArrayList<Player>();
+    private Collection<Player> lockedPlayersInDungeon = new HashSet<Player>();
     private long lockStartTime;
 
     public Dungeon() {
@@ -96,46 +102,34 @@ public class Dungeon {
         this.uuid = UUID.randomUUID();
     }
 
-    public void checkRooms() {
+    public void checkPlayerProximity(double detectionRange) {
+        boolean playerNearby = false;
 
-        boolean allRoomsComplete = true;
-        for (var room : rooms) {
-            if (room.isComplete())
+        World world = this.location.getWorld();
+        double lx = this.location.getX();
+        double ly = this.location.getY();
+        double lz = this.location.getZ();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!player.getWorld().equals(world))
                 continue;
-            if (!room.getPlayersInRoom().isEmpty()) {
-                var spawners = room.getSpawners();
-                if (spawners != null && !spawners.isEmpty()) {
-                    boolean allSpawnersComplete = true;
-                    for (Spawner spawner : spawners) {
-                        spawner.checkCompletion();
-                        allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
-                        if (!spawner.isComplete()) {
-                            if (spawner.isPlayerNearby()) {
-                                spawner.prepareSpawn();
-                            }
-                        }
-                    }
-                    if (room.mustBeCompleted()) {
-                        if (allSpawnersComplete)
-                            room.complete();
-                    }
-                } else {
-                    if (room.mustBeCompleted())
-                        room.complete();
-                }
-            }
-            allRoomsComplete = allRoomsComplete && (room.isComplete() || !room.mustBeCompleted());
+
+            double px = player.getX();
+            double py = player.getY();
+            double pz = player.getZ();
+
+            if (Math.abs(px - lx) > detectionRange)
+                continue;
+            if (Math.abs(py - ly) > detectionRange)
+                continue;
+            if (Math.abs(pz - lz) > detectionRange)
+                continue;
+
+            playerNearby = true;
+            break;
         }
-        Logger.log("allRoomsComplete: " + allRoomsComplete);
-        if (allRoomsComplete)
-            this.complete();
-    }
 
-    public void checkPlayerActivity() {
-
-        updatePlayersInDungeon();
-
-        if (playersInDungeon.isEmpty()) {
+        if (!playerNearby) {
             if (ticksWithoutPlayers < Integer.MAX_VALUE)
                 ticksWithoutPlayers++;
             if (ticksWithoutPlayers >= ticksBeforeSleep && !this.isSleeping) {
@@ -148,19 +142,38 @@ public class Dungeon {
                 ticksWithoutPlayers = 0;
                 this.isSleeping = false;
             }
-            if (this.isLocked) {
-                for (Player player : playersInDungeon) {
-                    if (player.hasPermission("united.dungeons.admin"))
-                        continue;
-                    if (!lockedPlayersInDungeon.contains(player)) {
-                        player.teleport(this.warpLocation);
-                        Messenger.sendMessageTemplate(player, "dungeon-status-locked",
-                                Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
-                                true);
-                    }
+        }
+    }
+
+    public void checkPlayerActivity() {
+
+        updatePlayersInDungeon();
+
+        if (this.isLocked) {
+            for (Player player : playersInDungeon) {
+                if (player.hasPermission("united.dungeons.admin"))
+                    continue;
+                if (!lockedPlayersInDungeon.contains(player)) {
+                    player.teleport(this.warpLocation);
+                    Messenger.sendMessageTemplate(player, "dungeon-status-locked",
+                            Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
+                            true);
                 }
             }
         }
+        if (this.isOnCooldown) {
+            for (Player player : playersInDungeon) {
+                if (player.hasPermission("united.dungeons.admin"))
+                    continue;
+                if (playersInPullout == null || !playersInPullout.contains(player)) {
+                    player.teleport(this.warpLocation);
+                    Messenger.sendMessageTemplate(player, "dungeon-status-cooldown",
+                            Map.of("cooldown-time", Formatter.formatDuration(this.getRemainingCooldown())),
+                            true);
+                }
+            }
+        }
+
     }
 
     public void updatePlayersInDungeon() {
@@ -173,25 +186,24 @@ public class Dungeon {
         Set<Player> currentPlayersInDungeon = rooms.stream().flatMap(r -> r.getPlayersInRoom().stream())
                 .collect(Collectors.toSet());
 
-        var pastPlayers = new HashSet<>(playersInDungeon);
-        pastPlayers.removeAll(currentPlayersInDungeon);
-        for (Player player : pastPlayers) {
-            (new PlayerExitDungeonEvent(this, player)).callEvent();
-        }
+        if (!isOnCooldown) {
+            var pastPlayers = new HashSet<>(playersInDungeon);
+            pastPlayers.removeAll(currentPlayersInDungeon);
+            for (Player player : pastPlayers) {
+                (new PlayerExitDungeonEvent(this, player)).callEvent();
+            }
 
-        var newPlayers = new HashSet<>(currentPlayersInDungeon);
-        newPlayers.removeAll(playersInDungeon);
-        for (Player player : newPlayers) {
-            (new PlayerEnterDungeonEvent(this, player)).callEvent();
+            var newPlayers = new HashSet<>(currentPlayersInDungeon);
+            newPlayers.removeAll(playersInDungeon);
+            for (Player player : newPlayers) {
+                (new PlayerEnterDungeonEvent(this, player)).callEvent();
+            }
         }
 
         playersInDungeon = currentPlayersInDungeon;
     }
 
     public void updatePlayersInRooms() {
-
-        if (playersInDungeon == null)
-            playersInDungeon = new ArrayList<>();
 
         var uncheckedOnlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
 
@@ -224,6 +236,39 @@ public class Dungeon {
 
     }
 
+    public void checkRooms() {
+        boolean allRoomsComplete = true;
+        for (var room : rooms) {
+            if (room.isComplete())
+                continue;
+            if (!room.getPlayersInRoom().isEmpty()) {
+                var spawners = room.getSpawners();
+                if (spawners != null && !spawners.isEmpty()) {
+                    boolean allSpawnersComplete = true;
+                    for (Spawner spawner : spawners) {
+                        spawner.checkCompletion();
+                        allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
+                        if (!spawner.isComplete()) {
+                            if (spawner.isPlayerNearby()) {
+                                spawner.prepareSpawn();
+                            }
+                        }
+                    }
+                    if (room.mustBeCompleted()) {
+                        if (allSpawnersComplete)
+                            room.complete();
+                    }
+                } else {
+                    if (room.mustBeCompleted())
+                        room.complete();
+                }
+            }
+            allRoomsComplete = allRoomsComplete && (room.isComplete() || !room.mustBeCompleted());
+        }
+        if (allRoomsComplete)
+            this.complete();
+    }
+
     public boolean isPlayerInDungeon(Player player) {
         return playersInDungeon.contains(player);
     }
@@ -233,6 +278,8 @@ public class Dungeon {
     }
 
     public Collection<Player> getPlayersInDungeon() {
+        if (playersInDungeon == null)
+            return new HashSet<>();
         return playersInDungeon;
     }
 
@@ -306,14 +353,18 @@ public class Dungeon {
 
     public void complete() {
         updateHighscores();
+
+        playersInPullout = new HashSet<>(playersInDungeon);
+        Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+            playersInPullout = new HashSet<>();
+        }, this.pulloutTime * 20L);
+
         resetLock();
 
         cooldownStart = System.currentTimeMillis();
         isOnCooldown = true;
 
-        if (this.isPublic) {
-            (new DungeonCompleteEvent(this)).callEvent();
-        }
+        (new DungeonCompleteEvent(this)).callEvent();
     }
 
     private void updateHighscores() {
@@ -327,7 +378,6 @@ public class Dungeon {
         String playerNames = String.join(", ",
                 lockedPlayersInDungeon.stream().map(p -> p.getName()).collect(Collectors.toList()));
 
-        Logger.log("Generating highscore...");
         var newHighscore = new HighScore(timeToCompletion, playerNames);
 
         int index = Collections.binarySearch(highscores, newHighscore, Comparator.comparingLong(h -> h.getTime()));
@@ -335,13 +385,13 @@ public class Dungeon {
             index = -index - 1;
         highscores.add(index, newHighscore);
 
-        Logger.log("i: " + index);
+        if (index <= 4) {
+            (new HighscoreEvent(this, newHighscore, index + 1)).callEvent();
+        }
 
         if (highscores.size() > 5) {
             highscores.remove(highscores.size() - 1);
         }
-
-        Logger.log("Highscores: " + highscores.size());
 
         UnitedDungeons.getInstance().getDungeonManager().saveDungeon(this);
     }
@@ -374,7 +424,7 @@ public class Dungeon {
         }
         playersInDungeon = new ArrayList<>();
 
-        if (isActive && isPublic) {
+        if (isActive) {
             (new DungeonOpenEvent(this)).callEvent();
         }
 
@@ -651,6 +701,18 @@ public class Dungeon {
 
     public ArrayList<HighScore> getHighscores() {
         return highscores;
+    }
+
+    public long getPulloutTime() {
+        return pulloutTime;
+    }
+
+    public void setPulloutTime(long pulloutTime) {
+        this.pulloutTime = pulloutTime;
+    }
+
+    public Collection<Player> getPlayersInPullout() {
+        return playersInPullout;
     }
 
     // #endregion

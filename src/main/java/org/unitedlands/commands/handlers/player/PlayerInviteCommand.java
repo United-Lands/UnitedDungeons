@@ -58,6 +58,7 @@ public class PlayerInviteCommand extends BaseCommandHandler {
 
         dungeon.invitePlayer(playerToInvite);
         Messenger.sendMessageTemplate(sender, "player-invited", null, true);
+        Messenger.sendMessageTemplate(playerToInvite, "player-party-start", null, true);
 
     }
 

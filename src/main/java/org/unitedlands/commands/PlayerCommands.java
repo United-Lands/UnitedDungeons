@@ -4,6 +4,7 @@ import org.unitedlands.UnitedDungeons;
 import org.unitedlands.commands.base.BaseCommandExecutor;
 import org.unitedlands.commands.handlers.player.PlayerEntranceCommand;
 import org.unitedlands.commands.handlers.player.PlayerHighscoresCommand;
+import org.unitedlands.commands.handlers.player.PlayerInfoCommand;
 import org.unitedlands.commands.handlers.player.PlayerInviteCommand;
 import org.unitedlands.commands.handlers.player.PlayerListCommand;
 import org.unitedlands.commands.handlers.player.PlayerStartCommand;
@@ -23,6 +24,7 @@ public class PlayerCommands extends BaseCommandExecutor {
         handlers.put("invite", new PlayerInviteCommand(plugin));
         handlers.put("list", new PlayerListCommand(plugin));
         handlers.put("highscores", new PlayerHighscoresCommand(plugin));
+        handlers.put("info", new PlayerInfoCommand(plugin));
     }
 
 }
