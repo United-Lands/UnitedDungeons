@@ -19,7 +19,7 @@ public class RoomSetCommand extends BaseCommandHandler {
         super(plugin);
     }
 
-    private List<String> propertyList = Arrays.asList("name", "enableLocking", "mustBeCompleted");
+    private List<String> propertyList = Arrays.asList("name", "enableLocking", "mustBeCompleted", "showTitle");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {

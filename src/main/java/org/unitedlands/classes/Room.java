@@ -46,6 +46,9 @@ public class Room {
     @Expose
     @Info
     private boolean mustBeCompleted = true;
+    @Expose
+    @Info
+    private boolean showTitle = false;
 
     private boolean isComplete;
 
@@ -442,6 +445,14 @@ public class Room {
 
     public void setMustBeCompleted(boolean mustBeCompleted) {
         this.mustBeCompleted = mustBeCompleted;
+    }
+
+    public boolean showTitle() {
+        return showTitle;
+    }
+
+    public void setShowTitle(boolean showTitle) {
+        this.showTitle = showTitle;
     }
 
     // #endregion

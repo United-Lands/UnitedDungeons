@@ -34,6 +34,9 @@ public class SelfListener implements Listener {
         var dungeon = event.getDungeon();
         var room = event.getRoom();
 
+        if (!room.showTitle())
+            return;
+
         var title = Title.title(
                 Component.text(dungeon.getCleanName()).color(NamedTextColor.DARK_RED),
                 Component.text(room.getCleanName()).color(NamedTextColor.WHITE),
@@ -82,11 +85,12 @@ public class SelfListener implements Listener {
         var placement = event.getPlacement();
 
         var players = dungeon.getPlayersInDungeon();
-        for (var player : players)
-        {
-            Messenger.sendMessageTemplate(player, "new-highscore", Map.of("time", Formatter.formatDuration(highscore.getTime()), "placement", placement.toString()), false);
+        for (var player : players) {
+            Messenger.sendMessageTemplate(player, "new-highscore",
+                    Map.of("time", Formatter.formatDuration(highscore.getTime()), "placement", placement.toString()),
+                    false);
         }
-        
+
     }
 
 }
