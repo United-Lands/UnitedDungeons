@@ -298,7 +298,6 @@ public class Room {
                 wall.setUp(true);
             block.setBlockData(wall, true);
         } else if (data instanceof Fence) {
-            Logger.log("Fence");
             var fence = (Fence) data;
             if (block.getRelative(BlockFace.EAST).getType() != Material.AIR)
                 fence.setFace(BlockFace.EAST, true);
@@ -472,9 +471,15 @@ public class Room {
     private void addRewardToShulker(ShulkerBox shulker, RewardSet rewardSet) {
         var itemStack = UnitedDungeons.getInstance().getItemFactory().getItemStack(rewardSet);
         if (itemStack != null) {
-            int maxSplits = 3;
+
+            int splits = 1;
             int amount = itemStack.getAmount();
-            int splits = 1 + new Random().nextInt(maxSplits);
+            if (itemStack.getMaxStackSize() == 1) {
+                splits = itemStack.getAmount();
+            } else {
+                int maxSplits = Math.min(itemStack.getAmount(), 3);
+                splits = 1 + new Random().nextInt(maxSplits);
+            }
 
             int[] splitAmounts = new int[splits];
             int remaining = amount;
@@ -503,7 +508,7 @@ public class Room {
                 inv.setItem(slotIndex, subStack);
             }
         } else {
-            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getAmount()
+            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getMinAmount() + "-" + rewardSet.getMaxAmount()
                     + " for chest in room " + this.uuid);
         }
     }
@@ -515,13 +520,25 @@ public class Room {
             for (var rewardSet : rewardSets) {
                 var rewardAmountSplits = rewardSet.split("#");
                 if (rewardAmountSplits.length == 2) {
+
+                    String amountStr = rewardAmountSplits[1];
+                    int minAmount, maxAmount;
+
+                    var amountSplit = amountStr.split("-");
+                    if (amountSplit.length == 2) {
+                        minAmount = Integer.parseInt(amountSplit[0]);
+                        maxAmount = Integer.parseInt(amountSplit[1]);
+                    } else {
+                        minAmount = Integer.parseInt(amountSplit[0]);
+                        maxAmount = minAmount;
+                    }
+
                     var rewardPercentSplits = rewardAmountSplits[0].split("%");
                     if (rewardPercentSplits.length == 1) {
                         result.add(new RewardSet(rewardAmountSplits[0],
-                                Integer.parseInt(rewardAmountSplits[1]), 1.0));
+                                minAmount, maxAmount, 1.0));
                     } else if (rewardPercentSplits.length == 2) {
-                        result.add(new RewardSet(rewardPercentSplits[1],
-                                Integer.parseInt(rewardAmountSplits[1]),
+                        result.add(new RewardSet(rewardPercentSplits[1], minAmount, maxAmount,
                                 Double.parseDouble(rewardPercentSplits[0]) / 100));
                     }
                 }

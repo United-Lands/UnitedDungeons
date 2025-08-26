@@ -4,6 +4,6 @@ import org.bukkit.inventory.ItemStack;
 import org.unitedlands.classes.RewardSet;
 
 public interface IItemFactory {
-    ItemStack getItemStack(String material, int amount);
+    ItemStack getItemStack(String material, int minAmount, int maxAmount);
     ItemStack getItemStack(RewardSet rewardSet);
 }

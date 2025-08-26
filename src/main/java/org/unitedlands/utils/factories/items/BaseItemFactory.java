@@ -15,7 +15,7 @@ public abstract class BaseItemFactory implements IItemFactory {
     }
 
     @Override
-    public abstract ItemStack getItemStack(String material, int amount);
+    public abstract ItemStack getItemStack(String material, int minAmount, int maxAmount);
     @Override
     public abstract ItemStack getItemStack(RewardSet rewardSet);
 }

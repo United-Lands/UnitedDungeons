@@ -1,5 +1,7 @@
 package org.unitedlands.utils.factories.items;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.unitedlands.UnitedDungeons;
@@ -13,11 +15,11 @@ public class VanillaItemFactory extends BaseItemFactory {
     }
 
     @Override
-    public ItemStack getItemStack(String material, int amount) {
+    public ItemStack getItemStack(String material, int minAmount, int maxAmount) {
         try {
             var mat = Material.getMaterial(material);
             if (mat != null) {
-                return new ItemStack(mat, amount);
+                return new ItemStack(mat, ThreadLocalRandom.current().nextInt(minAmount, maxAmount + 1));
             }
         } catch (Exception ex) {
             Logger.logError("Error creating item stack: " + ex.getMessage());
@@ -27,7 +29,7 @@ public class VanillaItemFactory extends BaseItemFactory {
 
     @Override
     public ItemStack getItemStack(RewardSet rewardSet) {
-        return getItemStack(rewardSet.getItem(), rewardSet.getAmount());
+        return getItemStack(rewardSet.getItem(), rewardSet.getMinAmount(), rewardSet.getMaxAmount());
     }
 
 }

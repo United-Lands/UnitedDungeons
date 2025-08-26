@@ -22,15 +22,19 @@ public class ReloadCommandHandler extends BaseCommandHandler {
 
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
-        if (args.length != 0)
+        if (args.length > 1)
             return;
 
         plugin.getDungeonManager().stopChecks();
         plugin.reloadConfig();
+
+        if (args != null && args.length == 1 && args[0].equals("-all")) {
+            plugin.getDungeonManager().loadDungeons();
+        }
+
         plugin.getDungeonManager().startChecks();
 
-        
-        Messenger.sendMessageTemplate(sender, "reload", null, true);    
+        Messenger.sendMessageTemplate(sender, "reload", null, true);
         Logger.log("Config reloaded.");
     }
 

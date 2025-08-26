@@ -2,12 +2,14 @@ package org.unitedlands.classes;
 
 public class RewardSet {
     private String item;
-    private int amount;
+    private int minAmount;
+    private int maxAmount;
     private double chance;
 
-    public RewardSet(String item, int amount, double chance) {
+    public RewardSet(String item, int minAmount, int maxAmount, double chance) {
         this.item = item;
-        this.amount = amount;
+        this.minAmount = minAmount;
+        this.maxAmount = maxAmount;
         this.chance = chance;
     }
 
@@ -19,20 +21,28 @@ public class RewardSet {
         this.item = item;
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
     public double getChance() {
         return chance;
     }
 
     public void setChance(double chance) {
         this.chance = chance;
+    }
+
+    public int getMinAmount() {
+        return minAmount;
+    }
+
+    public void setMinAmount(int minAmount) {
+        this.minAmount = minAmount;
+    }
+
+    public int getMaxAmount() {
+        return maxAmount;
+    }
+
+    public void setMaxAmount(int maxAmount) {
+        this.maxAmount = maxAmount;
     }
 
 }

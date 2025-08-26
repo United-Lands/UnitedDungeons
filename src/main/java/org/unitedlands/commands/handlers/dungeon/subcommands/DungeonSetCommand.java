@@ -20,13 +20,16 @@ public class DungeonSetCommand extends BaseCommandHandler {
         super(plugin);
     }
 
-    private List<String> propertyList = Arrays.asList("location", "warp", "isPublic", "isLockable", "name", "pulloutTime",
+    private List<String> propertyList = Arrays.asList("location", "warp", "isPublic", "isLockable", "name",
+            "pulloutTime",
             "description", "cooldownTime", "lockTime", "ticksBeforeSleep");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
         if (args.length == 1)
             return propertyList;
+        if (args.length == 2 && args[0].equals("location"))
+            return plugin.getDungeonManager().getDungeonNames();
         return new ArrayList<>();
     }
 
@@ -44,7 +47,12 @@ public class DungeonSetCommand extends BaseCommandHandler {
         }
 
         Player player = (Player) sender;
-        var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
+        Dungeon dungeon = null;
+        if (args[0].equals("location") && args.length == 2) {
+            dungeon = plugin.getDungeonManager().getDungeon(args[1]);
+        } else {
+            dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
+        }
         if (dungeon == null) {
             Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
             return;

@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.commands.base.BaseCommandHandler;
 import org.unitedlands.utils.Formatter;
-import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
 public class PlayerStartCommand extends BaseCommandHandler {
