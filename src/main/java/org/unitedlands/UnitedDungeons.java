@@ -20,6 +20,8 @@ import org.unitedlands.utils.factories.items.VanillaItemFactory;
 import org.unitedlands.utils.factories.mobs.IMobFactory;
 import org.unitedlands.utils.factories.mobs.MythicMobFactory;
 import org.unitedlands.utils.factories.mobs.VanillaMobFactory;
+import org.unitedlands.utils.integrations.MapTownyIntegration;
+import org.unitedlands.utils.integrations.TownyIntegration;
 
 public class UnitedDungeons extends JavaPlugin {
 
@@ -31,6 +33,9 @@ public class UnitedDungeons extends JavaPlugin {
 
     private IItemFactory itemFactory;
     private IMobFactory mobFactory;
+
+    private TownyIntegration townyIntegration;
+    private MapTownyIntegration mapTownyIntegration;
 
     @Override
     public void onEnable() {
@@ -47,6 +52,7 @@ public class UnitedDungeons extends JavaPlugin {
 
         loadManagers();
         loadFactories();
+        loadIntegrations();
 
         saveDefaultConfig();
 
@@ -70,6 +76,7 @@ public class UnitedDungeons extends JavaPlugin {
     }
 
     private void loadFactories() {
+
         Plugin itemsAdder = Bukkit.getPluginManager().getPlugin("ItemsAdder");
         if (itemsAdder != null && itemsAdder.isEnabled()) {
             Logger.log("ItemsAdder found, using custom item factory.");
@@ -86,6 +93,19 @@ public class UnitedDungeons extends JavaPlugin {
         } else {
             Logger.log("MythicMobs not found, using vanilla mob factory.");
             mobFactory = new VanillaMobFactory(this);
+        }
+    }
+
+    private void loadIntegrations() {
+        Plugin towny = Bukkit.getPluginManager().getPlugin("Towny");
+        if (towny != null && towny.isEnabled()) {
+            Logger.log("Towny found, enabling integration.");
+            townyIntegration = new TownyIntegration(this);
+        }
+        Plugin mapTowny = Bukkit.getPluginManager().getPlugin("MapTowny");
+        if (mapTowny != null && mapTowny.isEnabled()) {
+            Logger.log("MapTowny found, enabling integration.");
+            mapTownyIntegration = new MapTownyIntegration(this);
         }
     }
 
@@ -123,9 +143,17 @@ public class UnitedDungeons extends JavaPlugin {
     public IMobFactory getMobFactory() {
         return mobFactory;
     }
+    
+    public TownyIntegration getTownyIntegration() {
+        return townyIntegration;
+    }
+
+    public MapTownyIntegration getMapTownyIntegration() {
+        return mapTownyIntegration;
+    }
 
     public static UnitedDungeons getInstance() {
         return instance;
     }
-
+    
 }

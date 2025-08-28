@@ -1,21 +1,21 @@
 general:
   # The plugin tick speed in seconds (e.g. for room checks, spawner actions...)
-  tick-frequency: 1 
+  tick-frequency: 1
   # maximum number of dungeons (-1 for unlimited)
-  max-dungeons: -1 
+  max-dungeons: -1
   # minimum distance between two dungeons
   min-dungeon-distance: 512
   # maximum distance of rooms from the dungeon center
-  max-room-distance: 128 
+  max-room-distance: 128
   # maximum length for room edges
-  max-room-edge-lenth: 128 
+  max-room-edge-lenth: 128
   # How close a player needs to get to a dungeon for it to wake up and start detailed checks.
   # This should ideally be greater than maxroom-distance and smaller than min-dungeon-distance.
-  player-detection-range: 16 
+  player-detection-range: 16
   # time in minutes that players can't be part of a dungeon party again
   player-lock-cooldown: 120
   # maximum height for barriers
-  max-barrier-height: 8 
+  max-barrier-height: 8
 
 visualisation:
   dungeon-center:
@@ -31,6 +31,60 @@ visualisation:
     particle: CAMPFIRE_COSY_SMOKE
   warp:
     particle: WITCH
+
+
+###################################################
+# +---------------------------------------------+ #
+# |                   Towny                     | #
+# +---------------------------------------------+ #
+###################################################
+
+# Optional settings if Towny is present on the server
+# This will only apply to towns that have their dungeon metadata set 
+# to a specific dungeon (using "/ta town <townname> setdungeon <dungeonname>")
+# Valid placeholders are:
+# {dungeon-id} {dungeon-name} {dungeon-description} {dungeon-status}
+
+towny:
+  show-custom-town-screen: true
+  custom-town-screen:
+  - "                          <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>"
+  - "§6§l{dungeon-name}"
+  - "§7{dungeon-description}"
+  -
+
+
+###################################################
+# +---------------------------------------------+ #
+# |                  MapTowny                   | #
+# +---------------------------------------------+ #
+###################################################
+
+# Optional settings if MapTowny is present on the server
+# This will only apply to towns that have their dungeon metadata set 
+# to a specific dungeon (using "/ta town <townname> setdungeon <dungeonname>")
+# Valid placeholders are:
+# {dungeon-id} {dungeon-name} {dungeon-description} {dungeon-status}
+
+maptowny:
+  show-custom-town-info: true
+  dungeon-map-color: "#FF0000"
+  dungeon-map-fill: "#00FF00"
+  custom-town-info: |
+    <center>
+    <p style="font-size: 140%; font-weight: bold; line-height: 1em; margin-bottom: 5px">
+      {dungeon-name}
+    </p>
+    <p style="font-size: 90%; font-weight: bold; line-height: 1em">
+      DUNGEON
+    </p>
+    <hr />
+    <object data="/images/dungeons/{dungeon-id}.jpg" type="image/png" style="width: 260px; height: 180px; margin-top: 5px">
+      <img src="/images/og.png" alt="{dungeon-name}" style="width: 100%; height: auto">
+    </object>
+    <p>{dungeon-description}</p>
+    <p><strong>Status:</strong> {dungeon-status}</p>
+    </center>
 
 ###################################################
 # +---------------------------------------------+ #
@@ -145,21 +199,21 @@ messages:
   dungeon-reset-teleport: "The dungeon you were in has been reset. You have been teleported back to the entrance."
   dungeon-started: "§2Dungeon started."
   dungeon-stopped: "§cDungeon stopped."
-  dungeon-room-lockable: "§7You can use this room to start a §2dungeon party§7. Use \"/ud start\" to lock the dungeon for the current players and compete for the highscore (/ud highscores)."
+  dungeon-room-lockable: '§7You can use this room to start a §2dungeon party§7. Use "/ud start" to lock the dungeon for the current players and compete for the highscore (/ud highscores).'
 
   # +---------------------------------------------+ #
   # |                Dungeon Events               | #
   # +---------------------------------------------+ #
 
-  dungeon-event-open: 
-  - "§c§m+|✦                    §r§c§l[§f§l Dungeon opened! §c§l]§c§m                     |✦+"
-  - "§6{dungeon-name} §8has opened and is ready to welcome players. Use /ud warp to teleport there."
-  - "§7§o{dungeon-description}"
-  - "§c§m+|✦                                 +✦+                                 |✦+"
-  dungeon-event-completed: 
-  - "§c§m+|✦                    §r§c§l[§f§l Dungeon completed! §c§l]§c§m                  |✦+"
-  - "§6{dungeon-name} §7has been completed and is now on cooldown. It will reopen in {cooldown-time}."
-  - "§c§m+|✦                                 +✦+                                 |✦+"
+  dungeon-event-open:
+    - "§c§m+|✦                    §r§c§l[§f§l Dungeon opened! §c§l]§c§m                     |✦+"
+    - "§6{dungeon-name} §8has opened and is ready to welcome players. Use /ud warp to teleport there."
+    - "§7§o{dungeon-description}"
+    - "§c§m+|✦                                 +✦+                                 |✦+"
+  dungeon-event-completed:
+    - "§c§m+|✦                    §r§c§l[§f§l Dungeon completed! §c§l]§c§m                  |✦+"
+    - "§6{dungeon-name} §7has been completed and is now on cooldown. It will reopen in {cooldown-time}."
+    - "§c§m+|✦                                 +✦+                                 |✦+"
 
   # +---------------------------------------------+ #
   # |                      Misc                   | #
@@ -168,20 +222,20 @@ messages:
   player-party-start: "§fYou're now part of the dungeon party in §6{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
   player-invited: "§3The player has been added to the dungeon party."
   player-left: "§3You've left the dungeon party."
-  new-highscore: "§aYour party's time of {time} is a Top 5 highscore - you've been placed on rank {placement}. Good job! §7Check \"/ud highscores\" to see your competition."
-  dungeon-highscores: 
-  - "§c§m+|✦                  §r§c§l[§f§l Dungeon Highscores §c§l]§c§m                  |✦+"
-  - "§l§6{dungeon-name} §fTop 5:"
-  - "§l§f1. {time1} §r§7- {players1}"
-  - "§l§f2. {time2} §r§7- {players2}"
-  - "§l§f3. {time3} §r§7- {players3}"
-  - "§l§f4. {time4} §r§7- {players4}"
-  - "§l§f5. {time5} §r§7- {players5}"
-  - "§c§m+|✦                                 +✦+                                 |✦+"
-  dungeon-info: 
-  - "§c§m+|✦                     §r§c§l[§f§l Dungeon Info §c§l]§c§m                      |✦+"
-  - "§6{dungeon-name}"
-  - "§7§o{dungeon-description}"
-  - "§lStatus:§r {status}"
-  - "§lPlayers in dungeon:§r {players}"
-  - "§c§m+|✦                                 +✦+                                 |✦+"
+  new-highscore: '§aYour party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! §7Check "/ud highscores" to see your competition.'
+  dungeon-highscores:
+    - "§c§m+|✦                  §r§c§l[§f§l Dungeon Highscores §c§l]§c§m                  |✦+"
+    - "§l§6{dungeon-name} §fTop 5:"
+    - "§l§f1. {time1} §r§7- {players1}"
+    - "§l§f2. {time2} §r§7- {players2}"
+    - "§l§f3. {time3} §r§7- {players3}"
+    - "§l§f4. {time4} §r§7- {players4}"
+    - "§l§f5. {time5} §r§7- {players5}"
+    - "§c§m+|✦                                 +✦+                                 |✦+"
+  dungeon-info:
+    - "§c§m+|✦                     §r§c§l[§f§l Dungeon Info §c§l]§c§m                      |✦+"
+    - "§6{dungeon-name}"
+    - "§7§o{dungeon-description}"
+    - "§lStatus:§r {status}"
+    - "§lPlayers in dungeon:§r {players}"
+    - "§c§m+|✦                                 +✦+                                 |✦+"
