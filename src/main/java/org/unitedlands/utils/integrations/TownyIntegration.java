@@ -11,6 +11,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,7 @@ public class TownyIntegration implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onTownStatusScreen(TownStatusScreenEvent event) {
 
         var meta = event.getTown().getMetadata("uniteddungeons_dungeon", StringDataField.class);
@@ -61,26 +62,13 @@ public class TownyIntegration implements Listener {
                 return;
 
             var screen = event.getStatusScreen();
+            var keys = new ArrayList<>(screen.getComponentKeys());
 
-            screen.removeStatusComponent("subtitle");
-            screen.removeStatusComponent("board");
-            screen.removeStatusComponent("registered");
-            screen.removeStatusComponent("founder");
-            screen.removeStatusComponent("townblocks");
-            screen.removeStatusComponent("home");
-            screen.removeStatusComponent("outposts");
-            screen.removeStatusComponent("perm");
-            screen.removeStatusComponent("explosion");
-            screen.removeStatusComponent("firespread");
-            screen.removeStatusComponent("mobspawns");
-            screen.removeStatusComponent("moneynewline");
-            screen.removeStatusComponent("bankString");
-            screen.removeStatusComponent("towntax");
-            screen.removeStatusComponent("mayor");
-            screen.removeStatusComponent("newline");
-            screen.removeStatusComponent("residents");
-            screen.removeStatusComponent("plots");
-            screen.removeStatusComponent("extraFields");
+            for (var key : keys) {
+                if (!key.equals("title"))
+                    screen.removeStatusComponent(key);
+            }
+            
 
             String status = "<green>Open";
             if (!dungeon.isActive()) {
