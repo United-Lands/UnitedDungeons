@@ -2,7 +2,6 @@ package org.unitedlands.utils.integrations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -41,7 +40,9 @@ public class TownyIntegration implements Listener {
 
     private void initialize() {
 
+        @SuppressWarnings("unused")
         var townyCommandHandler = new TownyCommandHandler(plugin);
+        
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
         this.miniMessage = MiniMessage.miniMessage();
@@ -107,7 +108,6 @@ public class TownyIntegration implements Listener {
         private final UnitedDungeons plugin;
 
         private static final String META_KEYNAME = "uniteddungeons_dungeon";
-        private static final String META_LABEL = "Dungeon";
 
         public TownyCommandHandler(UnitedDungeons plugin) {
             this.plugin = plugin;

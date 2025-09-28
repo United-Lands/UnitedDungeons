@@ -71,6 +71,16 @@ public class Dungeon {
     private long cooldownStart;
 
     @Expose
+    @Info
+    private boolean disableElytra = false;
+    @Expose
+    @Info
+    private boolean disableEnderpearls = false;
+    @Expose
+    @Info
+    private boolean disableWindcharge = false;
+
+    @Expose
     private Set<Room> rooms = new HashSet<>();
 
     @Expose
@@ -782,6 +792,30 @@ public class Dungeon {
 
     public Collection<Player> getPlayersInPullout() {
         return playersInPullout;
+    }
+
+    public boolean disableElytra() {
+        return disableElytra;
+    }
+
+    public void setDisableElytra(boolean disableElytra) {
+        this.disableElytra = disableElytra;
+    }
+
+    public boolean disableEnderpearls() {
+        return disableEnderpearls;
+    }
+
+    public void setDisableEnderpearls(boolean disableEnderpearls) {
+        this.disableEnderpearls = disableEnderpearls;
+    }
+
+    public boolean disableWindcharge() {
+        return disableWindcharge;
+    }
+
+    public void setDisableWindcharge(boolean disableWindcharge) {
+        this.disableWindcharge = disableWindcharge;
     }
 
     // #endregion

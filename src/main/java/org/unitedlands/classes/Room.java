@@ -49,6 +49,9 @@ public class Room {
     @Expose
     @Info
     private boolean showTitle = false;
+    @Expose
+    @Info
+    private boolean useBossMusic = false;
 
     private boolean isComplete;
 
@@ -112,6 +115,10 @@ public class Room {
         spawnRewardChests();
         despawnBarriers(false, false);
 
+        if (this.useBossMusic) {
+            UnitedDungeons.getInstance().getEffectsManager().stopBossMusicForPlayers(playersInRoom);
+        }
+
         this.isComplete = true;
     }
 
@@ -124,6 +131,10 @@ public class Room {
         for (Spawner spawner : spawners)
             spawner.resetCompletion();
 
+        if (this.useBossMusic) {
+            UnitedDungeons.getInstance().getEffectsManager().stopBossMusicForPlayers(playersInRoom);
+        }
+
         this.isComplete = false;
     }
 
@@ -131,6 +142,10 @@ public class Room {
 
         despawnRewardChests();
         despawnBarriers(true, true);
+
+        if (this.useBossMusic) {
+            UnitedDungeons.getInstance().getEffectsManager().stopBossMusicForPlayers(playersInRoom);
+        }
 
         this.isComplete = false;
     }
@@ -454,6 +469,14 @@ public class Room {
         this.showTitle = showTitle;
     }
 
+    public boolean useBossMusic() {
+        return useBossMusic;
+    }
+
+    public void setUseBossMusic(boolean useBossMusic) {
+        this.useBossMusic = useBossMusic;
+    }
+
     // #endregion
 
     @Override
@@ -508,7 +531,8 @@ public class Room {
                 inv.setItem(slotIndex, subStack);
             }
         } else {
-            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getMinAmount() + "-" + rewardSet.getMaxAmount()
+            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getMinAmount() + "-"
+                    + rewardSet.getMaxAmount()
                     + " for chest in room " + this.uuid);
         }
     }

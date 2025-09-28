@@ -15,6 +15,6 @@ public class ServerListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getVisualisationManager().removeViewer(event.getPlayer());
+        plugin.getEffectsManager().removeViewer(event.getPlayer());
     }
 }

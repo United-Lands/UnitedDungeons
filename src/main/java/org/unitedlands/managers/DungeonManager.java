@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.unitedlands.UnitedDungeons;
@@ -102,6 +103,14 @@ public class DungeonManager {
         return null;
     }
 
+    public Dungeon getPlayerDungeon(Player player) {
+        for (var dungeon : dungeons.values()) {
+            if (dungeon.isPlayerInDungeon(player))
+                return dungeon;
+        }
+        return null;
+    }
+
     // #endregion
 
     public void addDungeon(Dungeon dungeon) {
@@ -163,7 +172,7 @@ public class DungeonManager {
                     if (!dungeon.isSleeping()) {
 
                         dungeon.checkPlayerActivity();
-            
+
                         if (dungeon.isOnCooldown()) {
                             continue;
                         } else {

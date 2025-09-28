@@ -16,6 +16,11 @@ general:
   player-lock-cooldown: 120
   # maximum height for barriers
   max-barrier-height: 8
+  # the sound that will be used if you activate boss music in a room
+  boss-music: sound.battle_music
+  # the length of the sound in ticks (for looping)
+  boss-music-loop-length: 480
+
 
 visualisation:
   dungeon-center:
@@ -31,6 +36,7 @@ visualisation:
     particle: CAMPFIRE_COSY_SMOKE
   warp:
     particle: WITCH
+
 
 
 ###################################################
@@ -51,7 +57,6 @@ towny:
   - "                          <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>"
   - "§6§l{dungeon-name}"
   - "§7{dungeon-description}"
-  -
 
 
 ###################################################
@@ -239,3 +244,6 @@ messages:
     - "§lStatus:§r {status}"
     - "§lPlayers in dungeon:§r {players}"
     - "§c§m+|✦                                 +✦+                                 |✦+"
+  elytra-disabled: "§cA spell in this dungeon has disabled your Elytra!"
+  enderpearl-disabled: "§cA spell in this dungeon has rendered your Ender pearls useless!"
+  windcharge-disabled: "§cA spell in this dungeon has rendered your wind charges useless!"

@@ -31,11 +31,11 @@ public class ToggleVisualisationCommandHandler extends BaseCommandHandler {
 
         switch (args[0]) {
             case "on":
-                plugin.getVisualisationManager().addViewer((Player) sender);
+                plugin.getEffectsManager().addViewer((Player) sender);
                 Messenger.sendMessageTemplate(sender, "visualisation-on", null, true);
                 break;
             case "off":
-                plugin.getVisualisationManager().removeViewer((Player) sender);
+                plugin.getEffectsManager().removeViewer((Player) sender);
                 Messenger.sendMessageTemplate(sender, "visualisation-off", null, true);    
                 break;
             default:

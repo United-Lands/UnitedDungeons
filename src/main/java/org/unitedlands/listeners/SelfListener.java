@@ -2,7 +2,7 @@ package org.unitedlands.listeners;
 
 import java.time.Duration;
 import java.util.Map;
-
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +11,7 @@ import org.unitedlands.events.DungeonCompleteEvent;
 import org.unitedlands.events.DungeonOpenEvent;
 import org.unitedlands.events.HighscoreEvent;
 import org.unitedlands.events.PlayerEnterRoomEvent;
+import org.unitedlands.events.PlayerExitRoomEvent;
 import org.unitedlands.utils.Formatter;
 import org.unitedlands.utils.Messenger;
 
@@ -34,19 +35,42 @@ public class SelfListener implements Listener {
         var dungeon = event.getDungeon();
         var room = event.getRoom();
 
-        if (!room.showTitle())
+        if (dungeon.isOnCooldown() || dungeon.isLocked())
             return;
 
-        var title = Title.title(
-                Component.text(dungeon.getCleanName()).color(NamedTextColor.DARK_RED),
-                Component.text(room.getCleanName()).color(NamedTextColor.WHITE),
-                Times.times(Duration.ofMillis(1000), Duration.ofMillis(3000), Duration.ofMillis(2000)));
+        if (room.showTitle()) {
 
-        player.showTitle(title);
-        player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 1, 1);
+            var title = Title.title(
+                    Component.text(dungeon.getCleanName()).color(NamedTextColor.DARK_RED),
+                    Component.text(room.getCleanName()).color(NamedTextColor.WHITE),
+                    Times.times(Duration.ofMillis(1000), Duration.ofMillis(3000), Duration.ofMillis(2000)));
+
+            player.showTitle(title);
+
+            if (!room.useBossMusic())
+                player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 1, 1);
+        }
+
+        if (room.useBossMusic()) {
+
+            var location = new Location(player.getWorld(), room.getBoundingBox().getCenterX(),
+                    room.getBoundingBox().getCenterY(), room.getBoundingBox().getCenterZ());
+
+            plugin.getEffectsManager().playBossMusicForPlayer(player, location);
+        }
 
         if (dungeon.isActive() && !dungeon.isOnCooldown() && !dungeon.isLocked() && room.enableLocking()) {
             Messenger.sendMessageTemplate(player, "dungeon-room-lockable", null, true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerExitRoom(PlayerExitRoomEvent event) {
+        var player = event.getPlayer();
+        var room = event.getRoom();
+
+        if (room.useBossMusic()) {
+            plugin.getEffectsManager().stopBossMusicForPlayer(player);
         }
     }
 

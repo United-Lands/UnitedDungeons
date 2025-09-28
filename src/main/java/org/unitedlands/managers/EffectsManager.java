@@ -1,7 +1,10 @@
 package org.unitedlands.managers;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,17 +18,20 @@ import org.unitedlands.classes.RewardChest;
 import org.unitedlands.classes.Spawner;
 import org.unitedlands.utils.Logger;
 
-public class VisualisationManager {
+public class EffectsManager {
 
     private final UnitedDungeons plugin;
 
     private Set<Player> viewers = new HashSet<>();
 
     private BukkitRunnable displayTask = null;
+    private Map<UUID, BukkitRunnable> soundLoopTasks = new HashMap<>();
 
-    public VisualisationManager(UnitedDungeons plugin) {
+    public EffectsManager(UnitedDungeons plugin) {
         this.plugin = plugin;
     }
+
+    // #region Visualisation
 
     public void addViewer(Player player) {
         if (!viewers.contains(player))
@@ -181,4 +187,41 @@ public class VisualisationManager {
             this.end = end;
         }
     }
+
+    // #endregion
+
+    // #region Sound effects
+
+    public void playBossMusicForPlayer(Player player, Location location) {
+
+        var sound = plugin.getConfig().getString("general.boss-music");
+        var loopticks = plugin.getConfig().getLong("general.boss-music-loop-length");
+
+        var task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.playSound(location, sound, 10, 1);
+            }
+        };
+        task.runTaskTimer(plugin, 0, loopticks);
+        soundLoopTasks.put(player.getUniqueId(), task);
+    }
+
+    public void stopBossMusicForPlayer(Player player) {
+        var sound = plugin.getConfig().getString("general.boss-music");
+        var task = soundLoopTasks.get(player.getUniqueId());
+        if (task != null) {
+            player.stopSound(sound);
+            task.cancel();
+            soundLoopTasks.remove(player.getUniqueId());
+        }
+    }
+
+    public void stopBossMusicForPlayers(Set<Player> players) {
+        for (Player player : players) {
+            stopBossMusicForPlayer(player);
+        }
+    }
+
+    // #endregion
 }

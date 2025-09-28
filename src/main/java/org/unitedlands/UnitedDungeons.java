@@ -8,11 +8,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.unitedlands.commands.AdminCommands;
 import org.unitedlands.commands.PlayerCommands;
 import org.unitedlands.listeners.MobDeathListener;
+import org.unitedlands.listeners.PlayerEventListeners;
 import org.unitedlands.listeners.SelfListener;
 import org.unitedlands.listeners.ServerListener;
 import org.unitedlands.managers.DungeonManager;
 import org.unitedlands.managers.MobManager;
-import org.unitedlands.managers.VisualisationManager;
+import org.unitedlands.managers.EffectsManager;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.factories.items.IItemFactory;
 import org.unitedlands.utils.factories.items.ItemsAdderFactory;
@@ -29,7 +30,7 @@ public class UnitedDungeons extends JavaPlugin {
 
     private DungeonManager dungeonManager;
     private MobManager mobManager;
-    private VisualisationManager visualisationManager;
+    private EffectsManager effectsManager;
 
     private IItemFactory itemFactory;
     private IMobFactory mobFactory;
@@ -61,6 +62,7 @@ public class UnitedDungeons extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MobDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new SelfListener(this), this);
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerEventListeners(this), this);
 
         dungeonManager.loadDungeons();
         dungeonManager.startChecks();
@@ -72,7 +74,7 @@ public class UnitedDungeons extends JavaPlugin {
     private void loadManagers() {
         dungeonManager = new DungeonManager(this);
         mobManager = new MobManager(this);
-        visualisationManager = new VisualisationManager(this);
+        effectsManager = new EffectsManager(this);
     }
 
     private void loadFactories() {
@@ -132,8 +134,8 @@ public class UnitedDungeons extends JavaPlugin {
         return this.mobManager;
     }
 
-    public VisualisationManager getVisualisationManager() {
-        return visualisationManager;
+    public EffectsManager getEffectsManager() {
+        return effectsManager;
     }
 
     public IItemFactory getItemFactory() {
