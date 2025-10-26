@@ -8,7 +8,7 @@ import org.unitedlands.commands.handlers.player.PlayerInfoCommand;
 import org.unitedlands.commands.handlers.player.PlayerInviteCommand;
 import org.unitedlands.commands.handlers.player.PlayerListCommand;
 import org.unitedlands.commands.handlers.player.PlayerStartCommand;
-import org.unitedlands.commands.handlers.player.PlayerWarpCommand;
+//import org.unitedlands.commands.handlers.player.PlayerWarpCommand;
 
 public class PlayerCommands extends BaseCommandExecutor {
 
@@ -19,7 +19,7 @@ public class PlayerCommands extends BaseCommandExecutor {
     @Override
     protected void registerHandlers() {
         handlers.put("entrance", new PlayerEntranceCommand(plugin));
-        handlers.put("warp", new PlayerWarpCommand(plugin));
+        //handlers.put("warp", new PlayerWarpCommand(plugin));
         handlers.put("start", new PlayerStartCommand(plugin));
         handlers.put("invite", new PlayerInviteCommand(plugin));
         handlers.put("list", new PlayerListCommand(plugin));
