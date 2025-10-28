@@ -147,6 +147,8 @@ public class DungeonManager {
                 }
             }
         }
+
+        plugin.getChestManager().loadChests(dungeons.values());
     }
 
     public void startChecks() {

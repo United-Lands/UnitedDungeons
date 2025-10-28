@@ -782,6 +782,10 @@ public class Dungeon {
         return highscores;
     }
 
+    public void setHighscores(ArrayList<HighScore> highscores) {
+        this.highscores = highscores;
+    }
+
     public long getPulloutTime() {
         return pulloutTime;
     }

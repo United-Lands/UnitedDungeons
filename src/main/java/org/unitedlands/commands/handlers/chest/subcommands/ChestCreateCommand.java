@@ -45,6 +45,8 @@ public class ChestCreateCommand extends BaseCommandHandler {
         RewardChest chest = new RewardChest(player.getLocation());
         room.addChest(chest);
 
+        plugin.getChestManager().registerChest(chest);
+        
         if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
             Messenger.sendMessageTemplate(sender, "save-error", null, true);
         } else {

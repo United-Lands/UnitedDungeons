@@ -2,6 +2,7 @@ package org.unitedlands.commands.handlers.dungeon;
 
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.commands.base.BaseSubcommandHandler;
+import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonClearHighscores;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonCreateCommand;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonDeleteCommand;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonInfoCommand;
@@ -23,6 +24,7 @@ public class DungeonCommandHandler extends BaseSubcommandHandler {
         subHandlers.put("stop", new DungeonStopCommand(plugin));
         subHandlers.put("set", new DungeonSetCommand(plugin));
         subHandlers.put("info", new DungeonInfoCommand(plugin));
+        subHandlers.put("clearhighscores", new DungeonClearHighscores(plugin));
     }
 
 }

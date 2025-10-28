@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,9 +16,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Wall;
@@ -28,6 +31,8 @@ import org.unitedlands.utils.annotations.Info;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.gson.annotations.Expose;
+
+import net.kyori.adventure.text.Component;
 
 public class Room {
 
@@ -162,35 +167,41 @@ public class Room {
                 Block chestBlock = chest.getLocation().getBlock();
                 chestBlock.setType(Material.YELLOW_SHULKER_BOX);
 
-                Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
-                    BlockState state = chestBlock.getState();
-                    if (state instanceof ShulkerBox) {
-                        ShulkerBox shulker = (ShulkerBox) state;
+                List<UUID> playerUUIDs = playersInRoom.stream().map(Player::getUniqueId).collect(Collectors.toList());
+                for (var uuid : playerUUIDs) {
+                    Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST, Component.text("Dungeon Rewards"));
+                    chest.addInventory(uuid, inv);
+                }
 
-                        if (chest.getRewards() != null) {
-                            var rewards = parseRewards(chest.getRewards());
-                            if (rewards != null && !rewards.isEmpty()) {
-                                for (var reward : rewards) {
-                                    addRewardToShulker(shulker, reward);
-                                }
-                            }
+                if (chest.getRewards() != null) {
+                    var rewards = parseRewards(chest.getRewards());
+                    if (rewards != null && !rewards.isEmpty()) {
+                        for (var reward : rewards) {
+
+                            int rnd = ThreadLocalRandom.current().nextInt(playerUUIDs.size());
+                            UUID rndUUID = playerUUIDs.get(rnd);
+
+                            addRewardToInventory(chest.getInventory(rndUUID), reward);
                         }
-
-                        if (chest.getRandomRewards() != null && chest.getRandomRewardCount() > 0) {
-                            var randomRewards = parseRewards(chest.getRandomRewards());
-                            for (int i = 0; i < chest.getRandomRewardCount(); i++) {
-                                var reward = getRandomReward(randomRewards);
-                                if (reward != null) {
-                                    addRewardToShulker(shulker, reward);
-                                }
-                            }
-
-                        }
-
-                        chest.getLocation().getWorld().playSound(chest.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 1);
-
                     }
+                }
 
+                if (chest.getRandomRewards() != null && chest.getRandomRewardCount() > 0) {
+                    var randomRewards = parseRewards(chest.getRandomRewards());
+                    for (int i = 0; i < chest.getRandomRewardCount(); i++) {
+                        var reward = getRandomReward(randomRewards);
+                        if (reward != null) {
+                            int rnd = ThreadLocalRandom.current().nextInt(playerUUIDs.size());
+                            UUID rndUUID = playerUUIDs.get(rnd);
+
+                            addRewardToInventory(chest.getInventory(rndUUID), reward);
+                        }
+                    }
+                }
+
+                Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+
+                    chest.getLocation().getWorld().playSound(chest.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 1);
                     new ParticleBuilder(Particle.WAX_OFF)
                             .location(chest.getLocation())
                             .offset(0.6, 0.6, 0.6)
@@ -207,7 +218,7 @@ public class Room {
         if (chests != null && !chests.isEmpty()) {
 
             for (RewardChest chest : chests) {
-
+                chest.clearInventories();
                 Block chestBlock = chest.getLocation().getBlock();
                 chestBlock.setType(Material.AIR);
             }
@@ -276,13 +287,13 @@ public class Room {
                     var loc = barrier.getLocation().clone().add(0, i, 0);
                     var block = loc.getBlock();
                     if (!barrier.isInverse() || ignoreInverse) {
-                            block.setType(Material.AIR);
+                        block.setType(Material.AIR);
                     } else {
-                            block.setType(barrierMaterial, true);
-                            // Update the connections one tick later
-                            Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
-                                updateConnections(block);
-                            }, 1);
+                        block.setType(barrierMaterial, true);
+                        // Update the connections one tick later
+                        Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+                            updateConnections(block);
+                        }, 1);
                     }
                 }
 
@@ -487,6 +498,52 @@ public class Room {
 
     // #region Helper methods
 
+    private void addRewardToInventory(Inventory inv, RewardSet rewardSet) {
+        var itemStack = UnitedDungeons.getInstance().getItemFactory().getItemStack(rewardSet);
+        if (itemStack != null) {
+
+            int splits = 1;
+            int amount = itemStack.getAmount();
+            if (itemStack.getMaxStackSize() == 1) {
+                splits = itemStack.getAmount();
+            } else {
+                int maxSplits = Math.min(itemStack.getAmount(), 3);
+                splits = 1 + new Random().nextInt(maxSplits);
+            }
+
+            int[] splitAmounts = new int[splits];
+            int remaining = amount;
+            for (int i = 0; i < splits - 1; i++) {
+                int max = remaining - (splits - i - 1);
+                int split = 1 + (max > 1 ? new Random().nextInt(max - 1) : 0);
+                splitAmounts[i] = split;
+                remaining -= split;
+            }
+            splitAmounts[splits - 1] = remaining;
+
+            List<Integer> emptySlots = new ArrayList<>();
+            for (int i = 0; i < inv.getSize(); i++) {
+                if (inv.getItem(i) == null)
+                    emptySlots.add(i);
+            }
+            Random rand = new Random();
+
+            for (int splitAmount : splitAmounts) {
+                if (emptySlots.isEmpty())
+                    break;
+                int slotIndex = emptySlots.remove(rand.nextInt(emptySlots.size()));
+                var subStack = itemStack.clone();
+                subStack.setAmount(splitAmount);
+                inv.setItem(slotIndex, subStack);
+            }
+        } else {
+            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getMinAmount() + "-"
+                    + rewardSet.getMaxAmount()
+                    + " for chest in room " + this.uuid);
+        }
+    }
+
+    @SuppressWarnings("unused")
     private void addRewardToShulker(ShulkerBox shulker, RewardSet rewardSet) {
         var itemStack = UnitedDungeons.getInstance().getItemFactory().getItemStack(rewardSet);
         if (itemStack != null) {

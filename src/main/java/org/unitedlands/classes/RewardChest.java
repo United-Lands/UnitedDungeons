@@ -1,9 +1,12 @@
 package org.unitedlands.classes;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Location;
+import org.bukkit.inventory.Inventory;
 import org.unitedlands.utils.annotations.Info;
 
 import com.google.gson.annotations.Expose;
@@ -23,6 +26,8 @@ public class RewardChest {
     @Expose
     @Info
     private int randomRewardCount = 0;
+
+    private Map<UUID, Inventory> inventories;
 
     public RewardChest() {
 
@@ -81,6 +86,28 @@ public class RewardChest {
             return false;
         RewardChest c = (RewardChest) o;
         return Objects.equals(uuid, c.getUuid());
+    }
+
+    public Inventory getInventory(UUID uuid) {
+        if (inventories == null)
+            return null;
+        return inventories.get(uuid);
+    }
+
+    public void addInventory(UUID uuid, Inventory inventory) {
+        if (inventories == null)
+            inventories = new HashMap<>();
+        inventories.put(uuid, inventory);
+    }
+
+    public void removeInventory(UUID uuid) {
+        if (inventories == null)
+            return;
+        inventories.remove(uuid);
+    }
+
+    public void clearInventories() {
+        inventories = new HashMap<>();
     }
 
 }
