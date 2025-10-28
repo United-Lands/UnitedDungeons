@@ -212,7 +212,7 @@ messages:
 
   dungeon-event-open:
     - "§c§m+|✦                    §r§c§l[§f§l Dungeon opened! §c§l]§c§m                     |✦+"
-    - "§6{dungeon-name} §8has opened and is ready to welcome players. Use /ud warp to teleport there."
+    - "§6{dungeon-name} §8has opened and is ready to welcome players."
     - "§7§o{dungeon-description}"
     - "§c§m+|✦                                 +✦+                                 |✦+"
   dungeon-event-completed:

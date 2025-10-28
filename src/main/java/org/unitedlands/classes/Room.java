@@ -276,17 +276,13 @@ public class Room {
                     var loc = barrier.getLocation().clone().add(0, i, 0);
                     var block = loc.getBlock();
                     if (!barrier.isInverse() || ignoreInverse) {
-                        if (block.getType() == barrierMaterial) {
                             block.setType(Material.AIR);
-                        }
                     } else {
-                        if (block.getType() == Material.AIR) {
                             block.setType(barrierMaterial, true);
                             // Update the connections one tick later
                             Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
                                 updateConnections(block);
                             }, 1);
-                        }
                     }
                 }
 
