@@ -54,6 +54,8 @@ public class ChestRemoveCommand extends BaseCommandHandler {
         }
 
         room.removeChest(chest);
+        
+        plugin.getChestManager().registerChest(chest);
 
         if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
             Messenger.sendMessageTemplate(sender, "save-error", null, true);

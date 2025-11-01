@@ -1,11 +1,16 @@
 package org.unitedlands.listeners;
 
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.utils.Messenger;
 
@@ -53,6 +58,33 @@ public class PlayerEventListeners implements Listener {
                     Messenger.sendMessageTemplate(player, "elytra-disabled", null, true);
                 }
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    private void onPlayerInteract(PlayerInteractEvent event) {
+
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK)
+            return;
+        if (event.getHand() != EquipmentSlot.HAND)
+            return;
+
+        var block = event.getClickedBlock();
+        if (block == null || block.getType() != Material.YELLOW_SHULKER_BOX)
+            return;
+
+        var chest = plugin.getChestManager().getChestAtLocation(block.getLocation());
+        if (chest == null)
+            return;
+
+        var player = event.getPlayer();
+        var inventory = chest.getInventory(player.getUniqueId());
+        if (inventory != null)
+        {
+            event.setCancelled(true);
+            player.openInventory(inventory);
+            chest.getLocation().getWorld().playSound(chest.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, 1, 1);
+
         }
     }
 
