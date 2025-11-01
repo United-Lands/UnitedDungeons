@@ -42,7 +42,7 @@ public class DungeonClearHighscores extends BaseCommandHandler {
 
         dungeon.setHighscores(new ArrayList<HighScore>());
 
-        Messenger.sendMessageTemplate(sender, "highscores-cleared", null, true);
+        Messenger.sendMessageTemplate(sender, "dungeon-highscores-cleared", null, true);
 
         if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
             Messenger.sendMessageTemplate(sender, "save-error", null, true);

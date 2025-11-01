@@ -44,7 +44,6 @@ public class RewardChestManager {
 
     public RewardChest getChestAtLocation(Location location) {
         for (var chest : chests) {
-            plugin.getLogger().info(chest.getLocation().getBlock().getLocation() + " == " + location);
             if (chest.getLocation().getBlock().getLocation().equals(location))
                 return chest;
         }
