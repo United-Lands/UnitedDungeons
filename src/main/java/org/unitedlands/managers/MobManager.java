@@ -24,12 +24,26 @@ public class MobManager {
 
     public void createMob(Spawner spawner) {
         var newMobUuid = plugin.getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation());
-        if (newMobUuid == null)
-        {
+        if (newMobUuid == null) {
             Logger.logError("Error creating new mob for spawner " + spawner.getUuid());
             return;
         }
         registerMob(newMobUuid, spawner);
+    }
+
+    // Remove mobs that have been unloaded for external reasons (e.g. chunk unloads,
+    // kill commands)
+    public void pruneMobs() {
+        List<UUID> mobsToPrune = new ArrayList<>();
+        for (var mobId : mobList.keySet()) {
+            var entity = Bukkit.getEntity(mobId);
+            if (entity == null)
+                mobsToPrune.add(mobId);
+        }
+        for (var mobId : mobsToPrune) {
+            Logger.log("Entity with id " + mobId + " no longer trackable, removing.");
+            deregisterMob(mobId);
+        }
     }
 
     public void removeAllSpawnerMobs(Spawner spawner) {

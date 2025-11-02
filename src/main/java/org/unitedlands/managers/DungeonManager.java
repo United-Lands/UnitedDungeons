@@ -183,6 +183,8 @@ public class DungeonManager {
                         }
                     }
                 }
+
+                plugin.getMobManager().pruneMobs();
             }
         }.runTaskTimer(plugin, 0L, frequency * 20L);
     }

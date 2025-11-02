@@ -20,9 +20,6 @@ public class VanillaMobFactory extends BaseMobFactory {
             var entityType = EntityType.valueOf(mobType);
             var entity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
 
-            entity.setPersistent(true);
-            entity.setRemoveWhenFarAway(false);
-
             return entity.getUniqueId();
         } catch (Exception ex) {
             Logger.logError("Error creating entity: " + ex.getMessage());
