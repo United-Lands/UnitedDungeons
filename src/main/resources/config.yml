@@ -226,6 +226,7 @@ messages:
 
   player-party-start: "§fYou're now part of the dungeon party in §6{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
   player-invited: "§3The player has been added to the dungeon party."
+  invitation-received: "§3You've been added to the dungeon party in §6{dungeon-name}!"
   player-left: "§3You've left the dungeon party."
   new-highscore: '§aYour party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! §7Check "/ud highscores" to see your competition.'
   dungeon-highscores:

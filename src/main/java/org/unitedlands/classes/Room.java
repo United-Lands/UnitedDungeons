@@ -169,19 +169,18 @@ public class Room {
 
                 List<UUID> playerUUIDs = playersInRoom.stream().map(Player::getUniqueId).collect(Collectors.toList());
                 for (var uuid : playerUUIDs) {
-                    Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST, Component.text("Dungeon Rewards"));
+                    Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST,
+                            Component.text("Dungeon Rewards"));
                     chest.addInventory(uuid, inv);
                 }
 
                 if (chest.getRewards() != null) {
                     var rewards = parseRewards(chest.getRewards());
                     if (rewards != null && !rewards.isEmpty()) {
-                        for (var reward : rewards) {
-
-                            int rnd = ThreadLocalRandom.current().nextInt(playerUUIDs.size());
-                            UUID rndUUID = playerUUIDs.get(rnd);
-
-                            addRewardToInventory(chest.getInventory(rndUUID), reward);
+                        for (var uuid : playerUUIDs) {
+                            for (var reward : rewards) {
+                                addRewardToInventory(chest.getInventory(uuid), reward);
+                            }
                         }
                     }
                 }
