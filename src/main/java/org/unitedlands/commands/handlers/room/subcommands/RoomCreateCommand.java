@@ -62,6 +62,7 @@ public class RoomCreateCommand extends BaseCommandHandler {
         }
 
         newRoom.setName(args[0]);
+        newRoom.setDungeon(dungeon);
         dungeon.addRoom(newRoom);
 
         if (!plugin.getDungeonManager().saveDungeon(dungeon)) {

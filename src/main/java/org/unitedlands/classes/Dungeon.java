@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -87,6 +88,7 @@ public class Dungeon {
     @Info
     int ticksBeforeSleep = 60;
     private int ticksWithoutPlayers = Integer.MAX_VALUE;
+    private long sleepStartTime = 0L;
 
     @Expose
     private ArrayList<HighScore> highscores = new ArrayList<>();
@@ -148,12 +150,14 @@ public class Dungeon {
             if (ticksWithoutPlayers >= ticksBeforeSleep && !this.isSleeping) {
                 Logger.log("Dungeon " + this.name + " going to sleep.");
                 this.isSleeping = true;
+                this.sleepStartTime = System.currentTimeMillis();
             }
         } else {
             if (this.isSleeping) {
                 Logger.log("Dungeon " + this.name + " waking up.");
                 ticksWithoutPlayers = 0;
                 this.isSleeping = false;
+                this.sleepStartTime = 0L;
             }
         }
     }
@@ -224,6 +228,9 @@ public class Dungeon {
 
             Set<Player> currentPlayersInRoom = new HashSet<>();
             for (Player player : uncheckedOnlinePlayers) {
+                // Ignore mods / admins that might watch in spectator mode
+                if (player.getGameMode() == GameMode.SPECTATOR)
+                    continue;
                 var ploc = player.getLocation();
                 if (room.getBoundingBox().contains(ploc.getX(), ploc.getY(), ploc.getZ())) {
                     currentPlayersInRoom.add(player);
@@ -432,6 +439,8 @@ public class Dungeon {
         updateHighscores();
 
         playersInPullout = new HashSet<>(playersInDungeon);
+        playersInPullout.addAll(new HashSet<>(lockedPlayersInDungeon));
+
         Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
             playersInPullout = new HashSet<>();
         }, this.pulloutTime * 20L);
@@ -506,6 +515,30 @@ public class Dungeon {
         }
 
         Logger.log("Dungeon " + this.name + " reset");
+    }
+
+    public void autoReset() {
+
+        var spawners = getSpawners();
+        if (spawners != null) {
+            for (Spawner s : spawners) {
+                UnitedDungeons.getInstance().getMobManager().removeAllSpawnerMobs(s);
+            }
+        }
+
+        cooldownStart = 0;
+        isOnCooldown = false;
+
+        resetLock();
+
+        for (Room room : rooms) {
+            room.reset();
+        }
+
+        playersInDungeon = new ArrayList<>();
+        sleepStartTime = System.currentTimeMillis();
+
+        Logger.log("Dungeon " + this.name + " auto-resetting");
     }
 
     public void resetLock() {
@@ -820,6 +853,10 @@ public class Dungeon {
 
     public void setDisableWindcharge(boolean disableWindcharge) {
         this.disableWindcharge = disableWindcharge;
+    }
+
+    public long getSleepStartTime() {
+        return sleepStartTime;
     }
 
     // #endregion

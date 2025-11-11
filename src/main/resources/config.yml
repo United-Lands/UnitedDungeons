@@ -14,13 +14,14 @@ general:
   player-detection-range: 16
   # time in minutes that players can't be part of a dungeon party again
   player-lock-cooldown: 120
+  # time in seconds that a dungeon needs to be sleeping in order to auto-reset. Use -1 to disable.
+  auto-reset-time: 1800
   # maximum height for barriers
   max-barrier-height: 8
   # the sound that will be used if you activate boss music in a room
   boss-music: sound.battle_music
   # the length of the sound in ticks (for looping)
   boss-music-loop-length: 480
-
 
 visualisation:
   dungeon-center:

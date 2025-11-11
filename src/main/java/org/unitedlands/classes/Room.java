@@ -38,6 +38,9 @@ public class Room {
 
     @Expose
     private UUID uuid;
+
+    private Dungeon dungeon;
+
     @Expose
     private BoundingBox boundingBox;
     @Expose
@@ -167,7 +170,18 @@ public class Room {
                 Block chestBlock = chest.getLocation().getBlock();
                 chestBlock.setType(Material.YELLOW_SHULKER_BOX);
 
-                List<UUID> playerUUIDs = playersInRoom.stream().map(Player::getUniqueId).collect(Collectors.toList());
+                List<UUID> playerUUIDs = new ArrayList<>();
+
+                if (dungeon != null && dungeon.isLocked() && !dungeon.getLockedPlayersInDungeon().isEmpty()) {
+                    playerUUIDs = dungeon.getLockedPlayersInDungeon().stream().map(Player::getUniqueId)
+                            .collect(Collectors.toList());
+                } else {
+                    playerUUIDs = playersInRoom.stream().map(Player::getUniqueId).collect(Collectors.toList());
+                }
+
+                if (playerUUIDs.size() == 0)
+                    return;
+
                 for (var uuid : playerUUIDs) {
                     Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST,
                             Component.text("Dungeon Rewards"));
@@ -389,6 +403,14 @@ public class Room {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public Dungeon getDungeon() {
+        return dungeon;
+    }
+
+    public void setDungeon(Dungeon dungeon) {
+        this.dungeon = dungeon;
     }
 
     public BoundingBox getBoundingBox() {

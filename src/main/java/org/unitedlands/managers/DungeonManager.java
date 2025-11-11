@@ -139,6 +139,8 @@ public class DungeonManager {
             for (File file : filesList) {
                 Dungeon dungeon = loadDungeon(file);
                 if (dungeon != null) {
+                    for (var room : dungeon.getRooms())
+                        room.setDungeon(dungeon);
                     dungeons.put(dungeon.getUuid(), dungeon);
                     dungeon.reset();
                     Logger.log("Dungeon " + dungeon.getName() + " loaded.");
@@ -172,14 +174,24 @@ public class DungeonManager {
                     dungeon.checkPlayerLockCooldowns();
 
                     if (!dungeon.isSleeping()) {
-
                         dungeon.checkPlayerActivity();
-
                         if (dungeon.isOnCooldown()) {
                             continue;
                         } else {
                             dungeon.checkLock();
                             dungeon.checkRooms();
+                        }
+                    } else {
+                        if (dungeon.isOnCooldown()) {
+                            continue;
+                        } else {
+                            var autoResetTime = plugin.getConfig().getLong("general.auto-reset-time", 1800L);
+                            if (autoResetTime != -1L) {
+                                var sleepStart = dungeon.getSleepStartTime();
+                                if (System.currentTimeMillis() - sleepStart > autoResetTime * 1000L) {
+                                    dungeon.autoReset();
+                                }
+                            }
                         }
                     }
                 }
