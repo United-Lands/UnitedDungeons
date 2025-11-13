@@ -33,6 +33,8 @@ visualisation:
     particle: RAID_OMEN
   chest:
     particle: HAPPY_VILLAGER
+  lock-chest:
+    particle: ANGRY_VILLAGER
   barrier:
     particle: CAMPFIRE_COSY_SMOKE
   warp:

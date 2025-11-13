@@ -15,6 +15,11 @@ public class VanillaItemFactory extends BaseItemFactory {
     }
 
     @Override
+    public boolean isItem(ItemStack item1, ItemStack item2) {
+        return item1.isSimilar(item2);
+    }
+
+    @Override
     public ItemStack getItemStack(String material, int minAmount, int maxAmount) {
         try {
             var mat = Material.getMaterial(material);

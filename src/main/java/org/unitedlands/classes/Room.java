@@ -68,6 +68,9 @@ public class Room {
     @Expose
     private Set<RewardChest> chests = new HashSet<>();
     @Expose
+    private Set<LockChest> lockChests = new HashSet<>();
+
+    @Expose
     private Set<Barrier> barriers = new HashSet<>();
 
     private Set<Player> playersInRoom = new HashSet<>();
@@ -121,6 +124,7 @@ public class Room {
     public void complete() {
 
         spawnRewardChests();
+        despawnLockChests();
         despawnBarriers(false, false);
 
         if (this.useBossMusic) {
@@ -134,6 +138,11 @@ public class Room {
 
         despawnRewardChests();
         despawnBarriers(true, true);
+
+        for (LockChest lockChest : lockChests)
+            lockChest.setComplete(false);
+        spawnLockChests();
+
         spawnBarriers();
 
         for (Spawner spawner : spawners)
@@ -149,6 +158,7 @@ public class Room {
     public void edit() {
 
         despawnRewardChests();
+        despawnLockChests();
         despawnBarriers(true, true);
 
         if (this.useBossMusic) {
@@ -235,6 +245,18 @@ public class Room {
                 Block chestBlock = chest.getLocation().getBlock();
                 chestBlock.setType(Material.AIR);
             }
+        }
+    }
+
+    private void spawnLockChests() {
+        for (var lockChest : lockChests) {
+            lockChest.getLocation().getBlock().setType(Material.CHEST, false);
+        }
+    }
+
+    private void despawnLockChests() {
+        for (var lockChest : lockChests) {
+            lockChest.getLocation().getBlock().setType(Material.AIR, false);
         }
     }
 
@@ -379,6 +401,20 @@ public class Room {
             chests.remove(chest);
     }
 
+    public void addLockChest(LockChest chest) {
+        if (lockChests == null)
+            lockChests = new HashSet<>();
+        if (!lockChests.contains(chest))
+            lockChests.add(chest);
+    }
+
+    public void removeLockChest(LockChest chest) {
+        if (lockChests == null)
+            return;
+        if (lockChests.contains(chest))
+            lockChests.remove(chest);
+    }
+
     public void addBarrier(Barrier barrier) {
         if (barriers == null)
             barriers = new HashSet<>();
@@ -449,6 +485,10 @@ public class Room {
 
     public Set<RewardChest> getChests() {
         return chests;
+    }
+
+    public Set<LockChest> getLockChests() {
+        return lockChests;
     }
 
     public Set<Barrier> getBarriers() {

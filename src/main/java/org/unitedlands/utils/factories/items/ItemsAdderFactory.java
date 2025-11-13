@@ -17,6 +17,32 @@ public class ItemsAdderFactory extends BaseItemFactory {
     }
 
     @Override
+    public boolean isItem(ItemStack item1, ItemStack item2) {
+        CustomStack customStack1 = CustomStack.byItemStack(item1);
+        CustomStack customStack2 = CustomStack.byItemStack(item2);
+
+        if (customStack1 != null) {
+
+            Logger.log(customStack1.getNamespacedID());
+            if (customStack2 == null) {
+                Logger.log("customStack2 false");
+                return false;
+            } else {
+                Logger.log(customStack2.getNamespacedID());
+                return customStack1.matchNamespacedID(customStack2);
+            }
+        } else {
+            Logger.log("customStack1 false");
+            if (customStack2 != null) {
+                Logger.log(customStack2.getNamespacedID());
+                return false;
+            } else {
+                return item1.isSimilar(item2);
+            }
+        }
+    }
+
+    @Override
     public ItemStack getItemStack(String material, int minAmount, int maxAmount) {
 
         CustomStack customStack = CustomStack.getInstance(material);

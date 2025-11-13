@@ -14,6 +14,8 @@ public abstract class BaseItemFactory implements IItemFactory {
         this.plugin = plugin;
     }
 
+    @Override 
+    public abstract boolean  isItem(ItemStack item1, ItemStack item2);
     @Override
     public abstract ItemStack getItemStack(String material, int minAmount, int maxAmount);
     @Override

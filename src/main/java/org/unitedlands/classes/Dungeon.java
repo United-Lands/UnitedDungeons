@@ -262,9 +262,12 @@ public class Dungeon {
             if (room.isComplete())
                 continue;
             if (!room.getPlayersInRoom().isEmpty()) {
+
+                // Spawner checks
                 var spawners = room.getSpawners();
+                boolean allSpawnersComplete = true;
+
                 if (spawners != null && !spawners.isEmpty()) {
-                    boolean allSpawnersComplete = true;
                     for (Spawner spawner : spawners) {
                         spawner.checkCompletion();
                         allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
@@ -274,19 +277,52 @@ public class Dungeon {
                             }
                         }
                     }
-                    if (room.mustBeCompleted()) {
-                        if (allSpawnersComplete)
-                            room.complete();
+                }
+
+                // Lock chests checks
+                var lockChests = room.getLockChests();
+                boolean allLockChestsComplete = true;
+
+                if (lockChests != null && !lockChests.isEmpty()) {
+                    for (var lockChest : lockChests)
+                    {
+                        lockChest.checkCompletion();
+                        allLockChestsComplete = allLockChestsComplete && lockChest.isComplete();
                     }
-                } else {
-                    if (room.mustBeCompleted())
+                }
+
+                if (room.mustBeCompleted()) {
+                    if (allSpawnersComplete && allLockChestsComplete)
                         room.complete();
                 }
+
+                // var spawners = room.getSpawners();
+                // if (spawners != null && !spawners.isEmpty()) {
+                // for (Spawner spawner : spawners) {
+                // spawner.checkCompletion();
+                // allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
+                // if (!spawner.isComplete()) {
+                // if (spawner.isPlayerNearby()) {
+                // spawner.prepareSpawn();
+                // }
+                // }
+                // }
+                // if (room.mustBeCompleted()) {
+                // if (allSpawnersComplete)
+                // room.complete();
+                // }
+                // } else {
+                // if (room.mustBeCompleted())
+                // room.complete();
+                // }
+
             }
             allRoomsComplete = allRoomsComplete && (room.isComplete() || !room.mustBeCompleted());
         }
+
         if (allRoomsComplete)
             this.complete();
+
     }
 
     public boolean isPlayerInDungeon(Player player) {

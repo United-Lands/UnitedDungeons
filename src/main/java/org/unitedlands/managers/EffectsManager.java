@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Barrier;
+import org.unitedlands.classes.LockChest;
 import org.unitedlands.classes.RewardChest;
 import org.unitedlands.classes.Spawner;
 import org.unitedlands.utils.Logger;
@@ -60,6 +61,9 @@ public class EffectsManager {
 
         String chestParticleName = plugin.getConfig().getString("visualisation.chest.particle");
         Particle chestParticle = Particle.valueOf(chestParticleName);
+
+        String lockChestParticleName = plugin.getConfig().getString("visualisation.lock-chest.particle");
+        Particle lockChestParticle = Particle.valueOf(lockChestParticleName);
 
         // Barrier visualisations
         String barrierParticleName = plugin.getConfig().getString("visualisation.barrier.particle");
@@ -122,6 +126,10 @@ public class EffectsManager {
 
                             for (RewardChest chest : room.getChests()) {
                                 player.spawnParticle(chestParticle, chest.getLocation(), 1, 0, 0, 0, 0);
+                            }
+
+                            for (LockChest lockChest : room.getLockChests()) {
+                                player.spawnParticle(lockChestParticle, lockChest.getLocation(), 1, 0, 0, 0, 0);
                             }
 
                             for (Barrier barrier : room.getBarriers()) {
