@@ -19,7 +19,7 @@ public class RoomSetCommand extends BaseCommandHandler {
         super(plugin);
     }
 
-    private List<String> propertyList = Arrays.asList("name", "enableLocking", "mustBeCompleted", "showTitle", "useBossMusic");
+    private List<String> propertyList = Arrays.asList("name", "enableLocking", "mustBeCompleted", "showTitle", "useBossMusic", "needsOtherRoomCompleted");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
@@ -49,7 +49,7 @@ public class RoomSetCommand extends BaseCommandHandler {
             return;
         }
 
-        setRoomFiels(player, room, args[0], args[1]);
+        setRoomFields(player, room, args[0], args[1]);
 
         if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
             Messenger.sendMessageTemplate(sender, "save-error", null, true);
@@ -58,7 +58,7 @@ public class RoomSetCommand extends BaseCommandHandler {
         }
     }
 
-    private void setRoomFiels(Player player, Room room, String fieldName, String arg) {
+    private void setRoomFields(Player player, Room room, String fieldName, String arg) {
         try {
             Field field = Room.class.getDeclaredField(fieldName);
             field.setAccessible(true);

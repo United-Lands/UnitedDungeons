@@ -15,6 +15,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.unitedlands.UnitedDungeons;
@@ -171,7 +172,7 @@ public class Dungeon {
                 if (player.hasPermission("united.dungeons.admin"))
                     continue;
                 if (!lockedPlayersInDungeon.contains(player)) {
-                    player.teleport(this.warpLocation);
+                    player.teleport(this.warpLocation, TeleportCause.SPECTATE);
                     Messenger.sendMessageTemplate(player, "dungeon-status-locked",
                             Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
                             true);
@@ -183,10 +184,33 @@ public class Dungeon {
                 if (player.hasPermission("united.dungeons.admin"))
                     continue;
                 if (playersInPullout == null || !playersInPullout.contains(player)) {
-                    player.teleport(this.warpLocation);
+                    player.teleport(this.warpLocation, TeleportCause.SPECTATE);
                     Messenger.sendMessageTemplate(player, "dungeon-status-cooldown",
                             Map.of("cooldown-time", Formatter.formatDuration(this.getRemainingCooldown())),
                             true);
+                }
+            }
+        }
+
+        for (var room : rooms) {
+            if (room.getPlayersInRoom().isEmpty())
+                continue;
+
+            var needsOtherRoom = room.getNeedsOtherRoomCompleted();
+            if (needsOtherRoom != null && !needsOtherRoom.isEmpty()) {
+                var otherRoom = rooms.stream().filter(r -> r.getName().equals(needsOtherRoom)).findFirst().orElse(null);
+                if (otherRoom != null) {
+                    if (!otherRoom.isComplete()) {
+                        for (Player player : room.getPlayersInRoom()) {
+                            if (player.hasPermission("united.dungeons.admin"))
+                                continue;
+                            player.teleport(this.warpLocation, TeleportCause.SPECTATE);
+                            Messenger.sendMessageTemplate(player, "dungeon-room-forbidden", null, true);
+                            Logger.logError("ERR-ROOM-FORBIDDEN: Player " + player.getName() + " has entered room " + room.getName() + " in dungeon " + this.getName() + " in an unintended way.");
+                        }
+                    }
+                } else {
+
                 }
             }
         }
@@ -284,8 +308,7 @@ public class Dungeon {
                 boolean allLockChestsComplete = true;
 
                 if (lockChests != null && !lockChests.isEmpty()) {
-                    for (var lockChest : lockChests)
-                    {
+                    for (var lockChest : lockChests) {
                         lockChest.checkCompletion();
                         allLockChestsComplete = allLockChestsComplete && lockChest.isComplete();
                     }
@@ -295,26 +318,6 @@ public class Dungeon {
                     if (allSpawnersComplete && allLockChestsComplete)
                         room.complete();
                 }
-
-                // var spawners = room.getSpawners();
-                // if (spawners != null && !spawners.isEmpty()) {
-                // for (Spawner spawner : spawners) {
-                // spawner.checkCompletion();
-                // allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
-                // if (!spawner.isComplete()) {
-                // if (spawner.isPlayerNearby()) {
-                // spawner.prepareSpawn();
-                // }
-                // }
-                // }
-                // if (room.mustBeCompleted()) {
-                // if (allSpawnersComplete)
-                // room.complete();
-                // }
-                // } else {
-                // if (room.mustBeCompleted())
-                // room.complete();
-                // }
 
             }
             allRoomsComplete = allRoomsComplete && (room.isComplete() || !room.mustBeCompleted());

@@ -61,6 +61,10 @@ public class Room {
     @Info
     private boolean useBossMusic = false;
 
+    @Expose
+    @Info
+    private String needsOtherRoomCompleted;
+
     private boolean isComplete;
 
     @Expose
@@ -543,6 +547,14 @@ public class Room {
 
     public void setUseBossMusic(boolean useBossMusic) {
         this.useBossMusic = useBossMusic;
+    }
+
+    public String getNeedsOtherRoomCompleted() {
+        return needsOtherRoomCompleted;
+    }
+
+    public void setNeedsOtherRoomCompleted(String needsOtherRoomCompleted) {
+        this.needsOtherRoomCompleted = needsOtherRoomCompleted;
     }
 
     // #endregion

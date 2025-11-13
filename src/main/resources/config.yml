@@ -208,6 +208,8 @@ messages:
   dungeon-started: "§2Dungeon started."
   dungeon-stopped: "§cDungeon stopped."
   dungeon-room-lockable: '§7You can use this room to start a §2dungeon party§7. Use "/ud start" to lock the dungeon for the current players and compete for the highscore (/ud highscores).'
+  dungeon-room-forbidden: "§cERROR: You've entered a room that should only be accessible after solving a different room. You've been teleported back to the entrance of the dungeon."
+  dungeon-highscores-cleared: "§bHighscores have been cleared."
 
   # +---------------------------------------------+ #
   # |                Dungeon Events               | #
