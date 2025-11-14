@@ -25,14 +25,12 @@ public class ItemsAdderFactory extends BaseItemFactory {
 
             Logger.log(customStack1.getNamespacedID());
             if (customStack2 == null) {
-                Logger.log("customStack2 false");
                 return false;
             } else {
                 Logger.log(customStack2.getNamespacedID());
                 return customStack1.matchNamespacedID(customStack2);
             }
         } else {
-            Logger.log("customStack1 false");
             if (customStack2 != null) {
                 Logger.log(customStack2.getNamespacedID());
                 return false;

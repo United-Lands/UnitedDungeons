@@ -9,9 +9,6 @@ general:
   max-room-distance: 128
   # maximum length for room edges
   max-room-edge-lenth: 128
-  # How close a player needs to get to a dungeon for it to wake up and start detailed checks.
-  # This should ideally be greater than maxroom-distance and smaller than min-dungeon-distance.
-  player-detection-range: 16
   # time in minutes that players can't be part of a dungeon party again
   player-lock-cooldown: 120
   # time in seconds that a dungeon needs to be sleeping in order to auto-reset. Use -1 to disable.

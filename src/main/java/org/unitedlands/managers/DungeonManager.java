@@ -158,7 +158,6 @@ public class DungeonManager {
         Logger.log("Starting dungeon checks...");
 
         var frequency = plugin.getConfig().getLong("general.tick-frequency", 1L);
-        var detectionRange = plugin.getConfig().getDouble("general.player-detection-range", 128d);
 
         dungeonCheckerTask = new BukkitRunnable() {
             @Override
@@ -169,7 +168,7 @@ public class DungeonManager {
                     if (!dungeon.isActive())
                         continue;
 
-                    dungeon.checkPlayerProximity(detectionRange);
+                    dungeon.checkPlayerProximity();
                     dungeon.checkCooldown();
                     dungeon.checkPlayerLockCooldowns();
 

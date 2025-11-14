@@ -52,6 +52,11 @@ public class Dungeon {
     @Expose
     @Info
     private boolean isPublic;
+
+    @Expose
+    @Info
+    private int playerDetectionRange = 128;
+
     @Expose
     @Info
     private boolean isActive = false;
@@ -118,7 +123,7 @@ public class Dungeon {
         this.uuid = UUID.randomUUID();
     }
 
-    public void checkPlayerProximity(double detectionRange) {
+    public void checkPlayerProximity() {
         boolean playerNearby = false;
 
         World world = this.location.getWorld();
@@ -134,11 +139,11 @@ public class Dungeon {
             double py = player.getY();
             double pz = player.getZ();
 
-            if (Math.abs(px - lx) > detectionRange)
+            if (Math.abs(px - lx) > this.playerDetectionRange)
                 continue;
-            if (Math.abs(py - ly) > detectionRange)
+            if (Math.abs(py - ly) > this.playerDetectionRange)
                 continue;
-            if (Math.abs(pz - lz) > detectionRange)
+            if (Math.abs(pz - lz) > this.playerDetectionRange)
                 continue;
 
             playerNearby = true;
