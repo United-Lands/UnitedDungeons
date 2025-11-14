@@ -19,7 +19,7 @@ public class LockChestSetCommand extends BaseCommandHandler {
         super(plugin);
     }
 
-    private List<String> propertyList = Arrays.asList("requiredItems");
+    private List<String> propertyList = Arrays.asList("requiredItems", "facing");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {

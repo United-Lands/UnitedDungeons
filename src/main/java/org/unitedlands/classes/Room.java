@@ -21,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.Wall.Height;
@@ -254,7 +255,18 @@ public class Room {
 
     private void spawnLockChests() {
         for (var lockChest : lockChests) {
-            lockChest.getLocation().getBlock().setType(Material.CHEST, false);
+            var block = lockChest.getLocation().getBlock();
+            block.setType(Material.CHEST, false);
+            if (lockChest.getFacing() != null && !lockChest.getFacing().isEmpty()) {
+                try {
+                    BlockFace face = BlockFace.valueOf(lockChest.getFacing());
+                    var directional = (Directional) block.getBlockData();
+                    directional.setFacing(face);
+                    block.setBlockData(directional);
+                } catch (Exception ex) {
+                    Logger.logError("Wrong facing data on lock chest " + lockChest.getUuid());
+                }
+            }
         }
     }
 
@@ -286,6 +298,17 @@ public class Room {
                     if (!barrier.isInverse()) {
                         if (block.getType() == Material.AIR) {
                             block.setType(barrierMaterial, true);
+                            if (barrier.getFacing() != null && !barrier.getFacing().isEmpty()) {
+                                try {
+                                    BlockFace face = BlockFace.valueOf(barrier.getFacing());
+                                    var directional = (Directional) block.getBlockData();
+                                    directional.setFacing(face);
+                                    block.setBlockData(directional);
+                                } catch (Exception ex) {
+                                    Logger.logError("Wrong facing data on barrier " + barrier.getUuid());
+                                }
+                            }
+
                             // Update the connections one tick later
                             Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
                                 updateConnections(block);
@@ -329,6 +352,16 @@ public class Room {
                         block.setType(Material.AIR);
                     } else {
                         block.setType(barrierMaterial, true);
+                        if (barrier.getFacing() != null && !barrier.getFacing().isEmpty()) {
+                            try {
+                                BlockFace face = BlockFace.valueOf(barrier.getFacing());
+                                var directional = (Directional) block.getBlockData();
+                                directional.setFacing(face);
+                                block.setBlockData(directional);
+                            } catch (Exception ex) {
+                                Logger.logError("Wrong facing data on barrier " + barrier.getUuid());
+                            }
+                        }
                         // Update the connections one tick later
                         Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
                             updateConnections(block);

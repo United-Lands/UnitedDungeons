@@ -30,6 +30,10 @@ public class Barrier {
     @Info
     private Double triggerChance = 100d;
 
+    @Expose
+    @Info
+    private String facing;
+
     public Barrier() {
 
     }
@@ -98,6 +102,14 @@ public class Barrier {
 
     public void setTriggerChance(Double triggerChance) {
         this.triggerChance = triggerChance;
+    }
+
+    public String getFacing() {
+        return facing;
+    }
+
+    public void setFacing(String facing) {
+        this.facing = facing;
     }
 
     @Override

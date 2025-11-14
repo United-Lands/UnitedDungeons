@@ -34,6 +34,10 @@ public class LockChest {
 
     @Expose
     @Info
+    private String facing;
+
+    @Expose
+    @Info
     private boolean complete;
 
     public LockChest() {
@@ -109,6 +113,14 @@ public class LockChest {
         this.complete = complete;
     }
 
+    public String getFacing() {
+        return facing;
+    }
+
+    public void setFacing(String facing) {
+        this.facing = facing;
+    }
+
     public void checkCompletion() {
         if (complete)
             return;
@@ -131,24 +143,25 @@ public class LockChest {
 
             List<ItemStack> remaining = new ArrayList<>(chestItems);
             for (ItemStack expectedItem : expected) {
-                boolean matched = remaining.removeIf(chestItem -> UnitedDungeons.getInstance().getItemFactory().isItem(chestItem, expectedItem)
-                        && chestItem.getAmount() == expectedItem.getAmount());
+                boolean matched = remaining.removeIf(
+                        chestItem -> UnitedDungeons.getInstance().getItemFactory().isItem(chestItem, expectedItem)
+                                && chestItem.getAmount() == expectedItem.getAmount());
                 if (!matched)
                     return;
             }
 
             complete = true;
-                    location.getBlock().setType(Material.AIR);
-                    Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
-                    location.getWorld().playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    new ParticleBuilder(Particle.WAX_OFF)
-                            .location(chest.getLocation())
-                            .offset(0.6, 0.6, 0.6)
-                            .receivers(64)
-                            .count(24)
-                            .spawn();
+            location.getBlock().setType(Material.AIR);
+            Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+                location.getWorld().playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                new ParticleBuilder(Particle.WAX_OFF)
+                        .location(chest.getLocation())
+                        .offset(0.6, 0.6, 0.6)
+                        .receivers(64)
+                        .count(24)
+                        .spawn();
 
-                }, 1L);
+            }, 1L);
 
         }
 

@@ -19,7 +19,7 @@ public class BarrierSetCommand extends BaseCommandHandler {
         super(plugin);
     }
 
-    private List<String> propertyList = Arrays.asList("material", "height", "inverse", "triggerChance");
+    private List<String> propertyList = Arrays.asList("material", "height", "inverse", "triggerChance", "facing");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
