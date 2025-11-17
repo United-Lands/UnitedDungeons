@@ -9,13 +9,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class PlayerEntranceCommand extends BaseCommandHandler {
+public class PlayerEntranceCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public PlayerEntranceCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public PlayerEntranceCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -27,24 +28,25 @@ public class PlayerEntranceCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 0) {
-            Messenger.sendMessageTemplate(sender, "info-chest-remove", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-chest-remove"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
-            Messenger.sendMessageTemplate(sender, "error-not-in-room", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
-        Messenger.sendMessageTemplate(sender, "teleport", null, true);
+        Messenger.sendMessage(sender, messageProvider.get("messages.teleport"), null, messageProvider.get("messages.prefix"));
+
         new BukkitRunnable() {
             int counter = 0;
             int maxExecutions = 3;
@@ -56,11 +58,11 @@ public class PlayerEntranceCommand extends BaseCommandHandler {
                 counter++;
 
                 if (counter <= maxExecutions) {
-                    Messenger.sendMessage(player, (maxExecutions - counter + 1) + "...", true);
+                    Messenger.sendMessage(sender, (maxExecutions - counter + 1) + "...", null, messageProvider.get("messages.prefix"));
                 }
 
                 if (!player.getLocation().getBlock().getLocation().equals(startBlock)) {
-                    Messenger.sendMessageTemplate(sender, "teleport-cancel", null, true);
+                    Messenger.sendMessage(sender, messageProvider.get("messages.teleport-cancel"), null, messageProvider.get("messages.prefix"));
                     this.cancel();
                 }
 

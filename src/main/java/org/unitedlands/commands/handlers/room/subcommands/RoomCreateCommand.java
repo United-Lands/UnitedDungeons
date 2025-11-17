@@ -6,14 +6,15 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Room;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class RoomCreateCommand extends BaseCommandHandler {
+public class RoomCreateCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public RoomCreateCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public RoomCreateCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -25,7 +26,8 @@ public class RoomCreateCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 1 && args.length != 3) {
-            Messenger.sendMessageTemplate(sender, "info-room-create", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-room-create"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -33,7 +35,8 @@ public class RoomCreateCommand extends BaseCommandHandler {
 
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -53,10 +56,11 @@ public class RoomCreateCommand extends BaseCommandHandler {
         } else {
             newRoom = new Room(roomLocation, 8, 8, 8);
         }
-        
+
         for (Room otherRoom : dungeon.getRooms()) {
             if (otherRoom.getBoundingBox().overlaps(newRoom.getBoundingBox())) {
-                Messenger.sendMessageTemplate(sender, "error-room-overlap", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-room-overlap"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         }
@@ -65,11 +69,8 @@ public class RoomCreateCommand extends BaseCommandHandler {
         newRoom.setDungeon(dungeon);
         dungeon.addRoom(newRoom);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 
 }

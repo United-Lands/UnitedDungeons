@@ -12,14 +12,17 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.utils.MessageProvider;
 import org.unitedlands.utils.Messenger;
 
 public class PlayerEventListeners implements Listener {
 
     private final UnitedDungeons plugin;
+    private final MessageProvider messageProvider;
 
-    public PlayerEventListeners(UnitedDungeons plugin) {
+    public PlayerEventListeners(UnitedDungeons plugin, MessageProvider messageProvider) {
         this.plugin = plugin;
+        this.messageProvider = messageProvider;
     }
 
     @EventHandler
@@ -36,10 +39,10 @@ public class PlayerEventListeners implements Listener {
             var dungeon = plugin.getDungeonManager().getPlayerDungeon(player);
             if (dungeon != null) {
                 if (type == EntityType.ENDER_PEARL && dungeon.disableEnderpearls()) {
-                    Messenger.sendMessageTemplate(player, "enderpearl-disabled", null, true);
+                    Messenger.sendMessage(player, messageProvider.get("messages.enderpearl-disabled"), null, messageProvider.get("messages.prefix"));
                     event.setCancelled(true);
                 } else if (type == EntityType.WIND_CHARGE && dungeon.disableWindcharge()) {
-                    Messenger.sendMessageTemplate(player, "windcharge-disabled", null, true);
+                    Messenger.sendMessage(player, messageProvider.get("messages.windcharge-disabled"), null, messageProvider.get("messages.prefix"));
                     event.setCancelled(true);
                 }
             }
@@ -55,7 +58,7 @@ public class PlayerEventListeners implements Listener {
                 var dungeon = plugin.getDungeonManager().getPlayerDungeon(player);
                 if (dungeon != null && dungeon.disableElytra()) {
                     event.setCancelled(true);
-                    Messenger.sendMessageTemplate(player, "elytra-disabled", null, true);
+                    Messenger.sendMessage(player, messageProvider.get("messages.elytra-disabled"), null, messageProvider.get("messages.prefix"));
                 }
             }
         }

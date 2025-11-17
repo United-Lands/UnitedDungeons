@@ -5,15 +5,16 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
 import org.unitedlands.classes.HighScore;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonClearHighscores extends BaseCommandHandler {
+public class DungeonClearHighscores extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonClearHighscores(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonClearHighscores(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -30,24 +31,24 @@ public class DungeonClearHighscores extends BaseCommandHandler {
         Dungeon dungeon = null;
 
         if (args.length != 1) {
-            Messenger.sendMessageTemplate(sender, "info-clear-highscores", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-clear-highscores"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         dungeon = plugin.getDungeonManager().getDungeon(args[0]);
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found-by-name", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         dungeon.setHighscores(new ArrayList<HighScore>());
 
-        Messenger.sendMessageTemplate(sender, "dungeon-highscores-cleared", null, true);
+        Messenger.sendMessage(sender, messageProvider.get("messages.dungeon-highscores-cleared"), null,
+                messageProvider.get("messages.prefix"));
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 }

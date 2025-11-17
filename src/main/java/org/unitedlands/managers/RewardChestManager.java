@@ -11,7 +11,7 @@ import org.unitedlands.classes.RewardChest;
 
 public class RewardChestManager {
 
-    @SuppressWarnings("unused")
+
     private final UnitedDungeons plugin;
 
     private Set<RewardChest> chests;

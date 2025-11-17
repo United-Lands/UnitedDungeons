@@ -9,13 +9,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class PlayerWarpCommand extends BaseCommandHandler {
+public class PlayerWarpCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public PlayerWarpCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public PlayerWarpCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -31,7 +32,8 @@ public class PlayerWarpCommand extends BaseCommandHandler {
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            Messenger.sendMessageTemplate(sender, "info-player-dungeon-warp", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-player-dungeon-warp"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -39,21 +41,25 @@ public class PlayerWarpCommand extends BaseCommandHandler {
 
         var dungeon = plugin.getDungeonManager().getDungeon(args[0]);
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found-by-name", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         if (!dungeon.isPublic() && !player.hasPermission("united.dungeons.admin")) {
-            Messenger.sendMessageTemplate(sender, "dungeon-status-not-public", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.dungeon-status-not-public"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         if (dungeon.getWarpLocation() == null) {
-            Messenger.sendMessageTemplate(sender, "dungeon-status-no-warp", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.dungeon-status-no-warp"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
-        Messenger.sendMessageTemplate(sender, "teleport", null, true);
+        Messenger.sendMessage(sender, messageProvider.get("messages.teleport"), null,
+                messageProvider.get("messages.prefix"));
         new BukkitRunnable() {
             int counter = 0;
             int maxExecutions = 3;
@@ -65,11 +71,13 @@ public class PlayerWarpCommand extends BaseCommandHandler {
                 counter++;
 
                 if (counter <= maxExecutions) {
-                    Messenger.sendMessage(player, (maxExecutions - counter + 1) + "...", true);
+                    Messenger.sendMessage(sender, (maxExecutions - counter + 1) + "...", null,
+                            messageProvider.get("messages.prefix"));
                 }
 
                 if (!player.getLocation().getBlock().getLocation().equals(startBlock)) {
-                    Messenger.sendMessageTemplate(sender, "teleport-cancel", null, true);
+                    Messenger.sendMessage(sender, messageProvider.get("messages.teleport-cancel"), null,
+                            messageProvider.get("messages.prefix"));
                     this.cancel();
                 }
 

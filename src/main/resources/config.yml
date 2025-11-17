@@ -19,7 +19,9 @@ general:
   boss-music: sound.battle_music
   # the length of the sound in ticks (for looping)
   boss-music-loop-length: 480
-
+  # allow the command to warp to dungeons
+  allow-warp: false
+  
 visualisation:
   dungeon-center:
     particle: SOUL_FIRE_FLAME
@@ -55,8 +57,8 @@ towny:
   show-custom-town-screen: true
   custom-town-screen:
   - "                          <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>"
-  - "§6§l{dungeon-name}"
-  - "§7{dungeon-description}"
+  - "<gold><bold>{dungeon-name}"
+  - "<gray>{dungeon-description}"
 
 
 ###################################################
@@ -99,13 +101,13 @@ maptowny:
 
 messages:
   # Plugin prefix before every system message.
-  prefix: "§c§lU§f§lL §7§lDungeons §8§l» "
-  reload: "§2Plugin reloaded."
+  prefix: "<bold><red>U</red><white>L</white> Dungeons <dark_gray>» </dark_gray></bold>"
+  reload: "<dark_green>Plugin reloaded."
   teleport: "Teleporting in 3 seconds. Move to cancel."
   teleport-cancel: "Teleportation cancelled."
   visualisation-on: "Dungeon visualisation switched on."
   visualisation-off: "Dungeon visualisation switched off."
-  no-permission: "§cYou don't have permission to use this command."
+  no-permission: "<red>You don't have permission to use this command."
 
   # +---------------------------------------------+ #
   # |           Command Usage Infos               | #
@@ -152,101 +154,101 @@ messages:
   # |                 IO Messages                 | #
   # +---------------------------------------------+ #
 
-  save-error: "§cError while saving changes."
-  save-success: "§2All changes saved."
-  file-delete-success: "§2Dungeon file deleted succesfully."
-  file-delete-error: "§cError while trying to delete dungeon file."
+  save-error: "<red>Error while saving changes."
+  save-success: "<dark_green>All changes saved."
+  file-delete-success: "<dark_green>Dungeon file deleted succesfully."
+  file-delete-error: "<red>Error while trying to delete dungeon file."
 
   # +---------------------------------------------+ #
   # |               Command Errors                | #
   # +---------------------------------------------+ #
 
-  error-no-dungeon-found: "§cYou are not close to a dungeon."
-  error-no-dungeon-found-by-name: "§cThere is no dungeon with that name."
-  error-not-in-room: "§cThis command can only be used inside of a dungeon room."
-  error-in-room: "§cThis command can only be used outside of a dungeon room."
-  error-barrier-not-found: "§cThere is no barrier at this location."
-  error-chest-not-found: "§cThere is no chest at this location."
-  error-max-dungeons: "§cMaximum allowed dungeons reached, you can't create another one."
-  error-dungeon-too-close: "§cThis location is too close to another dungeon."
-  error-dungeon-with-same-name: "§cA dungeon with the same name already exists."
-  error-start-no-warp: "§cYou can't start a dungeon that doesn't have a warp location. Set one with /uda dungeon set warp."
-  error-public-no-warp: "§cYou can't set a dungeon to public that doesn't have a warp location. Set one with /uda dungeon set warp."
-  error-start-no-rooms: "§cYou can't start a dungeon that doesn't have any rooms."
-  error-public-no-rooms: "§cYou can't set a dungeon to public that doesn't have any rooms."
-  error-room-overlap: "§cOverlapping rooms are not allowed."
-  error-room-too-large: "§cThe room size is too large."
-  error-room-too-small: "§cThe room size is too small."
-  error-number-format: "§cInvalid number format."
-  error-spawner-not-found: "§cThere is no spawner at this location."
-  error-not-in-party: "§cYou're not part of a dungeon party!"
-  error-player-not-in-party: "§cPlayer is not part of a dungeon party."
-  error-player-not-found: "§cCouldn't find an online player by that name."
-  error-dungeon-not-locked: "§cThis dungeon isn't locked."
-  error-player-still-on-lock-cooldown: "§cYou can't join this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
-  error-leader-still-on-lock-cooldown: "§cYou can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
+  error-no-dungeon-found: "<red>You are not close to a dungeon."
+  error-no-dungeon-found-by-name: "<red>There is no dungeon with that name."
+  error-not-in-room: "<red>This command can only be used inside of a dungeon room."
+  error-in-room: "<red>This command can only be used outside of a dungeon room."
+  error-barrier-not-found: "<red>There is no barrier at this location."
+  error-chest-not-found: "<red>There is no chest at this location."
+  error-max-dungeons: "<red>Maximum allowed dungeons reached, you can't create another one."
+  error-dungeon-too-close: "<red>This location is too close to another dungeon."
+  error-dungeon-with-same-name: "<red>A dungeon with the same name already exists."
+  error-start-no-warp: "<red>You can't start a dungeon that doesn't have a warp location. Set one with /uda dungeon set warp."
+  error-public-no-warp: "<red>You can't set a dungeon to public that doesn't have a warp location. Set one with /uda dungeon set warp."
+  error-start-no-rooms: "<red>You can't start a dungeon that doesn't have any rooms."
+  error-public-no-rooms: "<red>You can't set a dungeon to public that doesn't have any rooms."
+  error-room-overlap: "<red>Overlapping rooms are not allowed."
+  error-room-too-large: "<red>The room size is too large."
+  error-room-too-small: "<red>The room size is too small."
+  error-number-format: "<red>Invalid number format."
+  error-spawner-not-found: "<red>There is no spawner at this location."
+  error-not-in-party: "<red>You're not part of a dungeon party!"
+  error-player-not-in-party: "<red>Player is not part of a dungeon party."
+  error-player-not-found: "<red>Couldn't find an online player by that name."
+  error-dungeon-not-locked: "<red>This dungeon isn't locked."
+  error-player-still-on-lock-cooldown: "<red>You can't join this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
+  error-leader-still-on-lock-cooldown: "<red>You can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
 
   # +---------------------------------------------+ #
   # |             Dungeon Status Info             | #
   # +---------------------------------------------+ #
 
-  dungeon-status-lock: "§fThis dungeon is now locked for your §3dungeon party§f. No other players can enter in the next {lock-time}, unless you invite them with /ud invite. Good luck, adventurers!"
-  dungeon-status-locked: "This dungeon is §clocked §7by a party. It will be open again in {lock-time}."
-  dungeon-status-lock-expired: "Your lock on §6{dungeon-name} §7has expired. All players can enter again."
+  dungeon-status-lock: "<white>This dungeon is now locked for your <dark_aqua>dungeon party<white>. No other players can enter in the next {lock-time}, unless you invite them with /ud invite. Good luck, adventurers!"
+  dungeon-status-locked: "This dungeon is <red>locked <gray>by a party. It will be open again in {lock-time}."
+  dungeon-status-lock-expired: "Your lock on <gold>{dungeon-name} <gray>has expired. All players can enter again."
   dungeon-status-not-lockable: "This dungeon cannot be locked for dungeon parties."
   dungeon-room-not-lockable: "You cannot lock the dungeon from this room."
   dungeon-status-not-public: "This dungeon isn't public."
   dungeon-status-no-warp: "There is no location to teleport to."
-  dungeon-status-cooldown: "You've been teleported back to the entrance because this dungeon is on §ecooldown§7. It will open again in {cooldown-time}."
-  dungeon-status-lock-cooldown: "This can't be locked since it is on §ecooldown§7. It will open again in {cooldown-time}."
-  dungeon-completed: "§6{dungeon-name} §7has been completed and is now on §ecooldown§7. It will open again in {cooldown-time}."
-  dungeon-complete-countdown: "§fCongratulations on completing the dungeon. You will be teleported out in {countdown}, so get all the loot while you still can!"
+  dungeon-status-cooldown: "You've been teleported back to the entrance because this dungeon is on <yellow>cooldown<gray>. It will open again in {cooldown-time}."
+  dungeon-status-lock-cooldown: "This can't be locked since it is on <yellow>cooldown<gray>. It will open again in {cooldown-time}."
+  dungeon-completed: "<gold>{dungeon-name} <gray>has been completed and is now on <yellow>cooldown<gray>. It will open again in {cooldown-time}."
+  dungeon-complete-countdown: "<white>Congratulations on completing the dungeon. You will be teleported out in {countdown}, so get all the loot while you still can!"
   dungeon-reset-teleport: "The dungeon you were in has been reset. You have been teleported back to the entrance."
-  dungeon-started: "§2Dungeon started."
-  dungeon-stopped: "§cDungeon stopped."
-  dungeon-room-lockable: '§7You can use this room to start a §2dungeon party§7. Use "/ud start" to lock the dungeon for the current players and compete for the highscore (/ud highscores).'
-  dungeon-room-forbidden: "§cERROR: You've entered a room that should only be accessible after solving a different room. You've been teleported back to the entrance of the dungeon."
-  dungeon-highscores-cleared: "§bHighscores have been cleared."
+  dungeon-started: "<dark_green>Dungeon started."
+  dungeon-stopped: "<red>Dungeon stopped."
+  dungeon-room-lockable: '<gray>You can use this room to start a <dark_green>dungeon party<gray>. Use "/ud start" to lock the dungeon for the current players and compete for the highscore (/ud highscores).'
+  dungeon-room-forbidden: "<red>ERROR: You've entered a room that should only be accessible after solving a different room. You've been teleported back to the entrance of the dungeon."
+  dungeon-highscores-cleared: "<aqua>Highscores have been cleared."
 
   # +---------------------------------------------+ #
   # |                Dungeon Events               | #
   # +---------------------------------------------+ #
 
   dungeon-event-open:
-    - "§c§m+|✦                    §r§c§l[§f§l Dungeon opened! §c§l]§c§m                     |✦+"
-    - "§6{dungeon-name} §8has opened and is ready to welcome players."
-    - "§7§o{dungeon-description}"
-    - "§c§m+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                    <reset><red><bold>[<white><bold> Dungeon opened! <red><bold>]<red><strikethrough>                     |✦+"
+    - "<gold>{dungeon-name} <dark_gray>has opened and is ready to welcome players."
+    - "<gray><italic>{dungeon-description}"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
   dungeon-event-completed:
-    - "§c§m+|✦                    §r§c§l[§f§l Dungeon completed! §c§l]§c§m                  |✦+"
-    - "§6{dungeon-name} §7has been completed and is now on cooldown. It will reopen in {cooldown-time}."
-    - "§c§m+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                    <reset><red><bold>[<white><bold> Dungeon completed! <red><bold>]<red><strikethrough>                  |✦+"
+    - "<gold>{dungeon-name} <gray>has been completed and is now on cooldown. It will reopen in {cooldown-time}."
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
 
   # +---------------------------------------------+ #
   # |                      Misc                   | #
   # +---------------------------------------------+ #
 
-  player-party-start: "§fYou're now part of the dungeon party in §6{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
-  player-invited: "§3The player has been added to the dungeon party."
-  invitation-received: "§3You've been added to the dungeon party in §6{dungeon-name}!"
-  player-left: "§3You've left the dungeon party."
-  new-highscore: '§aYour party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! §7Check "/ud highscores" to see your competition.'
+  player-party-start: "<white>You're now part of the dungeon party in <gold>{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
+  player-invited: "<dark_aqua>The player has been added to the dungeon party."
+  invitation-received: "<dark_aqua>You've been added to the dungeon party in <gold>{dungeon-name}!"
+  player-left: "<dark_aqua>You've left the dungeon party."
+  new-highscore: '<green>Your party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! <gray>Check "/ud highscores" to see your competition.'
   dungeon-highscores:
-    - "§c§m+|✦                  §r§c§l[§f§l Dungeon Highscores §c§l]§c§m                  |✦+"
-    - "§l§6{dungeon-name} §fTop 5:"
-    - "§l§f1. {time1} §r§7- {players1}"
-    - "§l§f2. {time2} §r§7- {players2}"
-    - "§l§f3. {time3} §r§7- {players3}"
-    - "§l§f4. {time4} §r§7- {players4}"
-    - "§l§f5. {time5} §r§7- {players5}"
-    - "§c§m+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                  <reset><red><bold>[<white><bold> Dungeon Highscores <red><bold>]<red><strikethrough>                  |✦+"
+    - "<bold><gold>{dungeon-name} <white>Top 5:"
+    - "<bold><white>1. {time1} <reset><gray>- {players1}"
+    - "<bold><white>2. {time2} <reset><gray>- {players2}"
+    - "<bold><white>3. {time3} <reset><gray>- {players3}"
+    - "<bold><white>4. {time4} <reset><gray>- {players4}"
+    - "<bold><white>5. {time5} <reset><gray>- {players5}"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
   dungeon-info:
-    - "§c§m+|✦                     §r§c§l[§f§l Dungeon Info §c§l]§c§m                      |✦+"
-    - "§6{dungeon-name}"
-    - "§7§o{dungeon-description}"
-    - "§lStatus:§r {status}"
-    - "§lPlayers in dungeon:§r {players}"
-    - "§c§m+|✦                                 +✦+                                 |✦+"
-  elytra-disabled: "§cA spell in this dungeon has disabled your Elytra!"
-  enderpearl-disabled: "§cA spell in this dungeon has rendered your Ender pearls useless!"
-  windcharge-disabled: "§cA spell in this dungeon has rendered your wind charges useless!"
+    - "<red><strikethrough>+|✦                     <reset><red><bold>[<white><bold> Dungeon Info <red><bold>]<red><strikethrough>                      |✦+"
+    - "<gold>{dungeon-name}"
+    - "<gray><italic>{dungeon-description}"
+    - "<bold>Status:<reset> {status}"
+    - "<bold>Players in dungeon:<reset> {players}"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
+  elytra-disabled: "<red>A spell in this dungeon has disabled your Elytra!"
+  enderpearl-disabled: "<red>A spell in this dungeon has rendered your Ender pearls useless!"
+  windcharge-disabled: "<red>A spell in this dungeon has rendered your wind charges useless!"

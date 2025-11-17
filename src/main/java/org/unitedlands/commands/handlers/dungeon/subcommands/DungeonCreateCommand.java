@@ -6,14 +6,15 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonCreateCommand extends BaseCommandHandler {
+public class DungeonCreateCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonCreateCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonCreateCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -25,7 +26,8 @@ public class DungeonCreateCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 1) {
-            Messenger.sendMessageTemplate(sender, "info-dungeon-create", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-create"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -35,7 +37,8 @@ public class DungeonCreateCommand extends BaseCommandHandler {
         int maxDungeons = plugin.getConfig().getInt("general.max-dungeons", 0);
 
         if (maxDungeons != -1 && currentDungeons.size() >= maxDungeons) {
-            Messenger.sendMessageTemplate(sender, "error-max-dungeons", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-max-dungeons"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -44,7 +47,8 @@ public class DungeonCreateCommand extends BaseCommandHandler {
         for (var otherDungeon : currentDungeons) {
             var distance = location.distance(otherDungeon.getLocation());
             if (distance < minDistance) {
-                Messenger.sendMessageTemplate(sender, "error-dungeon-too-close", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-dungeon-too-close"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         }
@@ -52,7 +56,8 @@ public class DungeonCreateCommand extends BaseCommandHandler {
         var name = args[0].trim();
         var existingDungeon = plugin.getDungeonManager().getDungeon(name);
         if (existingDungeon != null) {
-            Messenger.sendMessageTemplate(sender, "error-dungeon-with-same-name", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-dungeon-with-same-name"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -61,11 +66,8 @@ public class DungeonCreateCommand extends BaseCommandHandler {
 
         plugin.getDungeonManager().addDungeon(dungeon);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 
 }

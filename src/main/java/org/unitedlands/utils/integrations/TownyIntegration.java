@@ -28,7 +28,6 @@ import com.palmergames.bukkit.towny.object.metadata.StringDataField;
 
 public class TownyIntegration implements Listener {
 
-    @SuppressWarnings("unused")
     private final UnitedDungeons plugin;
     private MiniMessage miniMessage;
 
@@ -141,7 +140,7 @@ public class TownyIntegration implements Listener {
             } else {
                 var dungeon = plugin.getDungeonManager().getDungeon(args[2]);
                 if (dungeon == null) {
-                    sender.sendMessage("§cUnknown dungeon: " + args[2]);
+                    sender.sendMessage("<red>Unknown dungeon: " + args[2]);
                 } else {
                     town.removeMetaData(META_KEYNAME);
                     town.addMetaData(new StringDataField(META_KEYNAME, dungeon.getUuid().toString()));

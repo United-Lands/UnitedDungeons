@@ -6,15 +6,16 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.commands.base.BaseCommandHandler;
-import org.unitedlands.utils.Formatter;
+import org.unitedlands.interfaces.IMessageProvider;
+import org.unitedlands.utils.FieldHelper;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonInfoCommand extends BaseCommandHandler {
+public class DungeonInfoCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonInfoCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonInfoCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -26,18 +27,21 @@ public class DungeonInfoCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 0) {
-            Messenger.sendMessageTemplate(sender, "info-dungeon-info", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-info"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
-        player.sendMessage(Formatter.getFieldValuesString(Dungeon.class, dungeon));
+        Messenger.sendMessage(sender, FieldHelper.getFieldValuesString(Dungeon.class, dungeon), null,
+                messageProvider.get("messages.prefix"));
     }
 
 }

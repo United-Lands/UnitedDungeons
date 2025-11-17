@@ -7,13 +7,14 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonSetPublicSubcommand extends BaseCommandHandler {
+public class DungeonSetPublicSubcommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonSetPublicSubcommand(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonSetPublicSubcommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -27,35 +28,36 @@ public class DungeonSetPublicSubcommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 1) {
-            Messenger.sendMessageTemplate(sender, "info-dungeon-set-public", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-set-public"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         if (dungeon.getWarpLocation() == null) {
-            Messenger.sendMessageTemplate(sender, "error-public-no-warp", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-public-no-warp"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         if (dungeon.getRooms() == null || dungeon.getRooms().size() == 0) {
-            Messenger.sendMessageTemplate(sender, "error-public-no-rooms", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-public-no-rooms"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         Boolean setPublic = Boolean.parseBoolean(args[0]);
         dungeon.setPublic(setPublic);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 
 }

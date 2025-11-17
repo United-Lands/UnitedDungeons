@@ -7,14 +7,15 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Room;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class RoomExpandCommand extends BaseCommandHandler {
+public class RoomExpandCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public RoomExpandCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public RoomExpandCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -29,7 +30,8 @@ public class RoomExpandCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 2) {
-            Messenger.sendMessageTemplate(sender, "info-room-expand", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-room-expand"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -37,13 +39,15 @@ public class RoomExpandCommand extends BaseCommandHandler {
 
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
-            Messenger.sendMessageTemplate(sender, "error-not-in-room", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -53,7 +57,8 @@ public class RoomExpandCommand extends BaseCommandHandler {
         try {
             value = Math.round(Double.parseDouble(args[1]));
         } catch (NumberFormatException ex) {
-            Messenger.sendMessageTemplate(sender, "error-number-format", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-number-format"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -63,13 +68,15 @@ public class RoomExpandCommand extends BaseCommandHandler {
         var newHeight = bbox.getHeight() + (value * 2);
 
         if (newWidth < 2 || newLength < 2 || newHeight < 2) {
-            Messenger.sendMessageTemplate(sender, "error-room-too-small", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-room-too-small"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         var maxLength = plugin.getConfig().getInt("general.max-room-edge-lenth", 0);
         if (newWidth > maxLength || newLength > maxLength || newHeight > maxLength) {
-            Messenger.sendMessageTemplate(sender, "error-room-too-large", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-room-too-large"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -78,18 +85,16 @@ public class RoomExpandCommand extends BaseCommandHandler {
                 continue;
 
             if (bbox.overlaps(otherRoom.getBoundingBox())) {
-                Messenger.sendMessageTemplate(sender, "error-room-overlap", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-room-overlap"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         }
 
         dungeon.expandRoom(room, axis, value);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 
 }
