@@ -6,14 +6,15 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonStartCommand extends BaseCommandHandler {
+public class DungeonStartCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonStartCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonStartCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -33,39 +34,42 @@ public class DungeonStartCommand extends BaseCommandHandler {
         if (args.length == 0) {
             dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
             if (dungeon == null) {
-                Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         } else if (args.length == 1) {
             dungeon = plugin.getDungeonManager().getDungeon(args[0]);
             if (dungeon == null) {
-                Messenger.sendMessageTemplate(sender, "error-no-dungeon-found-by-name", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         } else {
-            Messenger.sendMessageTemplate(sender, "info-dungeon-start", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-start"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         if (dungeon.getWarpLocation() == null) {
-            Messenger.sendMessageTemplate(sender, "error-start-no-warp", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-start-no-warp"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         if (dungeon.getRooms() == null || dungeon.getRooms().size() == 0) {
-            Messenger.sendMessageTemplate(sender, "error-start-no-rooms", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-start-no-rooms"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         dungeon.setActive(true);
         dungeon.reset();
 
-        Messenger.sendMessageTemplate(sender, "dungeon-started", null, true);
+        Messenger.sendMessage(sender, messageProvider.get("messages.dungeon-started"), null,
+                messageProvider.get("messages.prefix"));
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 }

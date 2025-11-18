@@ -7,14 +7,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Barrier;
-import org.unitedlands.commands.base.BaseCommandHandler;
-import org.unitedlands.utils.Formatter;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
+import org.unitedlands.utils.FieldHelper;
 import org.unitedlands.utils.Messenger;
 
-public class BarrierInfoCommand extends BaseCommandHandler {
+public class BarrierInfoCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public BarrierInfoCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public BarrierInfoCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -26,20 +27,23 @@ public class BarrierInfoCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 0) {
-            Messenger.sendMessageTemplate(sender, "info-barrier-info", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-barrier-info"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
-            Messenger.sendMessageTemplate(sender, "error-not-in-room", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -50,12 +54,12 @@ public class BarrierInfoCommand extends BaseCommandHandler {
             }
         }
         if (barrier == null) {
-            Messenger.sendMessageTemplate(sender, "error-barrier-not-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-barrier-not-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
-        player.sendMessage(Formatter.getFieldValuesString(Barrier.class, barrier));
-
+        Messenger.sendMessage(player, FieldHelper.getFieldValuesString(Barrier.class, barrier));
     }
 
 }

@@ -6,13 +6,14 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class PlayerListCommand extends BaseCommandHandler {
+public class PlayerListCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public PlayerListCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public PlayerListCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -24,7 +25,8 @@ public class PlayerListCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 0) {
-            Messenger.sendMessageTemplate(sender, "info-player-dungeon-list", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-player-dungeon-list"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -38,7 +40,7 @@ public class PlayerListCommand extends BaseCommandHandler {
         }
 
         var msg = String.join(", ", dungeonList);
-        Messenger.sendMessage(player, msg, true);
+        Messenger.sendMessage(sender, msg, null, messageProvider.get("messages.prefix"));
     }
 
 }

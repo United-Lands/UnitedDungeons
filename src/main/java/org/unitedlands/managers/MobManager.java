@@ -8,22 +8,20 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.unitedlands.UnitedDungeons;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.classes.Spawner;
 import org.unitedlands.utils.Logger;
 
 public class MobManager {
 
-    private final UnitedDungeons plugin;
-
     private HashMap<UUID, Spawner> mobList = new HashMap<>();
 
-    public MobManager(UnitedDungeons plugin) {
-        this.plugin = plugin;
+    public MobManager() {
+
     }
 
     public void createMob(Spawner spawner) {
-        var newMobUuid = plugin.getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation());
+        var newMobUuid = UnitedLib.getInstance().getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation());
         if (newMobUuid == null) {
             Logger.logError("Error creating new mob for spawner " + spawner.getUuid());
             return;

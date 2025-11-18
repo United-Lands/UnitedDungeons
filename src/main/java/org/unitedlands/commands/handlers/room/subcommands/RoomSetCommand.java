@@ -8,18 +8,20 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Room;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
-public class RoomSetCommand extends BaseCommandHandler {
+public class RoomSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public RoomSetCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public RoomSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
-    private List<String> propertyList = Arrays.asList("name", "enableLocking", "mustBeCompleted", "showTitle", "useBossMusic", "needsOtherRoomCompleted");
+    private List<String> propertyList = Arrays.asList("name", "enableLocking", "mustBeCompleted", "showTitle",
+            "useBossMusic", "needsOtherRoomCompleted");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
@@ -32,30 +34,30 @@ public class RoomSetCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 2) {
-            Messenger.sendMessageTemplate(sender, "info-room-set", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-room-set"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
-            Messenger.sendMessageTemplate(sender, "error-not-in-room", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         setRoomFields(player, room, args[0], args[1]);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 
     private void setRoomFields(Player player, Room room, String fieldName, String arg) {

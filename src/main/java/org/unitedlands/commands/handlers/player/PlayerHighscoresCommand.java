@@ -8,14 +8,15 @@ import java.util.Map;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Formatter;
 import org.unitedlands.utils.Messenger;
 
-public class PlayerHighscoresCommand extends BaseCommandHandler {
+public class PlayerHighscoresCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public PlayerHighscoresCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public PlayerHighscoresCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -31,15 +32,15 @@ public class PlayerHighscoresCommand extends BaseCommandHandler {
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
         if (args.length != 1) {
-            Messenger.sendMessageTemplate(sender, "info-player-highscores", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-player-highscores"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
-        Player player = (Player) sender;
-
         var dungeon = plugin.getDungeonManager().getDungeon(args[0]);
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found-by-name", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -56,16 +57,15 @@ public class PlayerHighscoresCommand extends BaseCommandHandler {
         replacements.put("players4", "-");
         replacements.put("players5", "-");
 
-        for (int i = 0; i < highscores.size(); i++)
-        {
+        for (int i = 0; i < highscores.size(); i++) {
             replacements.put("time" + (i + 1), Formatter.formatDuration(highscores.get(i).getTime()));
             replacements.put("players" + (i + 1), highscores.get(i).getPlayers());
         }
 
         replacements.put("dungeon-name", dungeon.getCleanName());
 
-        Messenger.sendMessageListTemplate(player, "dungeon-highscores", replacements, false);
-            
+        Messenger.sendMessage(sender, messageProvider.getList("messages.dungeon-highscores"), replacements);
+
     }
 
 }

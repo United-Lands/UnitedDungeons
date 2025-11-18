@@ -7,14 +7,15 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonDeleteCommand extends BaseCommandHandler {
+public class DungeonDeleteCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonDeleteCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonDeleteCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -25,14 +26,16 @@ public class DungeonDeleteCommand extends BaseCommandHandler {
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
         if (args.length != 0) {
-            Messenger.sendMessageTemplate(sender, "info-dungeon-delete", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-delete"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -48,10 +51,12 @@ public class DungeonDeleteCommand extends BaseCommandHandler {
         try {
             file.delete();
             plugin.getDungeonManager().removeDungeon(dungeon);
-            Messenger.sendMessageTemplate(sender, "file-delete-success", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.file-delete-success"), null,
+                    messageProvider.get("messages.prefix"));
         } catch (Exception ex) {
             Logger.logError(ex.getMessage());
-            Messenger.sendMessageTemplate(sender, "file-delete-error", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.file-delete-error"), null,
+                    messageProvider.get("messages.prefix"));
         }
 
     }

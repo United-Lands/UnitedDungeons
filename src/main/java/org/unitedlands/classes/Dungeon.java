@@ -28,6 +28,7 @@ import org.unitedlands.events.PlayerExitDungeonEvent;
 import org.unitedlands.events.PlayerExitRoomEvent;
 import org.unitedlands.utils.Formatter;
 import org.unitedlands.utils.Logger;
+import org.unitedlands.utils.MessageProvider;
 import org.unitedlands.utils.Messenger;
 import org.unitedlands.utils.annotations.Info;
 
@@ -109,18 +110,23 @@ public class Dungeon {
     @Expose
     private Set<PlayerLockCooldown> playerLockCooldowns = new HashSet<>();
 
+    private MessageProvider messageProvider;
+
     public Dungeon() {
         this.uuid = UUID.randomUUID();
+        this.messageProvider = UnitedDungeons.getInstance().getMessageProvider();
     }
 
     public Dungeon(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
+        this.messageProvider = UnitedDungeons.getInstance().getMessageProvider();
     }
 
     public Dungeon(Location location) {
         setLocation(location);
         this.uuid = UUID.randomUUID();
+        this.messageProvider = UnitedDungeons.getInstance().getMessageProvider();
     }
 
     public void checkPlayerProximity() {
@@ -178,9 +184,9 @@ public class Dungeon {
                     continue;
                 if (!lockedPlayersInDungeon.contains(player)) {
                     player.teleport(this.warpLocation, TeleportCause.SPECTATE);
-                    Messenger.sendMessageTemplate(player, "dungeon-status-locked",
+                    Messenger.sendMessage(player, messageProvider.get("messages.dungeon-status-locked"),
                             Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
-                            true);
+                            messageProvider.get("messages.prefix"));
                 }
             }
         }
@@ -190,9 +196,9 @@ public class Dungeon {
                     continue;
                 if (playersInPullout == null || !playersInPullout.contains(player)) {
                     player.teleport(this.warpLocation, TeleportCause.SPECTATE);
-                    Messenger.sendMessageTemplate(player, "dungeon-status-cooldown",
+                    Messenger.sendMessage(player, messageProvider.get("messages.dungeon-status-cooldown"),
                             Map.of("cooldown-time", Formatter.formatDuration(this.getRemainingCooldown())),
-                            true);
+                            messageProvider.get("messages.prefix"));
                 }
             }
         }
@@ -210,8 +216,10 @@ public class Dungeon {
                             if (player.hasPermission("united.dungeons.admin"))
                                 continue;
                             player.teleport(this.warpLocation, TeleportCause.SPECTATE);
-                            Messenger.sendMessageTemplate(player, "dungeon-room-forbidden", null, true);
-                            Logger.logError("ERR-ROOM-FORBIDDEN: Player " + player.getName() + " has entered room " + room.getName() + " in dungeon " + this.getName() + " in an unintended way.");
+                            Messenger.sendMessage(player, messageProvider.get("messages.dungeon-room-forbidden"), null,
+                                    messageProvider.get("messages.prefix"));
+                            Logger.logError("ERR-ROOM-FORBIDDEN: Player " + player.getName() + " has entered room "
+                                    + room.getName() + " in dungeon " + this.getName() + " in an unintended way.");
                         }
                     }
                 } else {
@@ -364,10 +372,10 @@ public class Dungeon {
             if (!isPlayerOnLockCooldown(player.getUniqueId())) {
                 validPlayersForLocking.add(player);
             } else {
-                Messenger.sendMessageTemplate(player, "error-player-still-on-lock-cooldown",
+                Messenger.sendMessage(player, messageProvider.get("messages.error-player-still-on-lock-cooldown"),
                         Map.of("cooldown",
                                 Formatter.formatDuration(getPlayerRemainingLockCooldown(player.getUniqueId()))),
-                        true);
+                        messageProvider.get("messages.prefix"));
             }
         }
 
@@ -381,9 +389,12 @@ public class Dungeon {
 
         for (Player player : lockedPlayersInDungeon) {
             playerLockCooldowns.add(new PlayerLockCooldown(System.currentTimeMillis(), player.getUniqueId()));
-            Messenger.sendMessageTemplate(player, "dungeon-status-lock",
-                    Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())), true);
+
         }
+
+        Messenger.sendMessage(lockedPlayersInDungeon, messageProvider.get("messages.dungeon-status-lock"),
+                Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
+                messageProvider.get("messages.prefix"));
 
         UnitedDungeons.getInstance().getDungeonManager().saveDungeon(this);
     }
@@ -424,8 +435,10 @@ public class Dungeon {
         if (!lockedPlayersInDungeon.contains(player))
             lockedPlayersInDungeon.add(player);
 
-        Messenger.sendMessageTemplate(player, "invitation-received",
-                Map.of("dungeon-name", this.getCleanName()), true);
+        Messenger.sendMessage(player, messageProvider.get("messages.invitation-received"),
+                Map.of("dungeon-name", this.getCleanName()),
+                messageProvider.get("messages.prefix"));
+
     }
 
     public void removeLockedPlayer(Player player) {
@@ -453,10 +466,10 @@ public class Dungeon {
 
         if (System.currentTimeMillis() - lockStartTime >= this.lockTime * 1000) {
 
-            for (Player player : lockedPlayersInDungeon) {
-                Messenger.sendMessageTemplate(player, "dungeon-status-lock-expired",
-                        Map.of("dungeon-name", this.getCleanName()), true);
-            }
+            Messenger.sendMessage(lockedPlayersInDungeon, messageProvider.get("messages.dungeon-status-lock-expired"),
+                    Map.of("dungeon-name", this.getCleanName()),
+                    messageProvider.get("messages.prefix"));
+
             lockedPlayersInDungeon = new ArrayList<>();
             lockStartTime = 0;
             isLocked = false;
@@ -549,7 +562,8 @@ public class Dungeon {
                 if (player.hasPermission("united.dungeons.admin"))
                     continue;
                 player.teleport(this.warpLocation);
-                Messenger.sendMessageTemplate(player, "dungeon-reset-teleport", null, true);
+                Messenger.sendMessage(player, messageProvider.get("messages.dungeon-reset-teleport"),
+                        null, messageProvider.get("messages.prefix"));
             }
         }
         playersInDungeon = new ArrayList<>();

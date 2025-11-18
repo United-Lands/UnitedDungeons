@@ -4,7 +4,8 @@ main: org.unitedlands.UnitedDungeons
 api-version: 1.21
 description: A custom United Lands plugin for dungeon management.
 author: Theriel_
-softdepend: [ItemsAdder, MythicMobs, MapTowny]
+depend: [UnitedLib]
+softdepend: [MapTowny]
 commands:
   uniteddungeons:
      description: Global UnitedDungeons player commands.

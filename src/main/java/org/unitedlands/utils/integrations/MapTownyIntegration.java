@@ -16,7 +16,6 @@ import me.silverwolfg11.maptowny.objects.MarkerOptions;
 
 public class MapTownyIntegration implements Listener {
 
-    @SuppressWarnings("unused")
     private final UnitedDungeons plugin;
 
     public MapTownyIntegration(UnitedDungeons plugin) {

@@ -8,15 +8,16 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.RewardChest;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
-public class ChestSetCommand extends BaseCommandHandler {
+public class ChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public ChestSetCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public ChestSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     private List<String> propertyList = Arrays.asList("randomRewards", "randomRewardCount", "rewards");
@@ -32,20 +33,20 @@ public class ChestSetCommand extends BaseCommandHandler {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 2) {
-            Messenger.sendMessageTemplate(sender, "info-chest-set", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-chest-set"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
-            Messenger.sendMessageTemplate(sender, "error-not-in-room", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -56,17 +57,13 @@ public class ChestSetCommand extends BaseCommandHandler {
             }
         }
         if (chest == null) {
-            Messenger.sendMessageTemplate(sender, "error-chest-not-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-chest-not-found"), null, messageProvider.get("messages.prefix"));
             return;
         }
 
         setChestField(player, chest, args[0], args[1]);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
     }
 
     private void setChestField(Player player, RewardChest chest, String fieldName, String arg) {

@@ -8,15 +8,17 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Spawner;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
+
 import org.unitedlands.utils.Messenger;
 
-public class SpawnerSetCommand extends BaseCommandHandler {
+public class SpawnerSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public SpawnerSetCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public SpawnerSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     private List<String> propertyList = Arrays.asList("mobType", "maxMobs", "spawnFrequency", "radius", "isGroupSpawn",
@@ -32,7 +34,8 @@ public class SpawnerSetCommand extends BaseCommandHandler {
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            Messenger.sendMessageTemplate(sender, "info-spawner-set", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-spawner-set"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -40,13 +43,15 @@ public class SpawnerSetCommand extends BaseCommandHandler {
 
         var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
         if (dungeon == null) {
-            Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
-            Messenger.sendMessageTemplate(sender, "error-not-in-room", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -57,17 +62,14 @@ public class SpawnerSetCommand extends BaseCommandHandler {
             }
         }
         if (spawner == null) {
-            Messenger.sendMessageTemplate(sender, "error-spawner-not-found", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-spawner-not-found"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
         setSpawnerField(player, spawner, args[0], args[1]);
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
     }
 
     private void setSpawnerField(Player player, Spawner spawner, String fieldName, String arg) {

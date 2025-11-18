@@ -6,7 +6,7 @@
 
   <groupId>org.unitedlands</groupId>
   <artifactId>UnitedDungeons</artifactId>
-  <version>2.3.3</version>
+  <version>2.4.0</version>
 
   <name>UnitedDungeons</name>
   <!-- FIXME change it to the project's website -->
@@ -77,21 +77,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.LoneDev6</groupId>
-      <artifactId>api-itemsadder</artifactId>
-      <version>3.6.3-beta-14</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>dev.lone</groupId>
-      <artifactId>LoneLibs</artifactId>
-      <version>1.0.58</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.lumine</groupId>
-      <artifactId>Mythic-Dist</artifactId>
-      <version>5.7.2</version>
+      <groupId>org.unitedlands</groupId>
+      <artifactId>UnitedLib</artifactId>
+      <version>1.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

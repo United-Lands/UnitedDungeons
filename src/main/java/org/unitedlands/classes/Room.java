@@ -27,6 +27,7 @@ import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.Wall.Height;
 import org.bukkit.util.BoundingBox;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.annotations.Info;
 
@@ -605,7 +606,7 @@ public class Room {
     // #region Helper methods
 
     private void addRewardToInventory(Inventory inv, RewardSet rewardSet) {
-        var itemStack = UnitedDungeons.getInstance().getItemFactory().getItemStack(rewardSet);
+        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(rewardSet.getItem(), rewardSet.getMinAmount(), rewardSet.getMaxAmount());
         if (itemStack != null) {
 
             int splits = 1;
@@ -651,7 +652,7 @@ public class Room {
 
     @SuppressWarnings("unused")
     private void addRewardToShulker(ShulkerBox shulker, RewardSet rewardSet) {
-        var itemStack = UnitedDungeons.getInstance().getItemFactory().getItemStack(rewardSet);
+        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(rewardSet.getItem(), rewardSet.getMinAmount(), rewardSet.getMaxAmount());
         if (itemStack != null) {
 
             int splits = 1;

@@ -16,12 +16,7 @@ import org.unitedlands.managers.MobManager;
 import org.unitedlands.managers.RewardChestManager;
 import org.unitedlands.managers.EffectsManager;
 import org.unitedlands.utils.Logger;
-import org.unitedlands.utils.factories.items.IItemFactory;
-import org.unitedlands.utils.factories.items.ItemsAdderFactory;
-import org.unitedlands.utils.factories.items.VanillaItemFactory;
-import org.unitedlands.utils.factories.mobs.IMobFactory;
-import org.unitedlands.utils.factories.mobs.MythicMobFactory;
-import org.unitedlands.utils.factories.mobs.VanillaMobFactory;
+import org.unitedlands.utils.MessageProvider;
 import org.unitedlands.utils.integrations.MapTownyIntegration;
 import org.unitedlands.utils.integrations.TownyIntegration;
 
@@ -35,11 +30,10 @@ public class UnitedDungeons extends JavaPlugin {
     private MobManager mobManager;
     private EffectsManager effectsManager;
 
-    private IItemFactory itemFactory;
-    private IMobFactory mobFactory;
-
     private TownyIntegration townyIntegration;
     private MapTownyIntegration mapTownyIntegration;
+
+    private MessageProvider messageProvider;
 
     @Override
     public void onEnable() {
@@ -54,8 +48,10 @@ public class UnitedDungeons extends JavaPlugin {
         Logger.log("    |_/|_|| |__|(/_(_)| |_> ");
         Logger.log("****************************");
 
+        messageProvider = new MessageProvider(getConfig());
+
         loadManagers();
-        loadFactories();
+
         loadIntegrations();
 
         saveDefaultConfig();
@@ -63,43 +59,23 @@ public class UnitedDungeons extends JavaPlugin {
         registerCommands();
 
         getServer().getPluginManager().registerEvents(new MobDeathListener(this), this);
-        getServer().getPluginManager().registerEvents(new SelfListener(this), this);
+        getServer().getPluginManager().registerEvents(new SelfListener(this, messageProvider), this);
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerEventListeners(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerEventListeners(this, messageProvider), this);
 
         dungeonManager.loadDungeons();
         dungeonManager.startChecks();
+
 
         getLogger().info("UnitedDungeons initialized.");
 
     }
 
     private void loadManagers() {
-        dungeonManager = new DungeonManager(this);
+        dungeonManager = new DungeonManager(this, messageProvider);
         chestManager = new RewardChestManager(this);
-        mobManager = new MobManager(this);
+        mobManager = new MobManager();
         effectsManager = new EffectsManager(this);
-    }
-
-    private void loadFactories() {
-
-        Plugin itemsAdder = Bukkit.getPluginManager().getPlugin("ItemsAdder");
-        if (itemsAdder != null && itemsAdder.isEnabled()) {
-            Logger.log("ItemsAdder found, using custom item factory.");
-            itemFactory = new ItemsAdderFactory(this);
-        } else {
-            Logger.log("ItemsAdder not found, using vanilla item factory.");
-            itemFactory = new VanillaItemFactory(this);
-        }
-
-        Plugin mythicMobs = Bukkit.getPluginManager().getPlugin("MythicMobs");
-        if (mythicMobs != null && mythicMobs.isEnabled()) {
-            Logger.log("MythicMobs found, using custom mob factory.");
-            mobFactory = new MythicMobFactory(this);
-        } else {
-            Logger.log("MythicMobs not found, using vanilla mob factory.");
-            mobFactory = new VanillaMobFactory(this);
-        }
     }
 
     private void loadIntegrations() {
@@ -116,10 +92,10 @@ public class UnitedDungeons extends JavaPlugin {
     }
 
     private void registerCommands() {
-        var adminCommands = new AdminCommands(this);
+        var adminCommands = new AdminCommands(this, messageProvider);
         Objects.requireNonNull(getCommand("udadmin")).setExecutor(adminCommands);
         Objects.requireNonNull(getCommand("udadmin")).setTabCompleter(adminCommands);
-        var playerCommands = new PlayerCommands(this);
+        var playerCommands = new PlayerCommands(this, messageProvider);
         Objects.requireNonNull(getCommand("uniteddungeons")).setExecutor(playerCommands);
         Objects.requireNonNull(getCommand("uniteddungeons")).setTabCompleter(playerCommands);
     }
@@ -146,14 +122,6 @@ public class UnitedDungeons extends JavaPlugin {
         return effectsManager;
     }
 
-    public IItemFactory getItemFactory() {
-        return itemFactory;
-    }
-
-    public IMobFactory getMobFactory() {
-        return mobFactory;
-    }
-
     public TownyIntegration getTownyIntegration() {
         return townyIntegration;
     }
@@ -164,6 +132,14 @@ public class UnitedDungeons extends JavaPlugin {
 
     public static UnitedDungeons getInstance() {
         return instance;
+    }
+
+    public MessageProvider getMessageProvider() {
+        return messageProvider;
+    }
+
+    public void setMessageProvider(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
     }
 
 }

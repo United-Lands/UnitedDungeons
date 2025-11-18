@@ -15,6 +15,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.annotations.Info;
 
@@ -88,8 +89,7 @@ public class LockChest {
                 if (itemAmountSplit.length == 2) {
                     try {
                         var amount = Integer.parseInt(itemAmountSplit[1]);
-                        var itemStack = UnitedDungeons.getInstance().getItemFactory().getItemStack(itemAmountSplit[0],
-                                amount, amount);
+                        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(itemAmountSplit[0], amount, amount);
                         result.add(itemStack);
                     } catch (Exception ex) {
                         Logger.logError(
@@ -144,7 +144,7 @@ public class LockChest {
             List<ItemStack> remaining = new ArrayList<>(chestItems);
             for (ItemStack expectedItem : expected) {
                 boolean matched = remaining.removeIf(
-                        chestItem -> UnitedDungeons.getInstance().getItemFactory().isItem(chestItem, expectedItem)
+                        chestItem -> UnitedLib.getInstance().getItemFactory().isItem(chestItem, expectedItem)
                                 && chestItem.getAmount() == expectedItem.getAmount());
                 if (!matched)
                     return;

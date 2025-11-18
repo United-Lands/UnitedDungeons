@@ -2,6 +2,8 @@ package org.unitedlands.listeners;
 
 import java.time.Duration;
 import java.util.Map;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,7 @@ import org.unitedlands.events.HighscoreEvent;
 import org.unitedlands.events.PlayerEnterRoomEvent;
 import org.unitedlands.events.PlayerExitRoomEvent;
 import org.unitedlands.utils.Formatter;
+import org.unitedlands.utils.MessageProvider;
 import org.unitedlands.utils.Messenger;
 
 import net.kyori.adventure.text.Component;
@@ -22,11 +25,12 @@ import net.kyori.adventure.title.Title.Times;
 
 public class SelfListener implements Listener {
 
-    @SuppressWarnings("unused")
     private final UnitedDungeons plugin;
+    private final MessageProvider messageProvider;
 
-    public SelfListener(UnitedDungeons plugin) {
+    public SelfListener(UnitedDungeons plugin, MessageProvider messageProvider) {
         this.plugin = plugin;
+        this.messageProvider = messageProvider;
     }
 
     @EventHandler
@@ -60,7 +64,8 @@ public class SelfListener implements Listener {
         }
 
         if (dungeon.isActive() && !dungeon.isOnCooldown() && !dungeon.isLocked() && room.enableLocking()) {
-            Messenger.sendMessageTemplate(player, "dungeon-room-lockable", null, true);
+            Messenger.sendMessage(player, messageProvider.get("messages.dungeon-room-lockable"), null,
+                    messageProvider.get("messages.prefix"));
         }
     }
 
@@ -79,41 +84,43 @@ public class SelfListener implements Listener {
         var dungeon = event.getDungeon();
 
         if (dungeon.isPublic()) {
-            Messenger.broadcastMessageListTemplate("dungeon-event-completed",
-                    Map.of("dungeon-name", dungeon.getCleanName(), "cooldown-time",
-                            Formatter.formatDuration(dungeon.getRemainingCooldown())),
-                    false);
+
+            Messenger.sendMessage(Bukkit.getServer(),
+                    messageProvider.getList("messages.dungeon-event-completed"),
+                    Map.of("dungeon-name", dungeon.getCleanName(),
+                            "cooldown-time", Formatter.formatDuration(dungeon.getRemainingCooldown())),
+                    null);
         }
 
-        for (var player : dungeon.getPlayersInPullout()) {
-            Messenger.sendMessageTemplate(player, "dungeon-complete-countdown",
-                    Map.of("countdown", Formatter.formatDuration(dungeon.getPulloutTime() * 1000)), true);
-        }
+        Messenger.sendMessage(dungeon.getPlayersInPullout(),
+                messageProvider.get("messages.dungeon-complete-countdown"),
+                Map.of("countdown", Formatter.formatDuration(dungeon.getPulloutTime() * 1000)),
+                messageProvider.get("messages.prefix"));
     }
 
     @EventHandler
     public void onDungeonOpen(DungeonOpenEvent event) {
         var dungeon = event.getDungeon();
         if (dungeon.isPublic()) {
-            Messenger.broadcastMessageListTemplate("dungeon-event-open",
+            Messenger.sendMessage(Bukkit.getServer(),
+                    messageProvider.getList("messages.dungeon-event-open"),
                     Map.of("dungeon-name", dungeon.getCleanName(),
                             "dungeon-description", dungeon.getDescription()),
-                    false);
+                    null);
         }
     }
 
     @EventHandler
     public void onHighscore(HighscoreEvent event) {
+
         var dungeon = event.getDungeon();
         var highscore = event.getHighscore();
         var placement = event.getPlacement();
 
-        var players = dungeon.getPlayersInDungeon();
-        for (var player : players) {
-            Messenger.sendMessageTemplate(player, "new-highscore",
-                    Map.of("time", Formatter.formatDuration(highscore.getTime()), "placement", placement.toString()),
-                    false);
-        }
+        Messenger.sendMessage(dungeon.getPlayersInDungeon(),
+                messageProvider.get("messages.new-highscore"),
+                Map.of("time", Formatter.formatDuration(highscore.getTime()), "placement", placement.toString()),
+                messageProvider.get("messages.prefix"));
 
     }
 

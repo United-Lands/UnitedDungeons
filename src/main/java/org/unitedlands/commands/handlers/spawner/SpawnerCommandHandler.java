@@ -1,24 +1,25 @@
 package org.unitedlands.commands.handlers.spawner;
 
 import org.unitedlands.UnitedDungeons;
-import org.unitedlands.commands.base.BaseSubcommandHandler;
+import org.unitedlands.classes.BaseSubcommandHandler;
 import org.unitedlands.commands.handlers.spawner.subcommands.SpawnerCreateCommand;
 import org.unitedlands.commands.handlers.spawner.subcommands.SpawnerInfoCommand;
 import org.unitedlands.commands.handlers.spawner.subcommands.SpawnerRemoveCommand;
 import org.unitedlands.commands.handlers.spawner.subcommands.SpawnerSetCommand;
+import org.unitedlands.interfaces.IMessageProvider;
 
-public class SpawnerCommandHandler extends BaseSubcommandHandler {
+public class SpawnerCommandHandler extends BaseSubcommandHandler<UnitedDungeons> {
 
-    public SpawnerCommandHandler(UnitedDungeons plugin) {
-        super(plugin);
+    public SpawnerCommandHandler(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
     protected void registerSubHandlers() {
-        subHandlers.put("create", new SpawnerCreateCommand(plugin));
-        subHandlers.put("remove", new SpawnerRemoveCommand(plugin));
-        subHandlers.put("set", new SpawnerSetCommand(plugin));
-        subHandlers.put("info", new SpawnerInfoCommand(plugin));
+        subHandlers.put("create", new SpawnerCreateCommand(plugin, messageProvider));
+        subHandlers.put("remove", new SpawnerRemoveCommand(plugin, messageProvider));
+        subHandlers.put("set", new SpawnerSetCommand(plugin, messageProvider));
+        subHandlers.put("info", new SpawnerInfoCommand(plugin, messageProvider));
     }
 
 }

@@ -6,15 +6,16 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
+import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
 import org.unitedlands.classes.Spawner;
-import org.unitedlands.commands.base.BaseCommandHandler;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonStopCommand extends BaseCommandHandler {
+public class DungeonStopCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonStopCommand(UnitedDungeons plugin) {
-        super(plugin);
+    public DungeonStopCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
@@ -33,17 +34,20 @@ public class DungeonStopCommand extends BaseCommandHandler {
         if (args.length == 0) {
             dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
             if (dungeon == null) {
-                Messenger.sendMessageTemplate(sender, "error-no-dungeon-found", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         } else if (args.length == 1) {
             dungeon = plugin.getDungeonManager().getDungeon(args[0]);
             if (dungeon == null) {
-                Messenger.sendMessageTemplate(sender, "error-no-dungeon-found-by-name", null, true);
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
         } else {
-            Messenger.sendMessageTemplate(sender, "info-dungeon-stop", null, true);
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-stop"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -56,13 +60,11 @@ public class DungeonStopCommand extends BaseCommandHandler {
         dungeon.setActive(false);
         dungeon.reset();
 
-        Messenger.sendMessageTemplate(sender, "dungeon-stopped", null, true);
+        Messenger.sendMessage(sender, messageProvider.get("messages.dungeon-stopped"), null,
+                messageProvider.get("messages.prefix"));
 
-        if (!plugin.getDungeonManager().saveDungeon(dungeon)) {
-            Messenger.sendMessageTemplate(sender, "save-error", null, true);
-        } else {
-            Messenger.sendMessageTemplate(sender, "save-success", null, true);
-        }
+        plugin.getDungeonManager().saveDungeon(dungeon, sender);
+
     }
 
 }

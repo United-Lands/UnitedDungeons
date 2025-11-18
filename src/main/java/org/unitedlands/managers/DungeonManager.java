@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -20,16 +21,21 @@ import org.unitedlands.classes.Room;
 import org.unitedlands.classes.Spawner;
 import org.unitedlands.utils.JsonUtils;
 import org.unitedlands.utils.Logger;
+import org.unitedlands.utils.MessageProvider;
+import org.unitedlands.utils.Messenger;
 
 public class DungeonManager {
 
     private final UnitedDungeons plugin;
+    private final MessageProvider messageProvider;
+
     private Map<UUID, Dungeon> dungeons;
 
     private BukkitTask dungeonCheckerTask;
 
-    public DungeonManager(UnitedDungeons plugin) {
+    public DungeonManager(UnitedDungeons plugin, MessageProvider messageProvider) {
         this.plugin = plugin;
+        this.messageProvider = messageProvider;
     }
 
     // #region Public utility functions
@@ -212,6 +218,14 @@ public class DungeonManager {
         }
         Logger.log("Stopping dungeon checks...");
         dungeonCheckerTask.cancel();
+    }
+
+    public void saveDungeon(Dungeon dungeon, CommandSender sender) {
+        if (!saveDungeon(dungeon)) {
+            Messenger.sendMessage(sender, messageProvider.get("messages.save-error"), null, messageProvider.get("messages.prefix"));
+        } else {
+            Messenger.sendMessage(sender, messageProvider.get("messages.save-success"), null, messageProvider.get("messages.prefix"));
+        }
     }
 
     public boolean saveDungeon(Dungeon dungeon) {
