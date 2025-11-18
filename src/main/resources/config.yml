@@ -215,14 +215,14 @@ messages:
   # +---------------------------------------------+ #
 
   dungeon-event-open:
-    - "<red><strikethrough>+|✦                    <reset><red><bold>[<white><bold> Dungeon opened! <red><bold>]<red><strikethrough>                     |✦+"
+    - "<red><strikethrough>+|✦                    </strikethrough><bold>[<white>  Dungeon opened! </white>]</bold><strikethrough>                   |✦+</strikethrough></red>"
     - "<gold>{dungeon-name} <dark_gray>has opened and is ready to welcome players."
     - "<gray><italic>{dungeon-description}"
-    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
   dungeon-event-completed:
-    - "<red><strikethrough>+|✦                    <reset><red><bold>[<white><bold> Dungeon completed! <red><bold>]<red><strikethrough>                  |✦+"
+    - "<red><strikethrough>+|✦                    </strikethrough><bold>[<white> Dungeon completed! </white>]</bold><strikethrough>                 |✦+</strikethrough></red>"
     - "<gold>{dungeon-name} <gray>has been completed and is now on cooldown. It will reopen in {cooldown-time}."
-    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
 
   # +---------------------------------------------+ #
   # |                      Misc                   | #
@@ -234,21 +234,21 @@ messages:
   player-left: "<dark_aqua>You've left the dungeon party."
   new-highscore: '<green>Your party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! <gray>Check "/ud highscores" to see your competition.'
   dungeon-highscores:
-    - "<red><strikethrough>+|✦                  <reset><red><bold>[<white><bold> Dungeon Highscores <red><bold>]<red><strikethrough>                  |✦+"
+    - "<red><strikethrough>+|✦                </strikethrough><bold>[<white> Dungeon Highscores </white>]</bold><strikethrough>                   |✦+</strikethrough></red>"
     - "<bold><gold>{dungeon-name} <white>Top 5:"
     - "<bold><white>1. {time1} <reset><gray>- {players1}"
     - "<bold><white>2. {time2} <reset><gray>- {players2}"
     - "<bold><white>3. {time3} <reset><gray>- {players3}"
     - "<bold><white>4. {time4} <reset><gray>- {players4}"
     - "<bold><white>5. {time5} <reset><gray>- {players5}"
-    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
   dungeon-info:
-    - "<red><strikethrough>+|✦                     <reset><red><bold>[<white><bold> Dungeon Info <red><bold>]<red><strikethrough>                      |✦+"
+    - "<red><strikethrough>+|✦                      </strikethrough><bold>[<white> Dungeon Info </white>]</bold><strikethrough>                       |✦+</strikethrough></red>"
     - "<gold>{dungeon-name}"
     - "<gray><italic>{dungeon-description}"
     - "<bold>Status:<reset> {status}"
     - "<bold>Players in dungeon:<reset> {players}"
-    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+"
+    - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
   elytra-disabled: "<red>A spell in this dungeon has disabled your Elytra!"
   enderpearl-disabled: "<red>A spell in this dungeon has rendered your Ender pearls useless!"
   windcharge-disabled: "<red>A spell in this dungeon has rendered your wind charges useless!"
