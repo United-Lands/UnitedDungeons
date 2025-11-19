@@ -216,8 +216,8 @@ messages:
 
   dungeon-event-open:
     - "<red><strikethrough>+|✦                    </strikethrough><bold>[<white>  Dungeon opened! </white>]</bold><strikethrough>                   |✦+</strikethrough></red>"
-    - "<gold>{dungeon-name} <dark_gray>has opened and is ready to welcome players."
-    - "<gray><italic>{dungeon-description}"
+    - "<gold>{dungeon-name}</gold> <dark_gray>has opened and is ready to welcome players.</dark_gray>"
+    - "<gray><italic>{dungeon-description}</italic></gray>"
     - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
   dungeon-event-completed:
     - "<red><strikethrough>+|✦                    </strikethrough><bold>[<white> Dungeon completed! </white>]</bold><strikethrough>                 |✦+</strikethrough></red>"
@@ -235,19 +235,19 @@ messages:
   new-highscore: '<green>Your party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! <gray>Check "/ud highscores" to see your competition.'
   dungeon-highscores:
     - "<red><strikethrough>+|✦                </strikethrough><bold>[<white> Dungeon Highscores </white>]</bold><strikethrough>                   |✦+</strikethrough></red>"
-    - "<bold><gold>{dungeon-name} <white>Top 5:"
-    - "<bold><white>1. {time1} <reset><gray>- {players1}"
-    - "<bold><white>2. {time2} <reset><gray>- {players2}"
-    - "<bold><white>3. {time3} <reset><gray>- {players3}"
-    - "<bold><white>4. {time4} <reset><gray>- {players4}"
-    - "<bold><white>5. {time5} <reset><gray>- {players5}"
+    - "<bold><gold>{dungeon-name}</gold> <white>Top 5:</white></bold>"
+    - "<bold><white>1. {time1} </white></bold><gray>- {players1}</gray>"
+    - "<bold><white>2. {time2} </white></bold><gray>- {players2}</gray>"
+    - "<bold><white>3. {time3} </white></bold><gray>- {players3}</gray>"
+    - "<bold><white>4. {time4} </white></bold><gray>- {players4}</gray>"
+    - "<bold><white>5. {time5} </white></bold><gray>- {players5}</gray>"
     - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
   dungeon-info:
     - "<red><strikethrough>+|✦                      </strikethrough><bold>[<white> Dungeon Info </white>]</bold><strikethrough>                       |✦+</strikethrough></red>"
-    - "<gold>{dungeon-name}"
-    - "<gray><italic>{dungeon-description}"
-    - "<bold>Status:<reset> {status}"
-    - "<bold>Players in dungeon:<reset> {players}"
+    - "<gold>{dungeon-name}</gold>"
+    - "<gray><italic>{dungeon-description}</italic></gray>"
+    - "<bold>Status:</bold> {status}"
+    - "<bold>Players in dungeon:</bold> <gray>{players}</gray>"
     - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
   elytra-disabled: "<red>A spell in this dungeon has disabled your Elytra!"
   enderpearl-disabled: "<red>A spell in this dungeon has rendered your Ender pearls useless!"

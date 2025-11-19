@@ -44,13 +44,13 @@ public class PlayerInfoCommand extends BaseCommandHandler<UnitedDungeons> {
 
         String status = "";
         if (dungeon.isOnCooldown()) {
-            status = "<yellow>On Cooldown <gray>(" + Formatter.formatDuration(dungeon.getRemainingCooldown()) + " remaining)";
+            status = "<yellow>On Cooldown</yellow> <gray>(" + Formatter.formatDuration(dungeon.getRemainingCooldown()) + " remaining)</gray>";
         } else if (dungeon.isLocked()) {
-            status = "<dark_red>Locked by dungeon party <gray>(" + Formatter.formatDuration(dungeon.getRemainingLockTime()) + " remaining)";
+            status = "<dark_red>Locked by dungeon party</dark_red> <gray>(" + Formatter.formatDuration(dungeon.getRemainingLockTime()) + " remaining)</gray>";
         } else if (!dungeon.isActive()) {
-            status = "<red>Closed";
+            status = "<red>Closed</red>";
         } else {
-            status = "<dark_green>Open";
+            status = "<dark_green>Open</dark_green>";
         }
 
         String players = "-";
