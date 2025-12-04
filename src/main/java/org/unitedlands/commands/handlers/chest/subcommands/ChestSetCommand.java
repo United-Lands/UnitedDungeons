@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.classes.Dungeon;
 import org.unitedlands.classes.RewardChest;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
@@ -38,12 +39,13 @@ public class ChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
         }
 
         Player player = (Player) sender;
-        var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
+        Dungeon dungeon = plugin.getDungeonManager().getEditSessionForPlayr(player.getUniqueId());
         if (dungeon == null) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null, messageProvider.get("messages.prefix"));
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-edit-session"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
-
+        
         var room = plugin.getDungeonManager().getRoomAtLocation(dungeon, player.getLocation());
         if (room == null) {
             Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-room"), null, messageProvider.get("messages.prefix"));

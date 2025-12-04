@@ -29,8 +29,6 @@ public class DungeonSetCommand extends BaseCommandHandler<UnitedDungeons> {
     public List<String> handleTab(CommandSender sender, String[] args) {
         if (args.length == 1)
             return propertyList;
-        if (args.length == 2 && args[0].equals("location"))
-            return plugin.getDungeonManager().getDungeonNames();
         return new ArrayList<>();
     }
 
@@ -40,25 +38,12 @@ public class DungeonSetCommand extends BaseCommandHandler<UnitedDungeons> {
             Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-set"), null,
                     messageProvider.get("messages.prefix"));
             return;
-        } else if (args.length == 1 && (!args[0].equals("location") && !args[0].equals("warp"))) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-set"), null,
-                    messageProvider.get("messages.prefix"));
-            return;
-        } else if (args.length >= 2 && !propertyList.contains(args[0])) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-set"), null,
-                    messageProvider.get("messages.prefix"));
-            return;
         }
 
         Player player = (Player) sender;
-        Dungeon dungeon = null;
-        if (args[0].equals("location") && args.length == 2) {
-            dungeon = plugin.getDungeonManager().getDungeon(args[1]);
-        } else {
-            dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
-        }
+        Dungeon dungeon = plugin.getDungeonManager().getEditSessionForPlayr(player.getUniqueId());
         if (dungeon == null) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-edit-session"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }
@@ -103,19 +88,7 @@ public class DungeonSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
         var oldLocation = dungeon.getLocation().clone();
         var newLocation = player.getLocation().getBlock().getLocation().add(0.5, 0.5, 0.5);
-
-        var minDistance = plugin.getConfig().getDouble("general.min-dungeon-distance", 0);
-        for (var otherDungeon : plugin.getDungeonManager().getDungeons()) {
-            if (dungeon.equals(otherDungeon))
-                continue;
-            var distance = newLocation.distance(otherDungeon.getLocation());
-            if (distance < minDistance) {
-                Messenger.sendMessage(player, messageProvider.get("messages.error-dungeon-too-close"), null,
-                        messageProvider.get("messages.prefix"));
-                return;
-            }
-        }
-
+        
         var delta = newLocation.subtract(oldLocation);
         for (Room room : dungeon.getRooms()) {
             dungeon.shiftRoom(room, delta);

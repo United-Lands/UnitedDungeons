@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.classes.Dungeon;
 import org.unitedlands.classes.Room;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
@@ -36,10 +37,9 @@ public class RoomExpandCommand extends BaseCommandHandler<UnitedDungeons> {
         }
 
         Player player = (Player) sender;
-
-        var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
+        Dungeon dungeon = plugin.getDungeonManager().getEditSessionForPlayr(player.getUniqueId());
         if (dungeon == null) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-edit-session"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }
@@ -73,21 +73,13 @@ public class RoomExpandCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        var maxLength = plugin.getConfig().getInt("general.max-room-edge-lenth", 0);
-        if (newWidth > maxLength || newLength > maxLength || newHeight > maxLength) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-room-too-large"), null,
-                    messageProvider.get("messages.prefix"));
-            return;
-        }
-
         for (Room otherRoom : dungeon.getRooms()) {
             if (room.equals(otherRoom))
                 continue;
 
             if (bbox.overlaps(otherRoom.getBoundingBox())) {
-                Messenger.sendMessage(sender, messageProvider.get("messages.error-room-overlap"), null,
+                Messenger.sendMessage(sender, messageProvider.get("messages.warning-room-overlap"), null,
                         messageProvider.get("messages.prefix"));
-                return;
             }
         }
 

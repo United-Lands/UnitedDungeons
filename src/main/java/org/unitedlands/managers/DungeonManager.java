@@ -29,7 +29,8 @@ public class DungeonManager {
     private final UnitedDungeons plugin;
     private final MessageProvider messageProvider;
 
-    private Map<UUID, Dungeon> dungeons;
+    private Map<UUID, Dungeon> editSessions = new HashMap<>();
+    private Map<UUID, Dungeon> dungeons = new HashMap<>();
 
     private BukkitTask dungeonCheckerTask;
 
@@ -129,6 +130,9 @@ public class DungeonManager {
     }
 
     public void removeDungeon(Dungeon dungeon) {
+        var editSessionsToRemove = editSessions.entrySet().stream().filter(e -> e.getValue().equals(dungeon)).collect(Collectors.toList());
+        for (var editSession : editSessionsToRemove)
+            editSessions.remove(editSession.getKey());
         dungeons.remove(dungeon.getUuid());
     }
 
@@ -222,9 +226,11 @@ public class DungeonManager {
 
     public void saveDungeon(Dungeon dungeon, CommandSender sender) {
         if (!saveDungeon(dungeon)) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.save-error"), null, messageProvider.get("messages.prefix"));
+            Messenger.sendMessage(sender, messageProvider.get("messages.save-error"), null,
+                    messageProvider.get("messages.prefix"));
         } else {
-            Messenger.sendMessage(sender, messageProvider.get("messages.save-success"), null, messageProvider.get("messages.prefix"));
+            Messenger.sendMessage(sender, messageProvider.get("messages.save-success"), null,
+                    messageProvider.get("messages.prefix"));
         }
     }
 
@@ -258,5 +264,13 @@ public class DungeonManager {
             Logger.logError(ex.getMessage());
             return null;
         }
+    }
+
+    public void registerEditSessionForPlayer(UUID userId, Dungeon dungen) {
+        editSessions.put(userId, dungen);
+    }
+
+    public Dungeon getEditSessionForPlayr(UUID userId) {
+        return editSessions.get(userId);
     }
 }

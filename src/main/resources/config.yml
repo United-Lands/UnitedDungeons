@@ -1,14 +1,6 @@
 general:
   # The plugin tick speed in seconds (e.g. for room checks, spawner actions...)
   tick-frequency: 1
-  # maximum number of dungeons (-1 for unlimited)
-  max-dungeons: -1
-  # minimum distance between two dungeons
-  min-dungeon-distance: 512
-  # maximum distance of rooms from the dungeon center
-  max-room-distance: 128
-  # maximum length for room edges
-  max-room-edge-lenth: 128
   # time in minutes that players can't be part of a dungeon party again
   player-lock-cooldown: 120
   # time in seconds that a dungeon needs to be sleeping in order to auto-reset. Use -1 to disable.
@@ -19,7 +11,7 @@ general:
   boss-music: sound.battle_music
   # the length of the sound in ticks (for looping)
   boss-music-loop-length: 480
-  # allow the command to warp to dungeons
+  # allow the command to warp to dungeons. Required a restart to take effect.
   allow-warp: false
   
 visualisation:
@@ -122,6 +114,7 @@ messages:
   info-chest-remove: "Usage: /uda chest remove"
   info-chest-set: "Usage: /uda chest set <property> <value>"
   info-dungeon-create: "Usage: /uda dungeon create <new_dungeon_name>"
+  info-dungeon-edit: "Usage: /uda dungeon edit <dungeon_name>"
   info-dungeon-delete: "Usage: /uda dungeon delete"
   info-dungeon-info: "Usage: /uda dungeon info"
   info-dungeon-set: "Usage: /uda dungeon set <location|warp|property_name> [property_value]"
@@ -169,14 +162,12 @@ messages:
   error-in-room: "<red>This command can only be used outside of a dungeon room."
   error-barrier-not-found: "<red>There is no barrier at this location."
   error-chest-not-found: "<red>There is no chest at this location."
-  error-max-dungeons: "<red>Maximum allowed dungeons reached, you can't create another one."
-  error-dungeon-too-close: "<red>This location is too close to another dungeon."
   error-dungeon-with-same-name: "<red>A dungeon with the same name already exists."
   error-start-no-warp: "<red>You can't start a dungeon that doesn't have a warp location. Set one with /uda dungeon set warp."
   error-public-no-warp: "<red>You can't set a dungeon to public that doesn't have a warp location. Set one with /uda dungeon set warp."
   error-start-no-rooms: "<red>You can't start a dungeon that doesn't have any rooms."
   error-public-no-rooms: "<red>You can't set a dungeon to public that doesn't have any rooms."
-  error-room-overlap: "<red>Overlapping rooms are not allowed."
+  warning-room-overlap: "<yellow>This room overlaps an existing room. This may cause issues and should be avoided.</yellow>"
   error-room-too-large: "<red>The room size is too large."
   error-room-too-small: "<red>The room size is too small."
   error-number-format: "<red>Invalid number format."
@@ -187,6 +178,7 @@ messages:
   error-dungeon-not-locked: "<red>This dungeon isn't locked."
   error-player-still-on-lock-cooldown: "<red>You can't join this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
   error-leader-still-on-lock-cooldown: "<red>You can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
+  error-no-edit-session: "<red>No edit session found. Use \"/uda dungeon edit <dungeon_name>\" to start editing a dungeon.</red>"
 
   # +---------------------------------------------+ #
   # |             Dungeon Status Info             | #
@@ -228,6 +220,7 @@ messages:
   # |                      Misc                   | #
   # +---------------------------------------------+ #
 
+  dungeon-edit-start: "<green>Now editing dungeon <bold><gold>{dungeon-name}</gold></bold>.</green>"
   player-party-start: "<white>You're now part of the dungeon party in <gold>{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
   player-invited: "<dark_aqua>The player has been added to the dungeon party."
   invitation-received: "<dark_aqua>You've been added to the dungeon party in <gold>{dungeon-name}!"

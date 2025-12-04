@@ -2,6 +2,7 @@ package org.unitedlands.commands.handlers.dungeon.subcommands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,38 +10,40 @@ import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
 import org.unitedlands.interfaces.IMessageProvider;
-import org.unitedlands.utils.FieldHelper;
 import org.unitedlands.utils.Messenger;
 
-public class DungeonInfoCommand extends BaseCommandHandler<UnitedDungeons> {
+public class DungeonEditCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public DungeonInfoCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public DungeonEditCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
-        return new ArrayList<String>();
+        if (args.length == 1) {
+            return plugin.getDungeonManager().getDungeonNames();
+        }
+        return new ArrayList<>();
     }
 
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
-
-        if (args.length != 0) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-info"), null,
+        if (args.length != 1) {
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-dungeon-edit"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }
 
         Player player = (Player) sender;
-        Dungeon dungeon = plugin.getDungeonManager().getEditSessionForPlayr(player.getUniqueId());
+        Dungeon dungeon = plugin.getDungeonManager().getDungeon(args[0]);
         if (dungeon == null) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-edit-session"), null,
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }
-        
-        Messenger.sendMessage(sender, FieldHelper.getFieldValuesString(Dungeon.class, dungeon), null,
+
+        plugin.getDungeonManager().registerEditSessionForPlayer(player.getUniqueId(), dungeon);
+        Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), Map.of("dungeon-name", dungeon.getName()),
                 messageProvider.get("messages.prefix"));
     }
 

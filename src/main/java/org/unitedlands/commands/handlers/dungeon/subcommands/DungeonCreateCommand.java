@@ -33,26 +33,6 @@ public class DungeonCreateCommand extends BaseCommandHandler<UnitedDungeons> {
 
         Player player = (Player) sender;
 
-        var currentDungeons = plugin.getDungeonManager().getDungeons();
-        int maxDungeons = plugin.getConfig().getInt("general.max-dungeons", 0);
-
-        if (maxDungeons != -1 && currentDungeons.size() >= maxDungeons) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-max-dungeons"), null,
-                    messageProvider.get("messages.prefix"));
-            return;
-        }
-
-        var location = player.getLocation();
-        var minDistance = plugin.getConfig().getDouble("general.min-dungeon-distance", 0);
-        for (var otherDungeon : currentDungeons) {
-            var distance = location.distance(otherDungeon.getLocation());
-            if (distance < minDistance) {
-                Messenger.sendMessage(sender, messageProvider.get("messages.error-dungeon-too-close"), null,
-                        messageProvider.get("messages.prefix"));
-                return;
-            }
-        }
-
         var name = args[0].trim();
         var existingDungeon = plugin.getDungeonManager().getDungeon(name);
         if (existingDungeon != null) {
