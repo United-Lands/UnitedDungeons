@@ -693,6 +693,9 @@ public class Dungeon {
         for (Barrier barrier : room.getBarriers()) {
             barrier.getLocation().add(shiftVector);
         }
+        for (LockChest lockChest : room.getLockChests()) {
+            lockChest.getLocation().add(shiftVector);
+        }
     }
 
     public void expandRoom(@NotNull Room room, @NotNull String axis, @NotNull Long value) {

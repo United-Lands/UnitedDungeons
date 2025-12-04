@@ -5,6 +5,7 @@ import org.unitedlands.classes.BaseSubcommandHandler;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonClearHighscores;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonCreateCommand;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonDeleteCommand;
+import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonEditCommand;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonInfoCommand;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonSetCommand;
 import org.unitedlands.commands.handlers.dungeon.subcommands.DungeonStartCommand;
@@ -20,6 +21,7 @@ public class DungeonCommandHandler extends BaseSubcommandHandler<UnitedDungeons>
     @Override
     protected void registerSubHandlers() {
         subHandlers.put("create", new DungeonCreateCommand(plugin, messageProvider));
+        subHandlers.put("edit", new DungeonEditCommand(plugin, messageProvider));
         subHandlers.put("delete", new DungeonDeleteCommand(plugin, messageProvider));
         subHandlers.put("start", new DungeonStartCommand(plugin, messageProvider));
         subHandlers.put("stop", new DungeonStopCommand(plugin, messageProvider));

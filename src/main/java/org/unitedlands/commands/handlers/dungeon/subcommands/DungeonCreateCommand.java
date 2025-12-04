@@ -45,6 +45,7 @@ public class DungeonCreateCommand extends BaseCommandHandler<UnitedDungeons> {
         dungeon.setName(name);
 
         plugin.getDungeonManager().addDungeon(dungeon);
+        plugin.getDungeonManager().registerEditSessionForPlayer(player.getUniqueId(), dungeon);
 
         plugin.getDungeonManager().saveDungeon(dungeon, sender);
 

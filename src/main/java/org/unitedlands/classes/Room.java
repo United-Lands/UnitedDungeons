@@ -87,10 +87,9 @@ public class Room {
 
     public Room(Location center, int width, int length, int height) {
 
-        var maxLength = UnitedDungeons.getInstance().getConfig().getInt("general.max-room-edge-lenth", 0);
-        width = Math.min(width, maxLength);
-        length = Math.min(length, maxLength);
-        height = Math.min(height, maxLength);
+        width = Math.max(width, 2);
+        length = Math.max(length, 2);
+        height = Math.max(height, 2);
 
         width = Math.max(width, 2);
         length = Math.max(length, 2);

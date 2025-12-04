@@ -43,7 +43,7 @@ public class DungeonEditCommand extends BaseCommandHandler<UnitedDungeons> {
         }
 
         plugin.getDungeonManager().registerEditSessionForPlayer(player.getUniqueId(), dungeon);
-        Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found-by-name"), Map.of("dungeon-name", dungeon.getName()),
+        Messenger.sendMessage(sender, messageProvider.get("messages.dungeon-edit-start"), Map.of("dungeon-name", dungeon.getName()),
                 messageProvider.get("messages.prefix"));
     }
 
