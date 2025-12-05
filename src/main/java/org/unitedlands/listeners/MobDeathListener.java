@@ -36,7 +36,7 @@ public class MobDeathListener implements Listener {
     }
 
     private void handleMobDeath(@NotNull LivingEntity entity) {
-        if (!(entity.getEntitySpawnReason() == SpawnReason.CUSTOM))
+        if (!(entity.getEntitySpawnReason() == SpawnReason.CUSTOM || entity.getEntitySpawnReason() == SpawnReason.PATROL))
             return;
         plugin.getMobManager().checkMobKill(entity.getUniqueId());
     }
