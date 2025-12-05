@@ -29,12 +29,12 @@ public class DungeonStartCommand extends BaseCommandHandler<UnitedDungeons> {
     @Override
     public void handleCommand(CommandSender sender, String[] args) {
         Dungeon dungeon = null;
-        Player player = (Player) sender;
+        Player player = (Player) sender; 
 
         if (args.length == 0) {
-            dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
+            dungeon = plugin.getDungeonManager().getEditSessionForPlayr(player.getUniqueId());
             if (dungeon == null) {
-                Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+                Messenger.sendMessage(sender, messageProvider.get("messages.error-no-edit-session"), null,
                         messageProvider.get("messages.prefix"));
                 return;
             }

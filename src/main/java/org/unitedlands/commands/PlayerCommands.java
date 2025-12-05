@@ -6,6 +6,7 @@ import org.unitedlands.commands.handlers.player.PlayerEntranceCommand;
 import org.unitedlands.commands.handlers.player.PlayerHighscoresCommand;
 import org.unitedlands.commands.handlers.player.PlayerInfoCommand;
 import org.unitedlands.commands.handlers.player.PlayerInviteCommand;
+import org.unitedlands.commands.handlers.player.PlayerLeaveCommand;
 import org.unitedlands.commands.handlers.player.PlayerListCommand;
 import org.unitedlands.commands.handlers.player.PlayerStartCommand;
 import org.unitedlands.commands.handlers.player.PlayerWarpCommand;
@@ -22,6 +23,7 @@ public class PlayerCommands extends BaseCommandExecutor<UnitedDungeons> {
         handlers.put("entrance", new PlayerEntranceCommand(plugin, messageProvider));
         handlers.put("start", new PlayerStartCommand(plugin, messageProvider));
         handlers.put("invite", new PlayerInviteCommand(plugin, messageProvider));
+        handlers.put("leave", new PlayerLeaveCommand(plugin, messageProvider));
         handlers.put("list", new PlayerListCommand(plugin, messageProvider));
         handlers.put("highscores", new PlayerHighscoresCommand(plugin, messageProvider));
         handlers.put("info", new PlayerInfoCommand(plugin, messageProvider));

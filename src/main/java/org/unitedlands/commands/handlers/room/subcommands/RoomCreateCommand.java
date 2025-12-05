@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
+import org.unitedlands.classes.Dungeon;
 import org.unitedlands.classes.Room;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
@@ -32,10 +33,9 @@ public class RoomCreateCommand extends BaseCommandHandler<UnitedDungeons> {
         }
 
         Player player = (Player) sender;
-
-        var dungeon = plugin.getDungeonManager().getClosestDungeon(player.getLocation());
+        Dungeon dungeon = plugin.getDungeonManager().getEditSessionForPlayr(player.getUniqueId());
         if (dungeon == null) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-dungeon-found"), null,
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-no-edit-session"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }
@@ -59,9 +59,8 @@ public class RoomCreateCommand extends BaseCommandHandler<UnitedDungeons> {
 
         for (Room otherRoom : dungeon.getRooms()) {
             if (otherRoom.getBoundingBox().overlaps(newRoom.getBoundingBox())) {
-                Messenger.sendMessage(sender, messageProvider.get("messages.error-room-overlap"), null,
+                Messenger.sendMessage(sender, messageProvider.get("messages.warning-room-overlap"), null,
                         messageProvider.get("messages.prefix"));
-                return;
             }
         }
 
