@@ -118,7 +118,7 @@ public class Barrier {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        RewardChest c = (RewardChest) o;
+        LootChest c = (LootChest) o;
         return Objects.equals(uuid, c.getUuid());
     }
 

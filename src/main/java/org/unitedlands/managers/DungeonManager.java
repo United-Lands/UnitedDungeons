@@ -160,7 +160,7 @@ public class DungeonManager {
             }
         }
 
-        plugin.getChestManager().loadChests(dungeons.values());
+        plugin.getChestManager().loadLootChests(dungeons.values());
     }
 
     public void startChecks() {
@@ -221,7 +221,8 @@ public class DungeonManager {
             }
         }
         Logger.log("Stopping dungeon checks...");
-        dungeonCheckerTask.cancel();
+        if (dungeonCheckerTask != null)
+            dungeonCheckerTask.cancel();
     }
 
     public void saveDungeon(Dungeon dungeon, CommandSender sender) {

@@ -8,14 +8,14 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.classes.RewardChest;
+import org.unitedlands.classes.LootChest;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.FieldHelper;
 import org.unitedlands.utils.Messenger;
 
-public class ChestInfoCommand extends BaseCommandHandler<UnitedDungeons> {
+public class LootChestInfoCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public ChestInfoCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public LootChestInfoCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
@@ -48,8 +48,8 @@ public class ChestInfoCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        RewardChest chest = null;
-        for (RewardChest c : room.getChests()) {
+        LootChest chest = null;
+        for (LootChest c : room.getLootChests()) {
             if (c.getLocation().getBlock().equals(player.getLocation().getBlock())) {
                 chest = c;
             }
@@ -60,7 +60,7 @@ public class ChestInfoCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        Messenger.sendMessage(player, FieldHelper.getFieldValuesString(RewardChest.class, chest));
+        Messenger.sendMessage(player, FieldHelper.getFieldValuesString(LootChest.class, chest));
 
     }
 

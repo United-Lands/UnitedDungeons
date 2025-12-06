@@ -1,12 +1,12 @@
 package org.unitedlands.classes;
 
-public class RewardSet {
+public class LootSet {
     private String item;
     private int minAmount;
     private int maxAmount;
     private double chance;
 
-    public RewardSet(String item, int minAmount, int maxAmount, double chance) {
+    public LootSet(String item, int minAmount, int maxAmount, double chance) {
         this.item = item;
         this.minAmount = minAmount;
         this.maxAmount = maxAmount;

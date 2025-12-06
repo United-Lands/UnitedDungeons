@@ -22,7 +22,7 @@ visualisation:
     density: 2
   spawner:
     particle: RAID_OMEN
-  chest:
+  loot-chest:
     particle: HAPPY_VILLAGER
   lock-chest:
     particle: ANGRY_VILLAGER

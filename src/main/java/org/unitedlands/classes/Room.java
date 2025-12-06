@@ -72,7 +72,7 @@ public class Room {
     @Expose
     private Set<Spawner> spawners = new HashSet<>();
     @Expose
-    private Set<RewardChest> chests = new HashSet<>();
+    private Set<LootChest> lootChests = new HashSet<>();
     @Expose
     private Set<LockChest> lockChests = new HashSet<>();
 
@@ -128,7 +128,7 @@ public class Room {
 
     public void complete() {
 
-        spawnRewardChests();
+        spawnLootChests();
         despawnLockChests();
         despawnBarriers(false, false);
 
@@ -141,7 +141,7 @@ public class Room {
 
     public void reset() {
 
-        despawnRewardChests();
+        despawnLootChests();
         despawnBarriers(true, true);
 
         for (LockChest lockChest : lockChests)
@@ -162,7 +162,7 @@ public class Room {
 
     public void edit() {
 
-        despawnRewardChests();
+        despawnLootChests();
         despawnLockChests();
         despawnBarriers(true, true);
 
@@ -177,13 +177,37 @@ public class Room {
 
     // #region Object spawning and despawning
 
-    private void spawnRewardChests() {
-        if (chests != null && !chests.isEmpty()) {
+    private void spawnLootChests() {
+        if (lootChests != null && !lootChests.isEmpty()) {
 
-            for (RewardChest chest : chests) {
+            for (LootChest lootChest : lootChests) {
 
-                Block chestBlock = chest.getLocation().getBlock();
-                chestBlock.setType(Material.YELLOW_SHULKER_BOX);
+                String materialName = lootChest.getMaterial();
+                if (materialName == null || materialName.isEmpty())
+                    materialName = "YELLOW_SHULKER_BOX";
+                String facing = lootChest.getFacing();
+                if (facing == null || facing.isEmpty())
+                    facing = "NORTH";
+
+                Material material = Material.CHEST; 
+                try {
+                    material = Material.valueOf(materialName);
+                } catch (Exception ignore)
+                {
+                    Logger.logError("Loot chest material not found: " + materialName, "UnitedDungeons");
+                }
+
+                var block = lootChest.getLocation().getBlock();
+                block.setType(material);
+
+                try {
+                    BlockFace face = BlockFace.valueOf(facing);
+                    var directional = (Directional) block.getBlockData();
+                    directional.setFacing(face);
+                    block.setBlockData(directional);
+                } catch (Exception ex) {
+                    Logger.logError("Wrong facing data on loot chest: " + facing);
+                }
 
                 List<UUID> playerUUIDs = new ArrayList<>();
 
@@ -195,43 +219,43 @@ public class Room {
                 }
 
                 if (playerUUIDs.size() == 0)
-                    return;
+                    continue;
 
                 for (var uuid : playerUUIDs) {
                     Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST,
-                            Component.text("Dungeon Rewards"));
-                    chest.addInventory(uuid, inv);
+                            Component.text("Dungeon Loot"));
+                    lootChest.addInventory(uuid, inv);
                 }
 
-                if (chest.getRewards() != null) {
-                    var rewards = parseRewards(chest.getRewards());
-                    if (rewards != null && !rewards.isEmpty()) {
+                if (lootChest.getLoot() != null) {
+                    var lootTable = parseLoot(lootChest.getLoot());
+                    if (lootTable != null && !lootTable.isEmpty()) {
                         for (var uuid : playerUUIDs) {
-                            for (var reward : rewards) {
-                                addRewardToInventory(chest.getInventory(uuid), reward);
+                            for (var loot : lootTable) {
+                                addLootToInventory(lootChest.getInventory(uuid), loot);
                             }
                         }
                     }
                 }
 
-                if (chest.getRandomRewards() != null && chest.getRandomRewardCount() > 0) {
-                    var randomRewards = parseRewards(chest.getRandomRewards());
-                    for (int i = 0; i < chest.getRandomRewardCount(); i++) {
-                        var reward = getRandomReward(randomRewards);
-                        if (reward != null) {
+                if (lootChest.getRandomLoot() != null && lootChest.getRandomLootCount() > 0) {
+                    var randomLootTable = parseLoot(lootChest.getRandomLoot());
+                    for (int i = 0; i < lootChest.getRandomLootCount(); i++) {
+                        var loot = getRandomLoot(randomLootTable);
+                        if (loot != null) {
                             int rnd = ThreadLocalRandom.current().nextInt(playerUUIDs.size());
                             UUID rndUUID = playerUUIDs.get(rnd);
 
-                            addRewardToInventory(chest.getInventory(rndUUID), reward);
+                            addLootToInventory(lootChest.getInventory(rndUUID), loot);
                         }
                     }
                 }
 
                 Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
 
-                    chest.getLocation().getWorld().playSound(chest.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 1);
+                    lootChest.getLocation().getWorld().playSound(lootChest.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 1);
                     new ParticleBuilder(Particle.WAX_OFF)
-                            .location(chest.getLocation())
+                            .location(lootChest.getLocation())
                             .offset(0.6, 0.6, 0.6)
                             .receivers(64)
                             .count(24)
@@ -242,10 +266,10 @@ public class Room {
         }
     }
 
-    private void despawnRewardChests() {
-        if (chests != null && !chests.isEmpty()) {
+    private void despawnLootChests() {
+        if (lootChests != null && !lootChests.isEmpty()) {
 
-            for (RewardChest chest : chests) {
+            for (LootChest chest : lootChests) {
                 chest.clearInventories();
                 Block chestBlock = chest.getLocation().getBlock();
                 chestBlock.setType(Material.AIR);
@@ -424,18 +448,18 @@ public class Room {
             spawners.remove(spawner);
     }
 
-    public void addChest(RewardChest chest) {
-        if (chests == null)
-            chests = new HashSet<>();
-        if (!chests.contains(chest))
-            chests.add(chest);
+    public void addLootChest(LootChest chest) {
+        if (lootChests == null)
+            lootChests = new HashSet<>();
+        if (!lootChests.contains(chest))
+            lootChests.add(chest);
     }
 
-    public void removeChest(RewardChest chest) {
-        if (chests == null)
+    public void removeLootChest(LootChest chest) {
+        if (lootChests == null)
             return;
-        if (chests.contains(chest))
-            chests.remove(chest);
+        if (lootChests.contains(chest))
+            lootChests.remove(chest);
     }
 
     public void addLockChest(LockChest chest) {
@@ -520,8 +544,8 @@ public class Room {
         return spawners;
     }
 
-    public Set<RewardChest> getChests() {
-        return chests;
+    public Set<LootChest> getLootChests() {
+        return lootChests;
     }
 
     public Set<LockChest> getLockChests() {
@@ -604,8 +628,9 @@ public class Room {
 
     // #region Helper methods
 
-    private void addRewardToInventory(Inventory inv, RewardSet rewardSet) {
-        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(rewardSet.getItem(), rewardSet.getMinAmount(), rewardSet.getMaxAmount());
+    private void addLootToInventory(Inventory inv, LootSet lootSet) {
+        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(lootSet.getItem(), lootSet.getMinAmount(),
+                lootSet.getMaxAmount());
         if (itemStack != null) {
 
             int splits = 1;
@@ -643,15 +668,16 @@ public class Room {
                 inv.setItem(slotIndex, subStack);
             }
         } else {
-            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getMinAmount() + "-"
-                    + rewardSet.getMaxAmount()
+            Logger.logError("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
+                    + lootSet.getMaxAmount()
                     + " for chest in room " + this.uuid);
         }
     }
 
     @SuppressWarnings("unused")
-    private void addRewardToShulker(ShulkerBox shulker, RewardSet rewardSet) {
-        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(rewardSet.getItem(), rewardSet.getMinAmount(), rewardSet.getMaxAmount());
+    private void addLootToShulker(ShulkerBox shulker, LootSet lootSet) {
+        var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(lootSet.getItem(), lootSet.getMinAmount(),
+                lootSet.getMaxAmount());
         if (itemStack != null) {
 
             int splits = 1;
@@ -690,21 +716,21 @@ public class Room {
                 inv.setItem(slotIndex, subStack);
             }
         } else {
-            Logger.logError("Could not generate ItemStack " + rewardSet.getItem() + ":" + rewardSet.getMinAmount() + "-"
-                    + rewardSet.getMaxAmount()
+            Logger.logError("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
+                    + lootSet.getMaxAmount()
                     + " for chest in room " + this.uuid);
         }
     }
 
-    private List<RewardSet> parseRewards(String rewards) {
-        var result = new ArrayList<RewardSet>();
-        if (rewards != null && !rewards.isEmpty()) {
-            var rewardSets = rewards.split(";");
-            for (var rewardSet : rewardSets) {
-                var rewardAmountSplits = rewardSet.split("#");
-                if (rewardAmountSplits.length == 2) {
+    private List<LootSet> parseLoot(String lootString) {
+        var result = new ArrayList<LootSet>();
+        if (lootString != null && !lootString.isEmpty()) {
+            var lootSets = lootString.split(";");
+            for (var lootSet : lootSets) {
+                var lootAmountSplits = lootSet.split("#");
+                if (lootAmountSplits.length == 2) {
 
-                    String amountStr = rewardAmountSplits[1];
+                    String amountStr = lootAmountSplits[1];
                     int minAmount, maxAmount;
 
                     var amountSplit = amountStr.split("-");
@@ -716,13 +742,13 @@ public class Room {
                         maxAmount = minAmount;
                     }
 
-                    var rewardPercentSplits = rewardAmountSplits[0].split("%");
-                    if (rewardPercentSplits.length == 1) {
-                        result.add(new RewardSet(rewardAmountSplits[0],
+                    var lootPercentSplits = lootAmountSplits[0].split("%");
+                    if (lootPercentSplits.length == 1) {
+                        result.add(new LootSet(lootAmountSplits[0],
                                 minAmount, maxAmount, 1.0));
-                    } else if (rewardPercentSplits.length == 2) {
-                        result.add(new RewardSet(rewardPercentSplits[1], minAmount, maxAmount,
-                                Double.parseDouble(rewardPercentSplits[0]) / 100));
+                    } else if (lootPercentSplits.length == 2) {
+                        result.add(new LootSet(lootPercentSplits[1], minAmount, maxAmount,
+                                Double.parseDouble(lootPercentSplits[0]) / 100));
                     }
                 }
             }
@@ -731,16 +757,16 @@ public class Room {
         return result;
     }
 
-    private RewardSet getRandomReward(List<RewardSet> rewards) {
+    private LootSet getRandomLoot(List<LootSet> lootTable) {
         double totalChance = 0.0;
-        for (RewardSet reward : rewards) {
-            totalChance += reward.getChance();
+        for (LootSet lootSet : lootTable) {
+            totalChance += lootSet.getChance();
         }
 
         // Normalize if totalChance > 1.0
         if (totalChance > 1.0) {
-            for (RewardSet reward : rewards) {
-                reward.setChance(reward.getChance() / totalChance);
+            for (LootSet lootSet : lootTable) {
+                lootSet.setChance(lootSet.getChance() / totalChance);
             }
             totalChance = 1.0;
         }
@@ -748,14 +774,14 @@ public class Room {
         double random = Math.random(); // [0.0, 1.0)
         double cumulative = 0.0;
 
-        for (RewardSet reward : rewards) {
-            cumulative += reward.getChance();
+        for (LootSet lootSet : lootTable) {
+            cumulative += lootSet.getChance();
             if (random < cumulative) {
-                return reward;
+                return lootSet;
             }
         }
 
-        // Remaining chance goes to "no reward"
+        // Remaining chance goes to "no loot"
         return null;
     }
     // #endregion

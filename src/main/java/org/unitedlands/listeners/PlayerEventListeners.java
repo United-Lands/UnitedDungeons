@@ -1,6 +1,5 @@
 package org.unitedlands.listeners;
 
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -73,10 +72,10 @@ public class PlayerEventListeners implements Listener {
             return;
 
         var block = event.getClickedBlock();
-        if (block == null || block.getType() != Material.YELLOW_SHULKER_BOX)
+        if (block == null)
             return;
 
-        var chest = plugin.getChestManager().getChestAtLocation(block.getLocation());
+        var chest = plugin.getChestManager().getLootChestAtLocation(block.getLocation());
         if (chest == null)
             return;
 
