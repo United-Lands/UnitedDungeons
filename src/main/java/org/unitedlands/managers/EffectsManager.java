@@ -17,6 +17,7 @@ import org.unitedlands.classes.Barrier;
 import org.unitedlands.classes.LockChest;
 import org.unitedlands.classes.LootChest;
 import org.unitedlands.classes.Spawner;
+import org.unitedlands.classes.SupplyChest;
 import org.unitedlands.utils.Logger;
 
 public class EffectsManager {
@@ -64,6 +65,9 @@ public class EffectsManager {
 
         String lockChestParticleName = plugin.getConfig().getString("visualisation.lock-chest.particle");
         Particle lockChestParticle = Particle.valueOf(lockChestParticleName);
+
+        String supplyChestParticleName = plugin.getConfig().getString("visualisation.supply-chest.particle");
+        Particle supplyChestParticle = Particle.valueOf(supplyChestParticleName);
 
         // Barrier visualisations
         String barrierParticleName = plugin.getConfig().getString("visualisation.barrier.particle");
@@ -132,9 +136,11 @@ public class EffectsManager {
                                 player.spawnParticle(lockChestParticle, lockChest.getLocation(), 1, 0, 0, 0, 0);
                             }
 
+                            for (SupplyChest supplyChest : room.getSupplyChests()) {
+                                player.spawnParticle(supplyChestParticle, supplyChest.getLocation(), 1, 0, 0, 0, 0);
+                            }
+
                             for (Barrier barrier : room.getBarriers()) {
-                                // player.spawnParticle(barrierParticle, barrier.getLocation(), 1, 0, 0, 0, 0);
-                                // Logger.log("barrier...");
                                 for (int i = 0; i < barrier.getHeight(); i++) {
                                     var loc = barrier.getLocation().clone();
                                     player.spawnParticle(barrierParticle, loc.add(0, i, 0), 1, 0, 0, 0, 0);

@@ -1,4 +1,4 @@
-package org.unitedlands.commands.handlers.chest.subcommands;
+package org.unitedlands.commands.handlers.supplychest.subcommands;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -10,18 +10,18 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.classes.LootChest;
+import org.unitedlands.classes.SupplyChest;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
-public class LootChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
+public class SupplyChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public LootChestSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public SupplyChestSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
-    private List<String> propertyList = Arrays.asList("randomLoot", "randomLootCount", "loot", "material", "facing");
+    private List<String> propertyList = Arrays.asList("items", "facing");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
@@ -52,8 +52,8 @@ public class LootChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        LootChest chest = null;
-        for (LootChest c : room.getLootChests()) {
+        SupplyChest chest = null;
+        for (SupplyChest c : room.getSupplyChests()) {
             if (c.getLocation().getBlock().equals(player.getLocation().getBlock())) {
                 chest = c;
             }
@@ -68,9 +68,9 @@ public class LootChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
         plugin.getDungeonManager().saveDungeon(dungeon, sender);
     }
 
-    private void setChestField(Player player, LootChest chest, String fieldName, String arg) {
+    private void setChestField(Player player, SupplyChest chest, String fieldName, String arg) {
         try {
-            Field field = LootChest.class.getDeclaredField(fieldName);
+            Field field = SupplyChest.class.getDeclaredField(fieldName);
             field.setAccessible(true);
 
             Class<?> fieldType = field.getType();

@@ -1,4 +1,4 @@
-package org.unitedlands.commands.handlers.chest.subcommands;
+package org.unitedlands.commands.handlers.supplychest.subcommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +8,13 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.classes.LootChest;
+import org.unitedlands.classes.SupplyChest;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class LootChestRemoveCommand extends BaseCommandHandler<UnitedDungeons> {
+public class SupplyChestRemoveCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public LootChestRemoveCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public SupplyChestRemoveCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
@@ -45,8 +45,8 @@ public class LootChestRemoveCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        LootChest chest = null;
-        for (LootChest c : room.getLootChests()) {
+        SupplyChest chest = null;
+        for (SupplyChest c : room.getSupplyChests()) {
             if (c.getLocation().getBlock().equals(player.getLocation().getBlock())) {
                 chest = c;
             }
@@ -56,8 +56,7 @@ public class LootChestRemoveCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        room.removeLootChest(chest);
-        plugin.getChestManager().unregisterLootChest(chest);
+        room.removeSupplyChest(chest);
 
         plugin.getDungeonManager().saveDungeon(dungeon, sender);
 

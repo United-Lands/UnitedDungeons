@@ -26,6 +26,8 @@ visualisation:
     particle: HAPPY_VILLAGER
   lock-chest:
     particle: ANGRY_VILLAGER
+  supply-chest:
+    particle: SOUL
   barrier:
     particle: CAMPFIRE_COSY_SMOKE
   warp:

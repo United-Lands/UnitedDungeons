@@ -1,4 +1,4 @@
-package org.unitedlands.commands.handlers.chest.subcommands;
+package org.unitedlands.commands.handlers.lootchest.subcommands;
 
 import java.util.ArrayList;
 import java.util.List;

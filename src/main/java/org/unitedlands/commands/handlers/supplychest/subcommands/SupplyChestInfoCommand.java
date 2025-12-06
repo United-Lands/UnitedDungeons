@@ -1,4 +1,4 @@
-package org.unitedlands.commands.handlers.chest.subcommands;
+package org.unitedlands.commands.handlers.supplychest.subcommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +8,14 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.classes.LootChest;
+import org.unitedlands.classes.SupplyChest;
 import org.unitedlands.interfaces.IMessageProvider;
+import org.unitedlands.utils.FieldHelper;
 import org.unitedlands.utils.Messenger;
 
-public class LootChestCreateCommand extends BaseCommandHandler<UnitedDungeons> {
+public class SupplyChestInfoCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public LootChestCreateCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public SupplyChestInfoCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
@@ -27,7 +28,7 @@ public class LootChestCreateCommand extends BaseCommandHandler<UnitedDungeons> {
     public void handleCommand(CommandSender sender, String[] args) {
 
         if (args.length != 0) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.info-chest-create"), null,
+            Messenger.sendMessage(sender, messageProvider.get("messages.info-chest-info"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }
@@ -47,12 +48,20 @@ public class LootChestCreateCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        LootChest chest = new LootChest(player.getLocation());
-        room.addLootChest(chest);
+        SupplyChest chest = null;
+        for (SupplyChest c : room.getSupplyChests()) {
+            if (c.getLocation().getBlock().equals(player.getLocation().getBlock())) {
+                chest = c;
+            }
+        }
+        if (chest == null) {
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-chest-not-found"), null,
+                    messageProvider.get("messages.prefix"));
+            return;
+        }
 
-        plugin.getChestManager().registerLootChest(chest);
+        Messenger.sendMessage(player, FieldHelper.getFieldValuesString(SupplyChest.class, chest));
 
-        plugin.getDungeonManager().saveDungeon(dungeon, sender);
     }
 
 }
