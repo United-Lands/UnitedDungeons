@@ -15,7 +15,7 @@ import org.bukkit.util.BoundingBox;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.Barrier;
 import org.unitedlands.classes.LockChest;
-import org.unitedlands.classes.RewardChest;
+import org.unitedlands.classes.LootChest;
 import org.unitedlands.classes.Spawner;
 import org.unitedlands.utils.Logger;
 
@@ -59,8 +59,8 @@ public class EffectsManager {
         String spawnerParticleName = plugin.getConfig().getString("visualisation.spawner.particle");
         Particle spawnerParticle = Particle.valueOf(spawnerParticleName);
 
-        String chestParticleName = plugin.getConfig().getString("visualisation.chest.particle");
-        Particle chestParticle = Particle.valueOf(chestParticleName);
+        String lootChestParticleName = plugin.getConfig().getString("visualisation.loot-chest.particle");
+        Particle lootChestParticle = Particle.valueOf(lootChestParticleName);
 
         String lockChestParticleName = plugin.getConfig().getString("visualisation.lock-chest.particle");
         Particle lockChestParticle = Particle.valueOf(lockChestParticleName);
@@ -124,8 +124,8 @@ public class EffectsManager {
                                 player.spawnParticle(spawnerParticle, spawner.getLocation(), 1, 0, 0, 0, 0);
                             }
 
-                            for (RewardChest chest : room.getChests()) {
-                                player.spawnParticle(chestParticle, chest.getLocation(), 1, 0, 0, 0, 0);
+                            for (LootChest chest : room.getLootChests()) {
+                                player.spawnParticle(lootChestParticle, chest.getLocation(), 1, 0, 0, 0, 0);
                             }
 
                             for (LockChest lockChest : room.getLockChests()) {

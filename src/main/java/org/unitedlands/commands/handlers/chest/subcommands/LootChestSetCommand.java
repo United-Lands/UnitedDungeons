@@ -10,18 +10,18 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.classes.RewardChest;
+import org.unitedlands.classes.LootChest;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
-public class ChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
+public class LootChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public ChestSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public LootChestSetCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
-    private List<String> propertyList = Arrays.asList("randomRewards", "randomRewardCount", "rewards");
+    private List<String> propertyList = Arrays.asList("randomLoot", "randomLootCount", "loot", "material", "facing");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
@@ -52,8 +52,8 @@ public class ChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        RewardChest chest = null;
-        for (RewardChest c : room.getChests()) {
+        LootChest chest = null;
+        for (LootChest c : room.getLootChests()) {
             if (c.getLocation().getBlock().equals(player.getLocation().getBlock())) {
                 chest = c;
             }
@@ -68,9 +68,9 @@ public class ChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
         plugin.getDungeonManager().saveDungeon(dungeon, sender);
     }
 
-    private void setChestField(Player player, RewardChest chest, String fieldName, String arg) {
+    private void setChestField(Player player, LootChest chest, String fieldName, String arg) {
         try {
-            Field field = RewardChest.class.getDeclaredField(fieldName);
+            Field field = LootChest.class.getDeclaredField(fieldName);
             field.setAccessible(true);
 
             Class<?> fieldType = field.getType();

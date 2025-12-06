@@ -8,13 +8,13 @@ import org.bukkit.entity.Player;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseCommandHandler;
 import org.unitedlands.classes.Dungeon;
-import org.unitedlands.classes.RewardChest;
+import org.unitedlands.classes.LootChest;
 import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.utils.Messenger;
 
-public class ChestCreateCommand extends BaseCommandHandler<UnitedDungeons> {
+public class LootChestCreateCommand extends BaseCommandHandler<UnitedDungeons> {
 
-    public ChestCreateCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
+    public LootChestCreateCommand(UnitedDungeons plugin, IMessageProvider messageProvider) {
         super(plugin, messageProvider);
     }
 
@@ -47,10 +47,10 @@ public class ChestCreateCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        RewardChest chest = new RewardChest(player.getLocation());
-        room.addChest(chest);
+        LootChest chest = new LootChest(player.getLocation());
+        room.addLootChest(chest);
 
-        plugin.getChestManager().registerChest(chest);
+        plugin.getChestManager().registerLootChest(chest);
 
         plugin.getDungeonManager().saveDungeon(dungeon, sender);
     }

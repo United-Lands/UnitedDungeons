@@ -11,7 +11,7 @@ import org.unitedlands.utils.annotations.Info;
 
 import com.google.gson.annotations.Expose;
 
-public class RewardChest {
+public class LootChest {
     @Expose
     public UUID uuid;
     @Expose
@@ -19,21 +19,28 @@ public class RewardChest {
 
     @Expose
     @Info
-    private String rewards;
+    private String loot;
     @Expose
     @Info
-    private String randomRewards;
+    private String randomLoot;
     @Expose
     @Info
-    private int randomRewardCount = 0;
+    private int randomLootCount = 0;
+
+    @Expose
+    @Info
+    private String material;
+    @Expose
+    @Info
+    private String facing;
 
     private Map<UUID, Inventory> inventories;
 
-    public RewardChest() {
+    public LootChest() {
 
     }
 
-    public RewardChest(Location location) {
+    public LootChest(Location location) {
         this.uuid = UUID.randomUUID();
         setLocation(location);
     }
@@ -54,28 +61,44 @@ public class RewardChest {
         this.location = location.getBlock().getLocation().add(0.5, 0.5, 0.5);
     }
 
-    public String getRewards() {
-        return rewards;
+    public String getLoot() {
+        return loot;
     }
 
-    public void setReward(String rewards) {
-        this.rewards = rewards;
+    public void setLoot(String loot) {
+        this.loot = loot;
     }
 
-    public String getRandomRewards() {
-        return randomRewards;
+    public String getRandomLoot() {
+        return randomLoot;
     }
 
-    public void setRandomRewards(String randomRewards) {
-        this.randomRewards = randomRewards;
+    public void setRandomLoot(String randomLoot) {
+        this.randomLoot = randomLoot;
     }
 
-    public int getRandomRewardCount() {
-        return randomRewardCount;
+    public int getRandomLootCount() {
+        return randomLootCount;
     }
 
-    public void setRandomRewardCount(int randomRewardCount) {
-        this.randomRewardCount = randomRewardCount;
+    public void setRandomLootCount(int randomLootCount) {
+        this.randomLootCount = randomLootCount;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String block) {
+        this.material = block;
+    }
+
+    public String getFacing() {
+        return facing;
+    }
+
+    public void setFacing(String facing) {
+        this.facing = facing;
     }
 
     @Override
@@ -84,7 +107,7 @@ public class RewardChest {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        RewardChest c = (RewardChest) o;
+        LootChest c = (LootChest) o;
         return Objects.equals(uuid, c.getUuid());
     }
 

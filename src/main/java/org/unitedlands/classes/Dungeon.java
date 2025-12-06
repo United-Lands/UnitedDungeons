@@ -687,7 +687,7 @@ public class Dungeon {
         for (Spawner spawner : room.getSpawners()) {
             spawner.getLocation().add(shiftVector);
         }
-        for (RewardChest chest : room.getChests()) {
+        for (LootChest chest : room.getLootChests()) {
             chest.getLocation().add(shiftVector);
         }
         for (Barrier barrier : room.getBarriers()) {
@@ -723,8 +723,8 @@ public class Dungeon {
         for (var spawner : spawnersToRemove)
             room.removeSpawner(spawner);
 
-        Set<RewardChest> chestsToRemove = new HashSet<>();
-        for (RewardChest chest : room.getChests()) {
+        Set<LootChest> chestsToRemove = new HashSet<>();
+        for (LootChest chest : room.getLootChests()) {
             var chestLocation = new Vector(chest.getLocation().getX(), chest.getLocation().getY(),
                     chest.getLocation().getZ());
             if (!bbox.contains(chestLocation)) {
@@ -732,7 +732,7 @@ public class Dungeon {
             }
         }
         for (var chest : chestsToRemove)
-            room.removeChest(chest);
+            room.removeLootChest(chest);
 
         Set<Barrier> barriersToRemove = new HashSet<>();
         for (Barrier barrier : room.getBarriers()) {

@@ -13,7 +13,7 @@ import org.unitedlands.listeners.SelfListener;
 import org.unitedlands.listeners.ServerListener;
 import org.unitedlands.managers.DungeonManager;
 import org.unitedlands.managers.MobManager;
-import org.unitedlands.managers.RewardChestManager;
+import org.unitedlands.managers.LootChestManager;
 import org.unitedlands.managers.EffectsManager;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.MessageProvider;
@@ -25,7 +25,7 @@ public class UnitedDungeons extends JavaPlugin {
     private static UnitedDungeons instance;
 
     private DungeonManager dungeonManager;
-    private RewardChestManager chestManager;
+    private LootChestManager chestManager;
 
     private MobManager mobManager;
     private EffectsManager effectsManager;
@@ -73,7 +73,7 @@ public class UnitedDungeons extends JavaPlugin {
 
     private void loadManagers() {
         dungeonManager = new DungeonManager(this, messageProvider);
-        chestManager = new RewardChestManager(this);
+        chestManager = new LootChestManager(this);
         mobManager = new MobManager();
         effectsManager = new EffectsManager(this);
     }
@@ -110,7 +110,7 @@ public class UnitedDungeons extends JavaPlugin {
         return this.dungeonManager;
     }
 
-    public RewardChestManager getChestManager() {
+    public LootChestManager getChestManager() {
         return chestManager;
     }
 

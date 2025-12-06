@@ -9,7 +9,7 @@ import org.unitedlands.classes.BaseCommandExecutor;
 import org.unitedlands.commands.handlers.ReloadCommandHandler;
 import org.unitedlands.commands.handlers.ToggleVisualisationCommandHandler;
 import org.unitedlands.commands.handlers.barrier.BarrierCommandHandler;
-import org.unitedlands.commands.handlers.chest.ChestCommandHandler;
+import org.unitedlands.commands.handlers.chest.LootChestCommandHandler;
 import org.unitedlands.commands.handlers.dungeon.DungeonCommandHandler;
 import org.unitedlands.commands.handlers.lockchest.LockChestCommandHandler;
 import org.unitedlands.commands.handlers.room.RoomCommandHandler;
@@ -29,7 +29,7 @@ public class AdminCommands extends BaseCommandExecutor<UnitedDungeons> {
         handlers.put("dungeon", new DungeonCommandHandler(plugin, messageProvider));
         handlers.put("room", new RoomCommandHandler(plugin, messageProvider));
         handlers.put("spawner", new SpawnerCommandHandler(plugin, messageProvider));
-        handlers.put("chest", new ChestCommandHandler(plugin, messageProvider));
+        handlers.put("lootchest", new LootChestCommandHandler(plugin, messageProvider));
         handlers.put("lockchest", new LockChestCommandHandler(plugin, messageProvider));
         handlers.put("barrier", new BarrierCommandHandler(plugin, messageProvider));
         handlers.put("reload", new ReloadCommandHandler(plugin, messageProvider));
