@@ -90,16 +90,7 @@ public class DungeonManager {
             }
         }
 
-        if (closestDungeon == null)
-            return null;
-
-        var maxRoomDistance = plugin.getConfig().getDouble("general.max-room-distance", 0);
-        var maxRoomEdgeLength = plugin.getConfig().getDouble("general.max-room-edge-lenth", 0);
-        if (closestDistanceSquared > (maxRoomDistance * maxRoomDistance) + (maxRoomEdgeLength * maxRoomEdgeLength)) {
-            return null;
-        } else {
-            return closestDungeon;
-        }
+        return closestDungeon;
     }
 
     public Room getRoomAtLocation(Dungeon dungeon, Location location) {
