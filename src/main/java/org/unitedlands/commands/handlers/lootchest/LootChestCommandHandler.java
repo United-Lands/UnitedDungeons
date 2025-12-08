@@ -1,11 +1,11 @@
-package org.unitedlands.commands.handlers.chest;
+package org.unitedlands.commands.handlers.lootchest;
 
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.classes.BaseSubcommandHandler;
-import org.unitedlands.commands.handlers.chest.subcommands.LootChestCreateCommand;
-import org.unitedlands.commands.handlers.chest.subcommands.LootChestInfoCommand;
-import org.unitedlands.commands.handlers.chest.subcommands.LootChestRemoveCommand;
-import org.unitedlands.commands.handlers.chest.subcommands.LootChestSetCommand;
+import org.unitedlands.commands.handlers.lootchest.subcommands.LootChestCreateCommand;
+import org.unitedlands.commands.handlers.lootchest.subcommands.LootChestInfoCommand;
+import org.unitedlands.commands.handlers.lootchest.subcommands.LootChestRemoveCommand;
+import org.unitedlands.commands.handlers.lootchest.subcommands.LootChestSetCommand;
 import org.unitedlands.interfaces.IMessageProvider;
 
 public class LootChestCommandHandler extends BaseSubcommandHandler<UnitedDungeons> {

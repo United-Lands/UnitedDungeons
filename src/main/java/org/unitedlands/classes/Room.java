@@ -20,6 +20,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Fence;
@@ -75,7 +77,8 @@ public class Room {
     private Set<LootChest> lootChests = new HashSet<>();
     @Expose
     private Set<LockChest> lockChests = new HashSet<>();
-
+    @Expose
+    private Set<SupplyChest> supplyChests = new HashSet<>();
     @Expose
     private Set<Barrier> barriers = new HashSet<>();
 
@@ -141,6 +144,7 @@ public class Room {
 
     public void reset() {
 
+        spawnSupplyChests();
         despawnLootChests();
         despawnBarriers(true, true);
 
@@ -162,6 +166,7 @@ public class Room {
 
     public void edit() {
 
+        despawnSupplyChests();
         despawnLootChests();
         despawnLockChests();
         despawnBarriers(true, true);
@@ -177,6 +182,48 @@ public class Room {
 
     // #region Object spawning and despawning
 
+    private void spawnSupplyChests() {
+        if (supplyChests != null && !supplyChests.isEmpty()) {
+
+            for (SupplyChest supplyChest : supplyChests) {
+
+                String facing = supplyChest.getFacing();
+                if (facing == null || facing.isEmpty())
+                    facing = "NORTH";
+
+                var block = supplyChest.getLocation().getBlock();
+                block.setType(Material.CHEST);
+
+                try {
+                    BlockFace face = BlockFace.valueOf(facing);
+                    var directional = (Directional) block.getBlockData();
+                    directional.setFacing(face);
+                    block.setBlockData(directional);
+                } catch (Exception ex) {
+                    Logger.logError("Wrong facing data on loot chest: " + facing);
+                }
+
+                if (supplyChest.getItems() != null) {
+                    Logger.log(supplyChest.getItems());
+                    var itemsTable = parseLoot(supplyChest.getItems());
+                    if (itemsTable != null && !itemsTable.isEmpty()) {
+                        BlockState state = block.getState();
+                        if (state instanceof Chest chest) {
+                            Inventory chestInventory = chest.getInventory();
+                            chestInventory.clear();
+                            Logger.log("Adding items...");
+                            for (var item : itemsTable) {
+                                addLootToInventory(chestInventory, item);
+                            }
+                        } else {
+                            Logger.log("No chest found.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void spawnLootChests() {
         if (lootChests != null && !lootChests.isEmpty()) {
 
@@ -189,11 +236,10 @@ public class Room {
                 if (facing == null || facing.isEmpty())
                     facing = "NORTH";
 
-                Material material = Material.CHEST; 
+                Material material = Material.CHEST;
                 try {
                     material = Material.valueOf(materialName);
-                } catch (Exception ignore)
-                {
+                } catch (Exception ignore) {
                     Logger.logError("Loot chest material not found: " + materialName, "UnitedDungeons");
                 }
 
@@ -262,6 +308,15 @@ public class Room {
                             .spawn();
 
                 }, 1L);
+            }
+        }
+    }
+
+    private void despawnSupplyChests() {
+        if (supplyChests != null && !supplyChests.isEmpty()) {
+            for (SupplyChest chest : supplyChests) {
+                Block chestBlock = chest.getLocation().getBlock();
+                chestBlock.setType(Material.AIR);
             }
         }
     }
@@ -476,6 +531,20 @@ public class Room {
             lockChests.remove(chest);
     }
 
+    public void addSupplyChest(SupplyChest chest) {
+        if (supplyChests == null)
+            supplyChests = new HashSet<>();
+        if (!supplyChests.contains(chest))
+            supplyChests.add(chest);
+    }
+
+    public void removeSupplyChest(SupplyChest chest) {
+        if (supplyChests == null)
+            return;
+        if (supplyChests.contains(chest))
+            supplyChests.remove(chest);
+    }
+
     public void addBarrier(Barrier barrier) {
         if (barriers == null)
             barriers = new HashSet<>();
@@ -554,6 +623,10 @@ public class Room {
 
     public Set<Barrier> getBarriers() {
         return barriers;
+    }
+
+    public Set<SupplyChest> getSupplyChests() {
+        return supplyChests;
     }
 
     public boolean isComplete() {
