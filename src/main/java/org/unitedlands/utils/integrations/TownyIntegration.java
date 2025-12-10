@@ -17,14 +17,15 @@ import org.jetbrains.annotations.Nullable;
 import org.unitedlands.UnitedDungeons;
 import org.unitedlands.utils.Formatter;
 
-import com.palmergames.adventure.text.Component;
-import com.palmergames.adventure.text.minimessage.MiniMessage;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.event.statusscreen.TownStatusScreenEvent;
 import com.palmergames.bukkit.towny.object.AddonCommand;
 import com.palmergames.bukkit.towny.object.metadata.StringDataField;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 
 public class TownyIntegration implements Listener {
