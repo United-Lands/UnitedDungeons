@@ -13,8 +13,7 @@ general:
   boss-music-loop-length: 480
   # allow the command to warp to dungeons. Required a restart to take effect.
   allow-warp: false
-  
-visualisation:
+  visualisation:
   dungeon-center:
     particle: SOUL_FIRE_FLAME
   room-edge:
@@ -33,8 +32,6 @@ visualisation:
   warp:
     particle: WITCH
 
-
-
 ###################################################
 # +---------------------------------------------+ #
 # |                   Towny                     | #
@@ -45,15 +42,15 @@ visualisation:
 # This will only apply to towns that have their dungeon metadata set 
 # to a specific dungeon (using "/ta town <townname> setdungeon <dungeonname>")
 # Valid placeholders are:
-# {dungeon-id} {dungeon-name} {dungeon-description} {dungeon-status}
+# {dungeon-name} {dungeon-description} {dungeon-status}
 
 towny:
   show-custom-town-screen: true
   custom-town-screen:
-  - "                          <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>"
+  - "<gold> .]|[.</gold>                            <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>                             <gold>.]|[.</gold>"
   - "<gold><bold>{dungeon-name}"
   - "<gray>{dungeon-description}"
-
+  - "<white><bold>Status:</bold></white> {dungeon-status}"
 
 ###################################################
 # +---------------------------------------------+ #
@@ -69,8 +66,8 @@ towny:
 
 maptowny:
   show-custom-town-info: true
-  dungeon-map-color: "#FF0000"
-  dungeon-map-fill: "#00FF00"
+  dungeon-map-color: "#ff6940"
+  dungeon-map-fill: "#ff6940"
   custom-town-info: |
     <center>
     <p style="font-size: 140%; font-weight: bold; line-height: 1em; margin-bottom: 5px">
@@ -164,6 +161,8 @@ messages:
   error-in-room: "<red>This command can only be used outside of a dungeon room."
   error-barrier-not-found: "<red>There is no barrier at this location."
   error-chest-not-found: "<red>There is no chest at this location."
+  error-max-dungeons: "<red>Maximum allowed dungeons reached, you can't create another one."
+  error-dungeon-too-close: "<red>This location is too close to another dungeon."
   error-dungeon-with-same-name: "<red>A dungeon with the same name already exists."
   error-start-no-warp: "<red>You can't start a dungeon that doesn't have a warp location. Set one with /uda dungeon set warp."
   error-public-no-warp: "<red>You can't set a dungeon to public that doesn't have a warp location. Set one with /uda dungeon set warp."
@@ -181,6 +180,7 @@ messages:
   error-player-still-on-lock-cooldown: "<red>You can't join this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
   error-leader-still-on-lock-cooldown: "<red>You can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
   error-no-edit-session: "<red>No edit session found. Use \"/uda dungeon edit <dungeon_name>\" to start editing a dungeon.</red>"
+  error-dungeon-partly-solved: "<red>You can't start a dungeon that has already been partly solved.</red>"
 
   # +---------------------------------------------+ #
   # |             Dungeon Status Info             | #
