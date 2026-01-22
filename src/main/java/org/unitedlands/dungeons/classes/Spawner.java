@@ -73,17 +73,17 @@ public class Spawner {
         this.isComplete = false;
     }
 
-    public void prepareSpawn() {
+    public void prepareSpawn(Dungeon dungeon) {
         if (System.currentTimeMillis() - lastSpawnTime >= this.spawnFrequency) {
             lastSpawnTime = System.currentTimeMillis();
             var currentMobCount = plugin.getMobManager().getMobCount(this);
             if (currentMobCount < this.maxMobs) {
                 if (!this.isGroupSpawn) {
-                    plugin.getMobManager().createMob(this);
+                    plugin.getMobManager().createMob(dungeon, this);
                 } else {
                     var num = this.maxMobs - currentMobCount;
                     for (int i = 0; i < num; i++) {
-                        plugin.getMobManager().createMob(this);
+                        plugin.getMobManager().createMob(dungeon, this);
                     }
                 }
             }

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.unitedlands.UnitedLib;
+import org.unitedlands.dungeons.classes.Dungeon;
 import org.unitedlands.dungeons.classes.Spawner;
 import org.unitedlands.utils.Logger;
 
@@ -20,8 +21,18 @@ public class MobManager {
 
     }
 
-    public void createMob(Spawner spawner) {
-        var newMobUuid = UnitedLib.getInstance().getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation());
+    public void createMob(Dungeon dungeon, Spawner spawner) {
+
+        double level = 1;
+        if (dungeon.scaleMobLevels())
+        {
+            if (dungeon.isLocked() && dungeon.getLockedPlayersInDungeon().size() > 1)
+                level = dungeon.getLockedPlayersInDungeon().size();
+            else if (dungeon.getPlayersInDungeon().size() > 1)
+                level = dungeon.getPlayersInDungeon().size();
+        }
+
+        var newMobUuid = UnitedLib.getInstance().getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation(), level);
         if (newMobUuid == null) {
             Logger.logError("Error creating new mob for spawner " + spawner.getUuid());
             return;

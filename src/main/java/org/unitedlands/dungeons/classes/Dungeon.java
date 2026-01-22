@@ -92,6 +92,10 @@ public class Dungeon {
     private boolean disableWindcharge = false;
 
     @Expose
+    @Info
+    private boolean scaleMobLevels = false;
+
+    @Expose
     private Set<Room> rooms = new HashSet<>();
 
     @Expose
@@ -313,7 +317,7 @@ public class Dungeon {
                         allSpawnersComplete = allSpawnersComplete && spawner.isComplete();
                         if (!spawner.isComplete()) {
                             if (spawner.isPlayerNearby()) {
-                                spawner.prepareSpawn();
+                                spawner.prepareSpawn(this);
                             }
                         }
                     }
@@ -935,6 +939,14 @@ public class Dungeon {
 
     public void setDisableWindcharge(boolean disableWindcharge) {
         this.disableWindcharge = disableWindcharge;
+    }
+
+    public boolean scaleMobLevels() {
+        return scaleMobLevels;
+    }
+
+    public void setScaleMobLevels(boolean scaleMobLevels) {
+        this.scaleMobLevels = scaleMobLevels;
     }
 
     public long getSleepStartTime() {
