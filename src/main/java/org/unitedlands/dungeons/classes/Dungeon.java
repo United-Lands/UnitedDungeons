@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -67,6 +66,9 @@ public class Dungeon {
     @Expose
     @Info
     private boolean isLockable = true;
+    @Expose
+    @Info
+    private boolean requireLock = false;
     private boolean isOnCooldown = false;
     @Expose
     @Info
@@ -500,12 +502,10 @@ public class Dungeon {
         playersInPullout.addAll(new HashSet<>(this.lockedPlayersInDungeon));
 
         Collection<Player> completingPlayers = new ArrayList<>();
-        if (this.isLocked && this.lockedPlayersInDungeon != null && !this.lockedPlayersInDungeon.isEmpty())
-        {
+        if (this.isLocked && this.lockedPlayersInDungeon != null && !this.lockedPlayersInDungeon.isEmpty()) {
             completingPlayers = this.lockedPlayersInDungeon;
         } else {
-            if (this.playersInDungeon != null && !this.playersInDungeon.isEmpty())
-            {
+            if (this.playersInDungeon != null && !this.playersInDungeon.isEmpty()) {
                 completingPlayers = this.playersInDungeon;
             }
         }
@@ -520,8 +520,6 @@ public class Dungeon {
 
         cooldownStart = System.currentTimeMillis();
         isOnCooldown = true;
-
-
 
     }
 
@@ -849,6 +847,14 @@ public class Dungeon {
 
     public void setLockable(boolean isLockable) {
         this.isLockable = isLockable;
+    }
+
+    public boolean requireLock() {
+        return requireLock;
+    }
+
+    public void setRequireLock(boolean requireLock) {
+        this.requireLock = requireLock;
     }
 
     public boolean isOnCooldown() {

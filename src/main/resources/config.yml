@@ -203,6 +203,7 @@ messages:
   dungeon-room-lockable: '<gray>You can use this room to start a <dark_green>dungeon party<gray>. Use "/ud start" to lock the dungeon for the current players and compete for the highscore (/ud highscores).'
   dungeon-room-forbidden: "<red>ERROR: You've entered a room that should only be accessible after solving a different room. You've been teleported back to the entrance of the dungeon."
   dungeon-highscores-cleared: "<aqua>Highscores have been cleared."
+  dungeon-requires-locking: "<gray>This dungeon must be <yellow>locked</yellow> to become active. Head to the lobby room and use \"<em>/ud start</em>\" to lock it for your dungeon party.</gray>"
 
   # +---------------------------------------------+ #
   # |                Dungeon Events               | #

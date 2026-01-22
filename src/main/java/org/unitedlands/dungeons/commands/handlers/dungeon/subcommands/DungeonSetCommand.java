@@ -23,7 +23,7 @@ public class DungeonSetCommand extends BaseCommandHandler<UnitedDungeons> {
 
     private List<String> propertyList = Arrays.asList("location", "warp", "isPublic", "isLockable", "name",
             "pulloutTime", "description", "cooldownTime", "lockTime", "ticksBeforeSleep", "disableElytra",
-            "disableEnderpearls", "disableWindcharge", "playerDetectionRange");
+            "disableEnderpearls", "disableWindcharge", "playerDetectionRange", "requireLock");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {

@@ -66,6 +66,10 @@ public class SelfListener implements Listener {
         if (dungeon.isActive() && !dungeon.isOnCooldown() && !dungeon.isLocked() && room.enableLocking()) {
             Messenger.sendMessage(player, messageProvider.get("messages.dungeon-room-lockable"), null,
                     messageProvider.get("messages.prefix"));
+
+        } else if (dungeon.requireLock() && !dungeon.isLocked()) {
+            Messenger.sendMessage(player, messageProvider.get("messages.dungeon-requires-locking"), null,
+                    messageProvider.get("messages.prefix"));
         }
     }
 

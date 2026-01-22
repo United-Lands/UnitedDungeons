@@ -121,7 +121,8 @@ public class DungeonManager {
     }
 
     public void removeDungeon(Dungeon dungeon) {
-        var editSessionsToRemove = editSessions.entrySet().stream().filter(e -> e.getValue().equals(dungeon)).collect(Collectors.toList());
+        var editSessionsToRemove = editSessions.entrySet().stream().filter(e -> e.getValue().equals(dungeon))
+                .collect(Collectors.toList());
         for (var editSession : editSessionsToRemove)
             editSessions.remove(editSession.getKey());
         dungeons.remove(dungeon.getUuid());
@@ -176,6 +177,8 @@ public class DungeonManager {
                     if (!dungeon.isSleeping()) {
                         dungeon.checkPlayerActivity();
                         if (dungeon.isOnCooldown()) {
+                            continue;
+                        } else if (dungeon.requireLock() && !dungeon.isLocked()) {
                             continue;
                         } else {
                             dungeon.checkLock();
