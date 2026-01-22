@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -495,8 +496,21 @@ public class Dungeon {
     public void complete() {
         updateHighscores();
 
-        playersInPullout = new HashSet<>(playersInDungeon);
-        playersInPullout.addAll(new HashSet<>(lockedPlayersInDungeon));
+        playersInPullout = new HashSet<>(this.playersInDungeon);
+        playersInPullout.addAll(new HashSet<>(this.lockedPlayersInDungeon));
+
+        Collection<Player> completingPlayers = new ArrayList<>();
+        if (this.isLocked && this.lockedPlayersInDungeon != null && !this.lockedPlayersInDungeon.isEmpty())
+        {
+            completingPlayers = this.lockedPlayersInDungeon;
+        } else {
+            if (this.playersInDungeon != null && !this.playersInDungeon.isEmpty())
+            {
+                completingPlayers = this.playersInDungeon;
+            }
+        }
+
+        (new DungeonCompleteEvent(this, completingPlayers)).callEvent();
 
         Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
             playersInPullout = new HashSet<>();
@@ -507,7 +521,8 @@ public class Dungeon {
         cooldownStart = System.currentTimeMillis();
         isOnCooldown = true;
 
-        (new DungeonCompleteEvent(this)).callEvent();
+
+
     }
 
     private void updateHighscores() {
