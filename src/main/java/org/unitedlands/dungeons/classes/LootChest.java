@@ -26,7 +26,9 @@ public class LootChest {
     @Expose
     @Info
     private int randomLootCount = 0;
-
+    @Expose
+    @Info
+    private boolean randomLootPerPlayer = false;
     @Expose
     @Info
     private String material;
@@ -99,6 +101,14 @@ public class LootChest {
 
     public void setFacing(String facing) {
         this.facing = facing;
+    }
+
+    public boolean randomLootPerPlayer() {
+        return randomLootPerPlayer;
+    }
+
+    public void setRandomLootPerPlayer(boolean randomLootPerPlayer) {
+        this.randomLootPerPlayer = randomLootPerPlayer;
     }
 
     @Override

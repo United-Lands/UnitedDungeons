@@ -286,13 +286,23 @@ public class Room {
 
                 if (lootChest.getRandomLoot() != null && lootChest.getRandomLootCount() > 0) {
                     var randomLootTable = parseLoot(lootChest.getRandomLoot());
-                    for (int i = 0; i < lootChest.getRandomLootCount(); i++) {
-                        var loot = getRandomLoot(randomLootTable);
-                        if (loot != null) {
-                            int rnd = ThreadLocalRandom.current().nextInt(playerUUIDs.size());
-                            UUID rndUUID = playerUUIDs.get(rnd);
-
-                            addLootToInventory(lootChest.getInventory(rndUUID), loot);
+                    if (lootChest.randomLootPerPlayer()) {
+                        for (var uuid : playerUUIDs) {
+                            for (int i = 0; i < lootChest.getRandomLootCount(); i++) {
+                                var loot = getRandomLoot(randomLootTable);
+                                if (loot != null) {
+                                    addLootToInventory(lootChest.getInventory(uuid), loot);
+                                }
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < lootChest.getRandomLootCount(); i++) {
+                            var loot = getRandomLoot(randomLootTable);
+                            if (loot != null) {
+                                int rnd = ThreadLocalRandom.current().nextInt(playerUUIDs.size());
+                                UUID rndUUID = playerUUIDs.get(rnd);
+                                addLootToInventory(lootChest.getInventory(rndUUID), loot);
+                            }
                         }
                     }
                 }

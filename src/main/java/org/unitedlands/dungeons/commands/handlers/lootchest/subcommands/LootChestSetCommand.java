@@ -21,7 +21,7 @@ public class LootChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
         super(plugin, messageProvider);
     }
 
-    private List<String> propertyList = Arrays.asList("randomLoot", "randomLootCount", "loot", "material", "facing");
+    private List<String> propertyList = Arrays.asList("randomLoot", "randomLootCount", "loot", "material", "facing", "randomLootPerPlayer");
 
     @Override
     public List<String> handleTab(CommandSender sender, String[] args) {
