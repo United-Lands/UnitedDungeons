@@ -514,6 +514,9 @@ public class Dungeon {
             }
         }
 
+        cooldownStart = System.currentTimeMillis();
+        isOnCooldown = true;
+
         (new DungeonCompleteEvent(this, completingPlayers)).callEvent();
 
         Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
@@ -521,10 +524,6 @@ public class Dungeon {
         }, this.pulloutTime * 20L);
 
         resetLock();
-
-        cooldownStart = System.currentTimeMillis();
-        isOnCooldown = true;
-
     }
 
     private void updateHighscores() {

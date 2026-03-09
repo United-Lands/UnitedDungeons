@@ -131,6 +131,7 @@ public class DungeonManager {
     public void loadDungeons() {
 
         dungeons = new HashMap<>();
+        editSessions = new HashMap<>();
 
         String directoryPath = File.separator + "dungeons";
         File directory = new File(plugin.getDataFolder(), directoryPath);
