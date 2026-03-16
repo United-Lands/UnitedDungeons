@@ -128,8 +128,10 @@ messages:
   info-player-dungeon-warp: "Usage: /ud warp <dungeon_name>"
   info-player-dungeon-info: "Usage: /ud info <dungeon_name>"
   info-player-invite: "Usage: /ud invite <player_name>"
+  info-player-kick: "Usage: /ud kick <player_name>"
   info-player-leave: "Usage: /ud leave"
   info-player-highscores: "Usage: /ud highscores <dungeon_name>"
+  info-player-party: "Usage: /ud party"
   info-room-create: "Usage: /uda room create <new_room_name> [<width> <lentgh>]"
   info-room-info: "Usage: /uda room info"
   info-room-set: "Usage: /uda room set <property> <value>"
@@ -158,6 +160,7 @@ messages:
   error-no-dungeon-found: "<red>You are not close to a dungeon."
   error-no-dungeon-found-by-name: "<red>There is no dungeon with that name."
   error-not-in-room: "<red>This command can only be used inside of a dungeon room."
+  error-not-dungeon: "<red>This command can only be used inside of a dungeon."
   error-in-room: "<red>This command can only be used outside of a dungeon room."
   error-barrier-not-found: "<red>There is no barrier at this location."
   error-chest-not-found: "<red>There is no chest at this location."
@@ -181,6 +184,8 @@ messages:
   error-leader-still-on-lock-cooldown: "<red>You can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
   error-no-edit-session: "<red>No edit session found. Use \"/uda dungeon edit <dungeon_name>\" to start editing a dungeon.</red>"
   error-dungeon-partly-solved: "<red>You can't start a dungeon that has already been partly solved.</red>"
+  error-not-party-leader: "<red>Only the party leader can use this command."
+  error-cant-kick-yourself: "<red>You can't kick yourself."
 
   # +---------------------------------------------+ #
   # |             Dungeon Status Info             | #
@@ -223,9 +228,12 @@ messages:
   # |                      Misc                   | #
   # +---------------------------------------------+ #
 
-  dungeon-edit-start: "<green>Now editing dungeon <bold><gold>{dungeon-name}</gold></bold>.</green>"
+  dungeon-edit-start: "<green>Now editing dungeon <bold><gold>{dungeon-name}</gold></bold>.</green>"  
   player-party-start: "<white>You're now part of the dungeon party in <gold>{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
   player-invited: "<dark_aqua>The player has been added to the dungeon party."
+  player-kicked: "<yellow>Player {name} was kicked from the dungeon party."
+  player-party-kicked: "<yellow>You were kicked from the dungeon party."
+  player-party-info: "<white><b>Party Leader:</b> {leader},</white> <gold><b>Members:</b> {members}</gold>"
   invitation-received: "<dark_aqua>You've been added to the dungeon party in <gold>{dungeon-name}!"
   player-left: "<dark_aqua>You've left the dungeon party."
   new-highscore: '<green>Your party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! <gray>Check "/ud highscores" to see your competition.'

@@ -6,8 +6,10 @@ import org.unitedlands.dungeons.commands.handlers.player.PlayerEntranceCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerHighscoresCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerInfoCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerInviteCommand;
+import org.unitedlands.dungeons.commands.handlers.player.PlayerKickCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerLeaveCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerListCommand;
+import org.unitedlands.dungeons.commands.handlers.player.PlayerPartyCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerStartCommand;
 import org.unitedlands.dungeons.commands.handlers.player.PlayerWarpCommand;
 import org.unitedlands.interfaces.IMessageProvider;
@@ -27,6 +29,8 @@ public class PlayerCommands extends BaseCommandExecutor<UnitedDungeons> {
         handlers.put("list", new PlayerListCommand(plugin, messageProvider));
         handlers.put("highscores", new PlayerHighscoresCommand(plugin, messageProvider));
         handlers.put("info", new PlayerInfoCommand(plugin, messageProvider));
+        handlers.put("kick", new PlayerKickCommand(plugin, messageProvider));
+        handlers.put("party", new PlayerPartyCommand(plugin, messageProvider));
 
         if (plugin.getConfig().getBoolean("general.allow-warp", false))
             handlers.put("warp", new PlayerWarpCommand(plugin, messageProvider));

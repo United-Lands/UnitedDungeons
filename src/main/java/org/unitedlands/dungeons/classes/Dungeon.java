@@ -454,6 +454,10 @@ public class Dungeon {
 
         lockedPlayersInDungeon.remove(player);
 
+        if (partyLeader.equals(player) && !lockedPlayersInDungeon.isEmpty()) {
+            partyLeader = lockedPlayersInDungeon.stream().findFirst().get();
+        }
+
         if (lockedPlayersInDungeon.isEmpty())
             resetLock();
     }
