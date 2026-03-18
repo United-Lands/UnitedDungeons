@@ -49,8 +49,15 @@ public class PlayerInviteCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        if (!dungeon.isPlayerLockedInDungeon(player) && !player.hasPermission("united.dungeons.admin")) {
+        if (!dungeon.isPlayerLockedInDungeon(player)) {
             Messenger.sendMessage(sender, messageProvider.get("messages.error-not-in-party"), null,
+                    messageProvider.get("messages.prefix"));
+            return;
+        }
+
+        var partyLeader = dungeon.getPartyLeader();
+        if (!partyLeader.equals(player)) {
+            Messenger.sendMessage(sender, messageProvider.get("messages.error-not-party-leader"), null,
                     messageProvider.get("messages.prefix"));
             return;
         }

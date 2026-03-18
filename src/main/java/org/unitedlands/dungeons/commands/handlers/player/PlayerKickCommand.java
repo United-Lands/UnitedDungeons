@@ -64,7 +64,7 @@ public class PlayerKickCommand extends BaseCommandHandler<UnitedDungeons> {
             return;
         }
 
-        if (playerToKick.equals(player)) {
+        if (playerToKick.getUniqueId().equals(player.getUniqueId())) {
             Messenger.sendMessage(sender, messageProvider.get("messages.error-cant-kick-yourself"), null,
                     messageProvider.get("messages.prefix"));
             return;

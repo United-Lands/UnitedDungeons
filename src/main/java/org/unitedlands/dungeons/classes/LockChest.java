@@ -93,7 +93,7 @@ public class LockChest {
                         result.add(itemStack);
                     } catch (Exception ex) {
                         Logger.logError(
-                                "Could not parse required item " + itemAmountSplit[0] + " in lock chest " + location);
+                                "Could not parse required item " + itemAmountSplit[0] + " in lock chest " + location, "UnitedDungeons");
                     }
                 }
             }

@@ -34,7 +34,7 @@ public class MobManager {
 
         var newMobUuid = UnitedLib.getInstance().getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation(), level);
         if (newMobUuid == null) {
-            Logger.logError("Error creating new mob for spawner " + spawner.getUuid());
+            Logger.logError("Error creating new mob for spawner " + spawner.getUuid(), "UnitedDungeons");
             return;
         }
         registerMob(newMobUuid, spawner);
@@ -50,7 +50,7 @@ public class MobManager {
                 mobsToPrune.add(mobId);
         }
         for (var mobId : mobsToPrune) {
-            Logger.log("Entity with id " + mobId + " no longer trackable, removing.");
+            Logger.log("Entity with id " + mobId + " no longer trackable, removing.", "UnitedDungeons");
             deregisterMob(mobId);
         }
     }

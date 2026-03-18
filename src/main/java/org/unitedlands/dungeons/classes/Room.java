@@ -200,23 +200,21 @@ public class Room {
                     directional.setFacing(face);
                     block.setBlockData(directional);
                 } catch (Exception ex) {
-                    Logger.logError("Wrong facing data on loot chest: " + facing);
+                    Logger.logError("Wrong facing data on loot chest: " + facing, "UnitedDungeons");
                 }
 
                 if (supplyChest.getItems() != null) {
-                    Logger.log(supplyChest.getItems());
                     var itemsTable = parseLoot(supplyChest.getItems());
                     if (itemsTable != null && !itemsTable.isEmpty()) {
                         BlockState state = block.getState();
                         if (state instanceof Chest chest) {
                             Inventory chestInventory = chest.getInventory();
                             chestInventory.clear();
-                            Logger.log("Adding items...");
                             for (var item : itemsTable) {
                                 addLootToInventory(chestInventory, item);
                             }
                         } else {
-                            Logger.log("No chest found.");
+                            Logger.logError("No chest found.", "UnitedDungeons");
                         }
                     }
                 }
@@ -252,7 +250,7 @@ public class Room {
                     directional.setFacing(face);
                     block.setBlockData(directional);
                 } catch (Exception ex) {
-                    Logger.logError("Wrong facing data on loot chest: " + facing);
+                    Logger.logError("Wrong facing data on loot chest: " + facing, "UnitedDungeons");
                 }
 
                 List<UUID> playerUUIDs = new ArrayList<>();
@@ -353,7 +351,7 @@ public class Room {
                     directional.setFacing(face);
                     block.setBlockData(directional);
                 } catch (Exception ex) {
-                    Logger.logError("Wrong facing data on lock chest " + lockChest.getUuid());
+                    Logger.logError("Wrong facing data on lock chest " + lockChest.getUuid(), "UnitedDungeons");
                 }
             }
         }
@@ -394,7 +392,7 @@ public class Room {
                                     directional.setFacing(face);
                                     block.setBlockData(directional);
                                 } catch (Exception ex) {
-                                    Logger.logError("Wrong facing data on barrier " + barrier.getUuid());
+                                    Logger.logError("Wrong facing data on barrier " + barrier.getUuid(), "UnitedDungeons");
                                 }
                             }
 
@@ -448,7 +446,7 @@ public class Room {
                                 directional.setFacing(face);
                                 block.setBlockData(directional);
                             } catch (Exception ex) {
-                                Logger.logError("Wrong facing data on barrier " + barrier.getUuid());
+                                Logger.logError("Wrong facing data on barrier " + barrier.getUuid(), "UnitedDungeons");
                             }
                         }
                         // Update the connections one tick later
@@ -753,7 +751,7 @@ public class Room {
         } else {
             Logger.logError("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
                     + lootSet.getMaxAmount()
-                    + " for chest in room " + this.uuid);
+                    + " for chest in room " + this.uuid, "UnitedDungeons");
         }
     }
 
@@ -801,7 +799,7 @@ public class Room {
         } else {
             Logger.logError("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
                     + lootSet.getMaxAmount()
-                    + " for chest in room " + this.uuid);
+                    + " for chest in room " + this.uuid, "UnitedDungeons");
         }
     }
 

@@ -167,13 +167,13 @@ public class Dungeon {
             if (ticksWithoutPlayers < Integer.MAX_VALUE)
                 ticksWithoutPlayers++;
             if (ticksWithoutPlayers >= ticksBeforeSleep && !this.isSleeping) {
-                Logger.log("Dungeon " + this.name + " going to sleep.");
+                Logger.log("Dungeon " + this.name + " going to sleep.", "UnitedDungeons");
                 this.isSleeping = true;
                 this.sleepStartTime = System.currentTimeMillis();
             }
         } else {
             if (this.isSleeping) {
-                Logger.log("Dungeon " + this.name + " waking up.");
+                Logger.log("Dungeon " + this.name + " waking up.", "UnitedDungeons");
                 ticksWithoutPlayers = 0;
                 this.isSleeping = false;
                 this.sleepStartTime = 0L;
@@ -226,7 +226,7 @@ public class Dungeon {
                             Messenger.sendMessage(player, messageProvider.get("messages.dungeon-room-forbidden"), null,
                                     messageProvider.get("messages.prefix"));
                             Logger.logError("ERR-ROOM-FORBIDDEN: Player " + player.getName() + " has entered room "
-                                    + room.getName() + " in dungeon " + this.getName() + " in an unintended way.");
+                                    + room.getName() + " in dungeon " + this.getName() + " in an unintended way.", "UnitedDungeons");
                         }
                     }
                 } else {
@@ -398,7 +398,6 @@ public class Dungeon {
             playerLockCooldowns.add(new PlayerLockCooldown(System.currentTimeMillis(), player.getUniqueId()));
 
         }
-
         Messenger.sendMessage(lockedPlayersInDungeon, messageProvider.get("messages.dungeon-status-lock"),
                 Map.of("lock-time", Formatter.formatDuration(this.getRemainingLockTime())),
                 messageProvider.get("messages.prefix"));
@@ -592,7 +591,7 @@ public class Dungeon {
             (new DungeonOpenEvent(this)).callEvent();
         }
 
-        Logger.log("Dungeon " + this.name + " reset");
+        Logger.log("Dungeon " + this.name + " reset", "UnitedDungeons");
     }
 
     public void autoReset() {
@@ -616,7 +615,7 @@ public class Dungeon {
         playersInDungeon = new ArrayList<>();
         sleepStartTime = System.currentTimeMillis();
 
-        Logger.log("Dungeon " + this.name + " auto-resetting");
+        Logger.log("Dungeon " + this.name + " auto-resetting", "UnitedDungeons");
     }
 
     public void resetLock() {

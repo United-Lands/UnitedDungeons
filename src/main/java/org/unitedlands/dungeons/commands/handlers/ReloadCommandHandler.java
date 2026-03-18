@@ -38,7 +38,7 @@ public class ReloadCommandHandler extends BaseCommandHandler<UnitedDungeons> {
         plugin.getDungeonManager().startChecks();
 
         Messenger.sendMessage(sender, messageProvider.get("messages.reload"), null, messageProvider.get("messages.prefix"));
-        Logger.log("Config reloaded.");
+        Logger.log("Config reloaded.", "UnitedDungeons");
     }
 
 }

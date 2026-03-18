@@ -160,7 +160,7 @@ public class EffectsManager {
             displayTask.cancel();
             displayTask = null;
         }
-        Logger.log("Dungeon visualisation task stopped.");
+        Logger.log("Dungeon visualisation task stopped.", "UnitedDungeons");
     }
 
     private Set<Edge> getBoundingBoxEdges(World world, BoundingBox boundingBox) {

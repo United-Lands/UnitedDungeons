@@ -95,11 +95,11 @@ public class LockChestSetCommand extends BaseCommandHandler<UnitedDungeons> {
             field.set(chest, value);
 
         } catch (NoSuchFieldException e) {
-            Logger.logError("Field " + fieldName + " does not exist.");
+            Logger.logError("Field " + fieldName + " does not exist.", "UnitedDungeons");
         } catch (IllegalAccessException e) {
-            Logger.logError("Unable to access field " + fieldName + ".");
+            Logger.logError("Unable to access field " + fieldName + ".", "UnitedDungeons");
         } catch (NumberFormatException e) {
-            Logger.logError("Invalid value for field " + fieldName + ".");
+            Logger.logError("Invalid value for field " + fieldName + ".", "UnitedDungeons");
         }
     }
 

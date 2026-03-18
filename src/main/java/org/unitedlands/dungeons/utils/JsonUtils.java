@@ -30,7 +30,7 @@ public class JsonUtils {
     public static boolean saveObjectToFile(Object obj, File file) throws IOException {
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(obj, writer);
-            Logger.log("JSON written.");
+            Logger.log("JSON written.", "UnitedDungeons");
             return true;
         } catch (IOException e) {
             throw e;

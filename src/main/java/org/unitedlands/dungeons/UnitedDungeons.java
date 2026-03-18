@@ -40,13 +40,13 @@ public class UnitedDungeons extends JavaPlugin {
 
         instance = this;
 
-        Logger.log("****************************");
-        Logger.log("    | |__  o _|_ _  _|      ");
-        Logger.log("    |_|| | |  |_(/_(_|      ");
-        Logger.log("     _        _             ");
-        Logger.log("    | \\   __ (_| _  _ __  _ ");
-        Logger.log("    |_/|_|| |__|(/_(_)| |_> ");
-        Logger.log("****************************");
+        Logger.log("****************************", "UnitedDungeons");
+        Logger.log("    | |__  o _|_ _  _|      ", "UnitedDungeons");
+        Logger.log("    |_|| | |  |_(/_(_|      ", "UnitedDungeons");
+        Logger.log("     _        _             ", "UnitedDungeons");
+        Logger.log("    | \\   __ (_| _  _ __  _ ", "UnitedDungeons");
+        Logger.log("    |_/|_|| |__|(/_(_)| |_> ", "UnitedDungeons");
+        Logger.log("****************************", "UnitedDungeons");
 
         messageProvider = new MessageProvider(getConfig());
 
@@ -81,12 +81,12 @@ public class UnitedDungeons extends JavaPlugin {
     private void loadIntegrations() {
         Plugin towny = Bukkit.getPluginManager().getPlugin("Towny");
         if (towny != null && towny.isEnabled()) {
-            Logger.log("Towny found, enabling integration.");
+            Logger.log("Towny found, enabling integration.", "UnitedDungeons");
             townyIntegration = new TownyIntegration(this);
         }
         Plugin mapTowny = Bukkit.getPluginManager().getPlugin("MapTowny");
         if (mapTowny != null && mapTowny.isEnabled()) {
-            Logger.log("MapTowny found, enabling integration.");
+            Logger.log("MapTowny found, enabling integration.", "UnitedDungeons");
             mapTownyIntegration = new MapTownyIntegration(this);
         }
     }

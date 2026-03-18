@@ -43,12 +43,10 @@ public class PlayerPartyCommand extends BaseCommandHandler<UnitedDungeons> {
         var partyLeader = dungeon.getPartyLeader();
         var lockedPlayers = dungeon.getLockedPlayersInDungeon();
 
-        lockedPlayers.remove(partyLeader);
-
         var leaderName = partyLeader.getName();
         var memberNames = String.join(", ", lockedPlayers.stream().map(Player::getName).collect(Collectors.toList()));
 
-        Messenger.sendMessage(player, messageProvider.get("player-party-info"),
+        Messenger.sendMessage(player, messageProvider.get("messages.player-party-info"),
                 Map.of("leader", leaderName, "members", memberNames), messageProvider.get("messages.prefix"));
 
     }

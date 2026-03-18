@@ -146,9 +146,9 @@ public class DungeonManager {
                         room.setDungeon(dungeon);
                     dungeons.put(dungeon.getUuid(), dungeon);
                     dungeon.reset();
-                    Logger.log("Dungeon " + dungeon.getName() + " loaded.");
+                    Logger.log("Dungeon " + dungeon.getName() + " loaded.", "UnitedDungeons");
                 } else {
-                    Logger.logError("Error loading dungeon file " + file.getName());
+                    Logger.logError("Error loading dungeon file " + file.getName(), "UnitedDungeons");
                 }
             }
         }
@@ -158,7 +158,7 @@ public class DungeonManager {
 
     public void startChecks() {
 
-        Logger.log("Starting dungeon checks...");
+        Logger.log("Starting dungeon checks...", "UnitedDungeons");
 
         var frequency = plugin.getConfig().getLong("general.tick-frequency", 1L);
 
@@ -206,7 +206,7 @@ public class DungeonManager {
     }
 
     public void stopChecks() {
-        Logger.log("Clearing dungeon mobs...");
+        Logger.log("Clearing dungeon mobs...", "UnitedDungeons");
         for (Dungeon dungeon : dungeons.values()) {
             var spawners = dungeon.getSpawners();
             if (spawners != null) {
@@ -215,7 +215,7 @@ public class DungeonManager {
                 }
             }
         }
-        Logger.log("Stopping dungeon checks...");
+        Logger.log("Stopping dungeon checks...", "UnitedDungeons");
         if (dungeonCheckerTask != null)
             dungeonCheckerTask.cancel();
     }
@@ -240,7 +240,7 @@ public class DungeonManager {
             try {
                 dungeonFile.createNewFile();
             } catch (IOException ex) {
-                Logger.logError(ex.getMessage());
+                Logger.logError(ex.getMessage(), "UnitedDungeons");
             }
         }
 
@@ -248,7 +248,7 @@ public class DungeonManager {
             JsonUtils.saveObjectToFile(dungeon, dungeonFile);
             return true;
         } catch (IOException ex) {
-            Logger.logError(ex.getMessage());
+            Logger.logError(ex.getMessage(), "UnitedDungeons");
             return false;
         }
     }
@@ -257,7 +257,7 @@ public class DungeonManager {
         try {
             return JsonUtils.loadObjectFromFile(file, Dungeon.class);
         } catch (IOException ex) {
-            Logger.logError(ex.getMessage());
+            Logger.logError(ex.getMessage(), "UnitedDungeons");
             return null;
         }
     }

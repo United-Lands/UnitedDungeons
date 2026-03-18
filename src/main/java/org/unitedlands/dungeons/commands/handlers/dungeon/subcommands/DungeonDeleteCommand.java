@@ -45,7 +45,7 @@ public class DungeonDeleteCommand extends BaseCommandHandler<UnitedDungeons> {
                 directoryPath + File.separator + dungeon.getUuid().toString() + ".json");
 
         if (!file.exists()) {
-            Logger.logError("Dungeon file " + dungeon.getUuid() + " not found.");
+            Logger.logError("Dungeon file " + dungeon.getUuid() + " not found.", "UnitedDungeons");
             return;
         }
 
@@ -55,7 +55,7 @@ public class DungeonDeleteCommand extends BaseCommandHandler<UnitedDungeons> {
             Messenger.sendMessage(sender, messageProvider.get("messages.file-delete-success"), null,
                     messageProvider.get("messages.prefix"));
         } catch (Exception ex) {
-            Logger.logError(ex.getMessage());
+            Logger.logError(ex.getMessage(), "UnitedDungeons");
             Messenger.sendMessage(sender, messageProvider.get("messages.file-delete-error"), null,
                     messageProvider.get("messages.prefix"));
         }
