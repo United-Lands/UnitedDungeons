@@ -63,12 +63,6 @@ public class UnitedDungeons extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerEventListeners(this, messageProvider), this);
 
-        dungeonManager.loadDungeons();
-        dungeonManager.startChecks();
-
-
-        getLogger().info("UnitedDungeons initialized.");
-
     }
 
     private void loadManagers() {
