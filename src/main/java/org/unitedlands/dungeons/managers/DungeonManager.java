@@ -20,23 +20,23 @@ import org.unitedlands.dungeons.classes.Dungeon;
 import org.unitedlands.dungeons.classes.Room;
 import org.unitedlands.dungeons.classes.Spawner;
 import org.unitedlands.dungeons.utils.JsonUtils;
-import org.unitedlands.dungeons.utils.MessageProvider;
-import org.unitedlands.utils.Logger;
-import org.unitedlands.utils.Messenger;
+import org.unitedlands.utils.United;
 
 public class DungeonManager {
 
-    private final UnitedDungeons plugin;
-    private final MessageProvider messageProvider;
+    private static  DungeonManager instance;
+
+    public static DungeonManager instance() {
+        return instance;
+    }
 
     private Map<UUID, Dungeon> editSessions = new HashMap<>();
     private Map<UUID, Dungeon> dungeons = new HashMap<>();
 
     private BukkitTask dungeonCheckerTask;
 
-    public DungeonManager(UnitedDungeons plugin, MessageProvider messageProvider) {
-        this.plugin = plugin;
-        this.messageProvider = messageProvider;
+    public DungeonManager() {
+        instance = this;
     }
 
     // #region Public utility functions
@@ -134,7 +134,7 @@ public class DungeonManager {
         editSessions = new HashMap<>();
 
         String directoryPath = File.separator + "dungeons";
-        File directory = new File(plugin.getDataFolder(), directoryPath);
+        File directory = new File(UnitedDungeons.instance().getDataFolder(), directoryPath);
 
         File[] filesList = directory.listFiles();
 
@@ -146,21 +146,21 @@ public class DungeonManager {
                         room.setDungeon(dungeon);
                     dungeons.put(dungeon.getUuid(), dungeon);
                     dungeon.reset();
-                    Logger.log("Dungeon " + dungeon.getName() + " loaded.", "UnitedDungeons");
+                    United.logger().info("Dungeon " + dungeon.getName() + " loaded.");
                 } else {
-                    Logger.logError("Error loading dungeon file " + file.getName(), "UnitedDungeons");
+                    United.logger().error("Error loading dungeon file " + file.getName());
                 }
             }
         }
 
-        plugin.getChestManager().loadLootChests(dungeons.values());
+        LootChestManager.instance().loadLootChests(dungeons.values());
     }
 
     public void startChecks() {
 
-        Logger.log("Starting dungeon checks...", "UnitedDungeons");
+        United.logger().info("Starting dungeon checks...");
 
-        var frequency = plugin.getConfig().getLong("general.tick-frequency", 1L);
+        var frequency = UnitedDungeons.instance().getConfig().getLong("general.tick-frequency", 1L);
 
         dungeonCheckerTask = new BukkitRunnable() {
             @Override
@@ -189,7 +189,7 @@ public class DungeonManager {
                         if (dungeon.isOnCooldown()) {
                             continue;
                         } else {
-                            var autoResetTime = plugin.getConfig().getLong("general.auto-reset-time", 1800L);
+                            var autoResetTime = UnitedDungeons.instance().getConfig().getLong("general.auto-reset-time", 1800L);
                             if (autoResetTime != -1L) {
                                 var sleepStart = dungeon.getSleepStartTime();
                                 if (System.currentTimeMillis() - sleepStart > autoResetTime * 1000L) {
@@ -200,33 +200,31 @@ public class DungeonManager {
                     }
                 }
 
-                plugin.getMobManager().pruneMobs();
+                MobManager.instance().pruneMobs();
             }
-        }.runTaskTimer(plugin, 0L, frequency * 20L);
+        }.runTaskTimer(UnitedDungeons.instance(), 0L, frequency * 20L);
     }
 
     public void stopChecks() {
-        Logger.log("Clearing dungeon mobs...", "UnitedDungeons");
+        United.logger().info("Clearing dungeon mobs...");
         for (Dungeon dungeon : dungeons.values()) {
             var spawners = dungeon.getSpawners();
             if (spawners != null) {
                 for (Spawner s : spawners) {
-                    plugin.getMobManager().removeAllSpawnerMobs(s);
+                    MobManager.instance().removeAllSpawnerMobs(s);
                 }
             }
         }
-        Logger.log("Stopping dungeon checks...", "UnitedDungeons");
+        United.logger().info("Stopping dungeon checks...");
         if (dungeonCheckerTask != null)
             dungeonCheckerTask.cancel();
     }
 
     public void saveDungeon(Dungeon dungeon, CommandSender sender) {
         if (!saveDungeon(dungeon)) {
-            Messenger.sendMessage(sender, messageProvider.get("messages.save-error"), null,
-                    messageProvider.get("messages.prefix"));
+            United.messenger().send(sender, "save-error");
         } else {
-            Messenger.sendMessage(sender, messageProvider.get("messages.save-success"), null,
-                    messageProvider.get("messages.prefix"));
+            United.messenger().send(sender, "save-success");
         }
     }
 
@@ -234,13 +232,13 @@ public class DungeonManager {
         var uuid = dungeon.getUuid();
         var filePath = File.separator + "dungeons" + File.separator + uuid + ".json";
 
-        File dungeonFile = new File(plugin.getDataFolder(), filePath);
+        File dungeonFile = new File(UnitedDungeons.instance().getDataFolder(), filePath);
         if (!dungeonFile.exists()) {
             dungeonFile.getParentFile().mkdirs();
             try {
                 dungeonFile.createNewFile();
             } catch (IOException ex) {
-                Logger.logError(ex.getMessage(), "UnitedDungeons");
+                United.logger().error(ex.getMessage());
             }
         }
 
@@ -248,7 +246,7 @@ public class DungeonManager {
             JsonUtils.saveObjectToFile(dungeon, dungeonFile);
             return true;
         } catch (IOException ex) {
-            Logger.logError(ex.getMessage(), "UnitedDungeons");
+            United.logger().error(ex.getMessage());
             return false;
         }
     }
@@ -257,7 +255,7 @@ public class DungeonManager {
         try {
             return JsonUtils.loadObjectFromFile(file, Dungeon.class);
         } catch (IOException ex) {
-            Logger.logError(ex.getMessage(), "UnitedDungeons");
+            United.logger().error(ex.getMessage());
             return null;
         }
     }

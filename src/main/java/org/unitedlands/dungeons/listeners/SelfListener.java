@@ -8,15 +8,13 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.unitedlands.dungeons.UnitedDungeons;
 import org.unitedlands.dungeons.events.DungeonCompleteEvent;
 import org.unitedlands.dungeons.events.DungeonOpenEvent;
 import org.unitedlands.dungeons.events.HighscoreEvent;
 import org.unitedlands.dungeons.events.PlayerEnterRoomEvent;
 import org.unitedlands.dungeons.events.PlayerExitRoomEvent;
-import org.unitedlands.dungeons.utils.MessageProvider;
-import org.unitedlands.utils.Formatter;
-import org.unitedlands.utils.Messenger;
+import org.unitedlands.dungeons.managers.EffectsManager;
+import org.unitedlands.utils.United;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,14 +22,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 
 public class SelfListener implements Listener {
-
-    private final UnitedDungeons plugin;
-    private final MessageProvider messageProvider;
-
-    public SelfListener(UnitedDungeons plugin, MessageProvider messageProvider) {
-        this.plugin = plugin;
-        this.messageProvider = messageProvider;
-    }
 
     @EventHandler
     public void onPlayerEnterRoom(PlayerEnterRoomEvent event) {
@@ -60,16 +50,14 @@ public class SelfListener implements Listener {
             var location = new Location(player.getWorld(), room.getBoundingBox().getCenterX(),
                     room.getBoundingBox().getCenterY(), room.getBoundingBox().getCenterZ());
 
-            plugin.getEffectsManager().playBossMusicForPlayer(player, location);
+            EffectsManager.instance().playBossMusicForPlayer(player, location);
         }
 
         if (dungeon.isActive() && !dungeon.isOnCooldown() && !dungeon.isLocked() && room.enableLocking()) {
-            Messenger.sendMessage(player, messageProvider.get("messages.dungeon-room-lockable"), null,
-                    messageProvider.get("messages.prefix"));
+            United.messenger().send(player, "dungeon-room-lockable");
 
         } else if (dungeon.requireLock() && !dungeon.isLocked()) {
-            Messenger.sendMessage(player, messageProvider.get("messages.dungeon-requires-locking"), null,
-                    messageProvider.get("messages.prefix"));
+            United.messenger().send(player, "dungeon-requires-locking");
         }
     }
 
@@ -79,7 +67,7 @@ public class SelfListener implements Listener {
         var room = event.getRoom();
 
         if (room.useBossMusic()) {
-            plugin.getEffectsManager().stopBossMusicForPlayer(player);
+            EffectsManager.instance().stopBossMusicForPlayer(player);
         }
     }
 
@@ -89,25 +77,24 @@ public class SelfListener implements Listener {
 
         if (dungeon.isPublic()) {
 
-            Messenger.sendMessage(Bukkit.getServer(),
-                    messageProvider.getList("messages.dungeon-event-completed"),
+            United.messenger().send(Bukkit.getServer(),
+                    "dungeon-event-completed",
                     Map.of("dungeon-name", dungeon.getCleanName(),
-                            "cooldown-time", Formatter.formatDuration(dungeon.getRemainingCooldown())),
+                            "cooldown-time", United.formatter().formatDuration(dungeon.getRemainingCooldown())),
                     null);
         }
 
-        Messenger.sendMessage(dungeon.getPlayersInPullout(),
-                messageProvider.get("messages.dungeon-complete-countdown"),
-                Map.of("countdown", Formatter.formatDuration(dungeon.getPulloutTime() * 1000)),
-                messageProvider.get("messages.prefix"));
+        United.messenger().send(dungeon.getPlayersInPullout(),
+                "dungeon-complete-countdown",
+                Map.of("countdown", United.formatter().formatDuration(dungeon.getPulloutTime() * 1000)));
     }
 
     @EventHandler
     public void onDungeonOpen(DungeonOpenEvent event) {
         var dungeon = event.getDungeon();
         if (dungeon.isPublic()) {
-            Messenger.sendMessage(Bukkit.getServer(),
-                    messageProvider.getList("messages.dungeon-event-open"),
+            United.messenger().send(Bukkit.getServer(),
+                    "dungeon-event-open",
                     Map.of("dungeon-name", dungeon.getCleanName(),
                             "dungeon-description", dungeon.getDescription()),
                     null);
@@ -121,10 +108,9 @@ public class SelfListener implements Listener {
         var highscore = event.getHighscore();
         var placement = event.getPlacement();
 
-        Messenger.sendMessage(dungeon.getPlayersInDungeon(),
-                messageProvider.get("messages.new-highscore"),
-                Map.of("time", Formatter.formatDuration(highscore.getTime()), "placement", placement.toString()),
-                messageProvider.get("messages.prefix"));
+        United.messenger().send(dungeon.getPlayersInDungeon(),
+                "new-highscore",
+                Map.of("time", United.formatter().formatDuration(highscore.getTime()), "placement", placement.toString()));
 
     }
 

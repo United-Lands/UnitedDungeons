@@ -10,19 +10,11 @@ import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.unitedlands.dungeons.UnitedDungeons;
-import org.unitedlands.dungeons.utils.MessageProvider;
-import org.unitedlands.utils.Messenger;
+import org.unitedlands.dungeons.managers.DungeonManager;
+import org.unitedlands.dungeons.managers.LootChestManager;
+import org.unitedlands.utils.United;
 
 public class PlayerEventListeners implements Listener {
-
-    private final UnitedDungeons plugin;
-    private final MessageProvider messageProvider;
-
-    public PlayerEventListeners(UnitedDungeons plugin, MessageProvider messageProvider) {
-        this.plugin = plugin;
-        this.messageProvider = messageProvider;
-    }
 
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
@@ -35,13 +27,13 @@ public class PlayerEventListeners implements Listener {
 
             Player player = (Player) event.getEntity().getShooter();
 
-            var dungeon = plugin.getDungeonManager().getPlayerDungeon(player);
+            var dungeon = DungeonManager.instance().getPlayerDungeon(player);
             if (dungeon != null) {
                 if (type == EntityType.ENDER_PEARL && dungeon.disableEnderpearls()) {
-                    Messenger.sendMessage(player, messageProvider.get("messages.enderpearl-disabled"), null, messageProvider.get("messages.prefix"));
+                    United.messenger().send(player, "enderpearl-disabled");
                     event.setCancelled(true);
                 } else if (type == EntityType.WIND_CHARGE && dungeon.disableWindcharge()) {
-                    Messenger.sendMessage(player, messageProvider.get("messages.windcharge-disabled"), null, messageProvider.get("messages.prefix"));
+                    United.messenger().send(player, "windcharge-disabled");
                     event.setCancelled(true);
                 }
             }
@@ -54,10 +46,10 @@ public class PlayerEventListeners implements Listener {
         if (event.getEntity() instanceof Player) {
             var player = (Player) event.getEntity();
             if (event.isGliding()) {
-                var dungeon = plugin.getDungeonManager().getPlayerDungeon(player);
+                var dungeon = DungeonManager.instance().getPlayerDungeon(player);
                 if (dungeon != null && dungeon.disableElytra()) {
                     event.setCancelled(true);
-                    Messenger.sendMessage(player, messageProvider.get("messages.elytra-disabled"), null, messageProvider.get("messages.prefix"));
+                    United.messenger().send(player, "elytra-disabled");
                 }
             }
         }
@@ -75,7 +67,7 @@ public class PlayerEventListeners implements Listener {
         if (block == null)
             return;
 
-        var chest = plugin.getChestManager().getLootChestAtLocation(block.getLocation());
+        var chest = LootChestManager.instance().getLootChestAtLocation(block.getLocation());
         if (chest == null)
             return;
 

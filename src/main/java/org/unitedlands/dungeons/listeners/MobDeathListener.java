@@ -8,15 +8,9 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.jetbrains.annotations.NotNull;
-import org.unitedlands.dungeons.UnitedDungeons;
+import org.unitedlands.dungeons.managers.MobManager;
 
 public class MobDeathListener implements Listener {
-
-    private final UnitedDungeons plugin;
-
-    public MobDeathListener(UnitedDungeons plugin) {
-        this.plugin = plugin;
-    }
 
     @EventHandler
     public void onMobDeath(EntityDeathEvent event) {
@@ -38,6 +32,6 @@ public class MobDeathListener implements Listener {
     private void handleMobDeath(@NotNull LivingEntity entity) {
         if (!(entity.getEntitySpawnReason() == SpawnReason.CUSTOM || entity.getEntitySpawnReason() == SpawnReason.PATROL))
             return;
-        plugin.getMobManager().checkMobKill(entity.getUniqueId());
+        MobManager.instance().checkMobKill(entity.getUniqueId());
     }
 }

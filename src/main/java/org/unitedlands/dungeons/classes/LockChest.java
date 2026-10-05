@@ -17,8 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.unitedlands.UnitedLib;
 import org.unitedlands.dungeons.UnitedDungeons;
 import org.unitedlands.dungeons.utils.annotations.Info;
-import org.unitedlands.utils.Logger;
-
+import org.unitedlands.utils.United;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.gson.annotations.Expose;
 
@@ -92,8 +91,8 @@ public class LockChest {
                         var itemStack = UnitedLib.getInstance().getItemFactory().getItemStack(itemAmountSplit[0], amount, amount);
                         result.add(itemStack);
                     } catch (Exception ex) {
-                        Logger.logError(
-                                "Could not parse required item " + itemAmountSplit[0] + " in lock chest " + location, "UnitedDungeons");
+                        United.logger().error(
+                                "Could not parse required item " + itemAmountSplit[0] + " in lock chest " + location);
                     }
                 }
             }
@@ -152,7 +151,7 @@ public class LockChest {
 
             complete = true;
             location.getBlock().setType(Material.AIR);
-            Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskLater(UnitedDungeons.instance(), () -> {
                 location.getWorld().playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                 new ParticleBuilder(Particle.WAX_OFF)
                         .location(chest.getLocation())

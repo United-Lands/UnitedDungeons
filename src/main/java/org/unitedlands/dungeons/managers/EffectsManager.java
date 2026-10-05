@@ -18,19 +18,22 @@ import org.unitedlands.dungeons.classes.LockChest;
 import org.unitedlands.dungeons.classes.LootChest;
 import org.unitedlands.dungeons.classes.Spawner;
 import org.unitedlands.dungeons.classes.SupplyChest;
-import org.unitedlands.utils.Logger;
+import org.unitedlands.utils.United;
 
 public class EffectsManager {
 
-    private final UnitedDungeons plugin;
+    private static  EffectsManager instance;   
+    public static EffectsManager instance() {
+        return instance;
+    }
 
     private Set<Player> viewers = new HashSet<>();
 
     private BukkitRunnable displayTask = null;
     private Map<UUID, BukkitRunnable> soundLoopTasks = new HashMap<>();
 
-    public EffectsManager(UnitedDungeons plugin) {
-        this.plugin = plugin;
+    public EffectsManager() {
+        instance = this;
     }
 
     // #region Visualisation
@@ -54,39 +57,39 @@ public class EffectsManager {
     private void startVisualisation() {
 
         // POI visualisations
-        String dungeonCenterParticleName = plugin.getConfig().getString("visualisation.dungeon-center.particle");
+        String dungeonCenterParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.dungeon-center.particle");
         Particle dungeonCenterParticle = Particle.valueOf(dungeonCenterParticleName);
 
-        String spawnerParticleName = plugin.getConfig().getString("visualisation.spawner.particle");
+        String spawnerParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.spawner.particle");
         Particle spawnerParticle = Particle.valueOf(spawnerParticleName);
 
-        String lootChestParticleName = plugin.getConfig().getString("visualisation.loot-chest.particle");
+        String lootChestParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.loot-chest.particle");
         Particle lootChestParticle = Particle.valueOf(lootChestParticleName);
 
-        String lockChestParticleName = plugin.getConfig().getString("visualisation.lock-chest.particle");
+        String lockChestParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.lock-chest.particle");
         Particle lockChestParticle = Particle.valueOf(lockChestParticleName);
 
-        String supplyChestParticleName = plugin.getConfig().getString("visualisation.supply-chest.particle");
+        String supplyChestParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.supply-chest.particle");
         Particle supplyChestParticle = Particle.valueOf(supplyChestParticleName);
 
         // Barrier visualisations
-        String barrierParticleName = plugin.getConfig().getString("visualisation.barrier.particle");
+        String barrierParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.barrier.particle");
         Particle barrierParticle = Particle.valueOf(barrierParticleName);
 
         // Warp visualisations
-        String warpParticleName = plugin.getConfig().getString("visualisation.warp.particle");
+        String warpParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.warp.particle");
         Particle warpParticle = Particle.valueOf(warpParticleName);
 
         // Room visualisations
-        String roomEdgeParticleName = plugin.getConfig().getString("visualisation.room-edge.particle");
+        String roomEdgeParticleName = UnitedDungeons.instance().getConfig().getString("visualisation.room-edge.particle");
         Particle roomEdgeParticle = Particle.valueOf(roomEdgeParticleName);
-        Double roomEdgeParticleDensity = plugin.getConfig().getDouble("visualisation.room-edge.density");
+        Double roomEdgeParticleDensity = UnitedDungeons.instance().getConfig().getDouble("visualisation.room-edge.density");
 
         displayTask = new BukkitRunnable() {
             @Override
             public void run() {
 
-                var dungeons = plugin.getDungeonManager().getDungeons();
+                var dungeons = DungeonManager.instance().getDungeons();
 
                 // Room visualisations
 
@@ -152,7 +155,7 @@ public class EffectsManager {
 
             }
         };
-        displayTask.runTaskTimer(plugin, 0, 10L);
+        displayTask.runTaskTimer(UnitedDungeons.instance(), 0, 10L);
     }
 
     private void stopVisualisation() {
@@ -160,7 +163,7 @@ public class EffectsManager {
             displayTask.cancel();
             displayTask = null;
         }
-        Logger.log("Dungeon visualisation task stopped.", "UnitedDungeons");
+        United.logger().info("Dungeon visualisation task stopped.");
     }
 
     private Set<Edge> getBoundingBoxEdges(World world, BoundingBox boundingBox) {
@@ -208,8 +211,8 @@ public class EffectsManager {
 
     public void playBossMusicForPlayer(Player player, Location location) {
 
-        var sound = plugin.getConfig().getString("general.boss-music");
-        var loopticks = plugin.getConfig().getLong("general.boss-music-loop-length");
+        var sound = UnitedDungeons.instance().getConfig().getString("general.boss-music");
+        var loopticks = UnitedDungeons.instance().getConfig().getLong("general.boss-music-loop-length");
 
         var task = new BukkitRunnable() {
             @Override
@@ -217,12 +220,12 @@ public class EffectsManager {
                 player.playSound(location, sound, 10, 1);
             }
         };
-        task.runTaskTimer(plugin, 0, loopticks);
+        task.runTaskTimer(UnitedDungeons.instance(), 0, loopticks);
         soundLoopTasks.put(player.getUniqueId(), task);
     }
 
     public void stopBossMusicForPlayer(Player player) {
-        var sound = plugin.getConfig().getString("general.boss-music");
+        var sound = UnitedDungeons.instance().getConfig().getString("general.boss-music");
         var task = soundLoopTasks.get(player.getUniqueId());
         if (task != null) {
             player.stopSound(sound);

@@ -4,27 +4,23 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
-import org.unitedlands.dungeons.UnitedDungeons;
-import org.unitedlands.utils.Logger;
+import org.unitedlands.dungeons.managers.DungeonManager;
+import org.unitedlands.dungeons.managers.EffectsManager;
+import org.unitedlands.utils.United;
 
 public class ServerListener implements Listener {
 
-    private final UnitedDungeons plugin;
-
-    public ServerListener(UnitedDungeons plugin) {
-        this.plugin = plugin;
-    }
 
     @EventHandler
     public void onServerLoad(ServerLoadEvent event) {
-        plugin.getDungeonManager().loadDungeons();
-        plugin.getDungeonManager().startChecks();
-        Logger.log("UnitedDungeons initialized.", "UnitedDungeons");
+        DungeonManager.instance().loadDungeons();
+        DungeonManager.instance().startChecks();
+        United.logger().info("UnitedDungeons initialized.");
     }
 
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getEffectsManager().removeViewer(event.getPlayer());
+        EffectsManager.instance().removeViewer(event.getPlayer());
     }
 }

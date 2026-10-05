@@ -11,14 +11,20 @@ import org.bukkit.Bukkit;
 import org.unitedlands.UnitedLib;
 import org.unitedlands.dungeons.classes.Dungeon;
 import org.unitedlands.dungeons.classes.Spawner;
-import org.unitedlands.utils.Logger;
+import org.unitedlands.utils.United;
 
 public class MobManager {
+
+    private static MobManager instance;
+    
+    public static MobManager instance() {
+        return instance;
+    }
 
     private HashMap<UUID, Spawner> mobList = new HashMap<>();
 
     public MobManager() {
-
+        instance = this;
     }
 
     public void createMob(Dungeon dungeon, Spawner spawner) {
@@ -34,7 +40,7 @@ public class MobManager {
 
         var newMobUuid = UnitedLib.getInstance().getMobFactory().createMobAtLocation(spawner.getMobType(), spawner.getLocation(), level);
         if (newMobUuid == null) {
-            Logger.logError("Error creating new mob for spawner " + spawner.getUuid(), "UnitedDungeons");
+            United.logger().error("Error creating new mob for spawner " + spawner.getUuid());
             return;
         }
         registerMob(newMobUuid, spawner);
@@ -50,7 +56,7 @@ public class MobManager {
                 mobsToPrune.add(mobId);
         }
         for (var mobId : mobsToPrune) {
-            Logger.log("Entity with id " + mobId + " no longer trackable, removing.", "UnitedDungeons");
+            United.logger().info("Entity with id " + mobId + " no longer trackable, removing.");
             deregisterMob(mobId);
         }
     }

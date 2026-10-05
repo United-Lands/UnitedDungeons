@@ -1,0 +1,163 @@
+# Plugin prefix before every system message.
+reload: "<dark_green>Plugin reloaded."
+teleport: "Teleporting in 3 seconds. Move to cancel."
+teleport-cancel: "Teleportation cancelled."
+visualisation-on: "Dungeon visualisation switched on."
+visualisation-off: "Dungeon visualisation switched off."
+no-permission: "<red>You don't have permission to use this command."
+
+# +---------------------------------------------+ #
+# |           Command Usage Infos               | #
+# +---------------------------------------------+ #
+
+info-barrier-create: "Usage: /uda barrier create"
+info-barrier-info: "Usage: /uda barrier info"
+info-barrier-remove: "Usage: /uda barrier remove"
+info-barrier-set: "Usage: /uda barrier set <property> <value>"
+info-chest-create: "Usage: /uda chest create"
+info-chest-info: "Usage: /uda chest info"
+info-chest-remove: "Usage: /uda chest remove"
+info-chest-set: "Usage: /uda chest set <property> <value>"
+info-dungeon-create: "Usage: /uda dungeon create <new_dungeon_name>"
+info-dungeon-edit: "Usage: /uda dungeon edit <dungeon_name>"
+info-dungeon-delete: "Usage: /uda dungeon delete"
+info-dungeon-info: "Usage: /uda dungeon info"
+info-dungeon-set: "Usage: /uda dungeon set <location|warp|property_name> [property_value]"
+info-dungeon-set-location: "Usage: /uda dungeon set location"
+info-dungeon-set-warp: "Usage: /uda dungeon set warp"
+info-dungeon-set-public: "Usage: /uda dungeon set public <true|false>"
+info-dungeon-start: "Usage: /uda dungeon start [dungeon_name]"
+info-dungeon-stop: "Usage: /uda dungeon stop [dungeon_name]"
+info-dungeon-kick: "Usage: /uda dungeon kick <player_name>"
+info-player-dungeon-list: "Usage: /ud list"
+info-player-dungeon-start: "Usage: /ud start"
+info-player-dungeon-warp: "Usage: /ud warp <dungeon_name>"
+info-player-dungeon-info: "Usage: /ud info <dungeon_name>"
+info-player-invite: "Usage: /ud invite <player_name>"
+info-player-kick: "Usage: /ud kick <player_name>"
+info-player-leave: "Usage: /ud leave"
+info-player-highscores: "Usage: /ud highscores <dungeon_name>"
+info-player-party: "Usage: /ud party"
+info-room-create: "Usage: /uda room create <new_room_name> [<width> <lentgh>]"
+info-room-info: "Usage: /uda room info"
+info-room-set: "Usage: /uda room set <property> <value>"
+info-room-delete: "Usage: /uda room delete"
+info-room-expand: "Usage: /uda room expand <x|y|z> <amount>"
+info-room-move: "Usage: /uda room move <x|y|z> <distance>"
+info-room-state: "Usage: /uda room state <edit|complete|reset>"
+info-spawner-create: "Usage: /uda spawner create"
+info-spawner-info: "Usage: /uda spawner info"
+info-spawner-remove: "Usage: /uda spawner remove"
+info-spawner-set: "Usage: /uda spawner set <property> <value>"
+
+# +---------------------------------------------+ #
+# |                 IO Messages                 | #
+# +---------------------------------------------+ #
+
+save-error: "<red>Error while saving changes."
+save-success: "<dark_green>All changes saved."
+file-delete-success: "<dark_green>Dungeon file deleted succesfully."
+file-delete-error: "<red>Error while trying to delete dungeon file."
+
+# +---------------------------------------------+ #
+# |               Command Errors                | #
+# +---------------------------------------------+ #
+
+error-no-dungeon-found: "<red>You are not close to a dungeon."
+error-no-dungeon-found-by-name: "<red>There is no dungeon with that name."
+error-not-in-room: "<red>This command can only be used inside of a dungeon room."
+error-not-dungeon: "<red>This command can only be used inside of a dungeon."
+error-in-room: "<red>This command can only be used outside of a dungeon room."
+error-barrier-not-found: "<red>There is no barrier at this location."
+error-chest-not-found: "<red>There is no chest at this location."
+error-max-dungeons: "<red>Maximum allowed dungeons reached, you can't create another one."
+error-dungeon-too-close: "<red>This location is too close to another dungeon."
+error-dungeon-with-same-name: "<red>A dungeon with the same name already exists."
+error-start-no-warp: "<red>You can't start a dungeon that doesn't have a warp location. Set one with /uda dungeon set warp."
+error-public-no-warp: "<red>You can't set a dungeon to public that doesn't have a warp location. Set one with /uda dungeon set warp."
+error-start-no-rooms: "<red>You can't start a dungeon that doesn't have any rooms."
+error-public-no-rooms: "<red>You can't set a dungeon to public that doesn't have any rooms."
+warning-room-overlap: "<yellow>This room overlaps an existing room. This may cause issues and should be avoided.</yellow>"
+error-room-too-large: "<red>The room size is too large."
+error-room-too-small: "<red>The room size is too small."
+error-number-format: "<red>Invalid number format."
+error-spawner-not-found: "<red>There is no spawner at this location."
+error-not-in-party: "<red>You're not part of a dungeon party!"
+error-player-not-in-party: "<red>Player is not part of a dungeon party."
+error-player-not-found: "<red>Couldn't find an online player by that name."
+error-dungeon-not-locked: "<red>This dungeon isn't locked."
+error-player-still-on-lock-cooldown: "<red>You can't join this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
+error-leader-still-on-lock-cooldown: "<red>You can't start this dungeon party because you already joined one recently! ({cooldown} cooldown remaining)"
+error-no-edit-session: '<red>No edit session found. Use "/uda dungeon edit <dungeon_name>" to start editing a dungeon.</red>'
+error-dungeon-partly-solved: "<red>You can't start a dungeon that has already been partly solved.</red>"
+error-not-party-leader: "<red>Only the party leader can use this command."
+error-cant-kick-yourself: "<red>You can't kick yourself."
+
+# +---------------------------------------------+ #
+# |             Dungeon Status Info             | #
+# +---------------------------------------------+ #
+
+dungeon-status-lock: "<white>This dungeon is now locked for your <dark_aqua>dungeon party<white>. No other players can enter in the next {lock-time}, unless you invite them with /ud invite. Good luck, adventurers!"
+dungeon-status-locked: "This dungeon is <red>locked <gray>by a party. It will be open again in {lock-time}."
+dungeon-status-lock-expired: "Your lock on <gold>{dungeon-name} <gray>has expired. All players can enter again."
+dungeon-status-not-lockable: "This dungeon cannot be locked for dungeon parties."
+dungeon-room-not-lockable: "You cannot lock the dungeon from this room."
+dungeon-status-not-public: "This dungeon isn't public."
+dungeon-status-no-warp: "There is no location to teleport to."
+dungeon-status-cooldown: "You've been teleported back to the entrance because this dungeon is on <yellow>cooldown<gray>. It will open again in {cooldown-time}."
+dungeon-status-lock-cooldown: "This can't be locked since it is on <yellow>cooldown<gray>. It will open again in {cooldown-time}."
+dungeon-completed: "<gold>{dungeon-name} <gray>has been completed and is now on <yellow>cooldown<gray>. It will open again in {cooldown-time}."
+dungeon-complete-countdown: "<white>Congratulations on completing the dungeon. You will be teleported out in {countdown}, so get all the loot while you still can!"
+dungeon-reset-teleport: "The dungeon you were in has been reset. You have been teleported back to the entrance."
+dungeon-started: "<dark_green>Dungeon started."
+dungeon-stopped: "<red>Dungeon stopped."
+dungeon-room-lockable: '<gray>You can use this room to start a <dark_green>dungeon party<gray>. Use "/ud start" to lock the dungeon for the current players and compete for the highscore (/ud highscores).'
+dungeon-room-forbidden: "<red>ERROR: You've entered a room that should only be accessible after solving a different room. You've been teleported back to the entrance of the dungeon."
+dungeon-highscores-cleared: "<aqua>Highscores have been cleared."
+dungeon-requires-locking: '<gray>This dungeon must be <yellow>locked</yellow> to become active. Head to the lobby room and use "<em>/ud start</em>" to lock it for your dungeon party.</gray>'
+
+# +---------------------------------------------+ #
+# |                Dungeon Events               | #
+# +---------------------------------------------+ #
+
+dungeon-event-open:
+  - "<red><strikethrough>+|✦                    </strikethrough><bold>[<white>  Dungeon opened! </white>]</bold><strikethrough>                   |✦+</strikethrough></red>"
+  - "<gold>{dungeon-name}</gold> <dark_gray>has opened and is ready to welcome players.</dark_gray>"
+  - "<gray><italic>{dungeon-description}</italic></gray>"
+  - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
+dungeon-event-completed:
+  - "<red><strikethrough>+|✦                    </strikethrough><bold>[<white> Dungeon completed! </white>]</bold><strikethrough>                 |✦+</strikethrough></red>"
+  - "<gold>{dungeon-name} <gray>has been completed and is now on cooldown. It will reopen in {cooldown-time}."
+  - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
+
+# +---------------------------------------------+ #
+# |                      Misc                   | #
+# +---------------------------------------------+ #
+
+dungeon-edit-start: "<green>Now editing dungeon <bold><gold>{dungeon-name}</gold></bold>.</green>"
+player-party-start: "<white>You're now part of the dungeon party in <gold>{dungeon-name}. Complete the dungeon as fast as possible to get a spot in the Top 5 Highscores! (/ud highscores)"
+player-invited: "<dark_aqua>The player has been added to the dungeon party."
+player-kicked: "<yellow>Player {name} was kicked from the dungeon party."
+player-party-kicked: "<yellow>You were kicked from the dungeon party."
+player-party-info: "<white><b>Party Leader:</b> {leader},</white> <gold><b>Members:</b> {members}</gold>"
+invitation-received: "<dark_aqua>You've been added to the dungeon party in <gold>{dungeon-name}!"
+player-left: "<dark_aqua>You've left the dungeon party."
+new-highscore: '<green>Your party''s time of {time} is a Top 5 highscore - you''ve been placed on rank {placement}. Good job! <gray>Check "/ud highscores" to see your competition.'
+dungeon-highscores:
+  - "<red><strikethrough>+|✦                </strikethrough><bold>[<white> Dungeon Highscores </white>]</bold><strikethrough>                   |✦+</strikethrough></red><br><bold><gold>{dungeon-name}</gold> <white>Top 5:</white></bold>"
+  - "<bold><white>1. {time1} </white></bold><gray>- {players1}</gray>"
+  - "<bold><white>2. {time2} </white></bold><gray>- {players2}</gray>"
+  - "<bold><white>3. {time3} </white></bold><gray>- {players3}</gray>"
+  - "<bold><white>4. {time4} </white></bold><gray>- {players4}</gray>"
+  - "<bold><white>5. {time5} </white></bold><gray>- {players5}</gray>"
+  - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
+dungeon-info:
+  - "<red><strikethrough>+|✦                      </strikethrough><bold>[<white> Dungeon Info </white>]</bold><strikethrough>                       |✦+</strikethrough></red>"
+  - "<gold>{dungeon-name}</gold>"
+  - "<gray><italic>{dungeon-description}</italic></gray>"
+  - "<bold>Status:</bold> {status}"
+  - "<bold>Players in dungeon:</bold> <gray>{players}</gray>"
+  - "<red><strikethrough>+|✦                                 +✦+                                 |✦+</strikethrough></red>"
+elytra-disabled: "<red>A spell in this dungeon has disabled your Elytra!"
+enderpearl-disabled: "<red>A spell in this dungeon has rendered your Ender pearls useless!"
+windcharge-disabled: "<red>A spell in this dungeon has rendered your wind charges useless!"

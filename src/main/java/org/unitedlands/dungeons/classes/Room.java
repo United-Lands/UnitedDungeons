@@ -30,9 +30,9 @@ import org.bukkit.block.data.type.Wall.Height;
 import org.bukkit.util.BoundingBox;
 import org.unitedlands.UnitedLib;
 import org.unitedlands.dungeons.UnitedDungeons;
+import org.unitedlands.dungeons.managers.EffectsManager;
 import org.unitedlands.dungeons.utils.annotations.Info;
-import org.unitedlands.utils.Logger;
-
+import org.unitedlands.utils.United;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.gson.annotations.Expose;
 
@@ -136,7 +136,7 @@ public class Room {
         despawnBarriers(false, false);
 
         if (this.useBossMusic) {
-            UnitedDungeons.getInstance().getEffectsManager().stopBossMusicForPlayers(playersInRoom);
+            EffectsManager.instance().stopBossMusicForPlayers(playersInRoom);
         }
 
         this.isComplete = true;
@@ -158,7 +158,7 @@ public class Room {
             spawner.resetCompletion();
 
         if (this.useBossMusic) {
-            UnitedDungeons.getInstance().getEffectsManager().stopBossMusicForPlayers(playersInRoom);
+            EffectsManager.instance().stopBossMusicForPlayers(playersInRoom);
         }
 
         this.isComplete = false;
@@ -172,7 +172,7 @@ public class Room {
         despawnBarriers(true, true);
 
         if (this.useBossMusic) {
-            UnitedDungeons.getInstance().getEffectsManager().stopBossMusicForPlayers(playersInRoom);
+            EffectsManager.instance().stopBossMusicForPlayers(playersInRoom);
         }
 
         this.isComplete = false;
@@ -200,7 +200,7 @@ public class Room {
                     directional.setFacing(face);
                     block.setBlockData(directional);
                 } catch (Exception ex) {
-                    Logger.logError("Wrong facing data on loot chest: " + facing, "UnitedDungeons");
+                    United.logger().error("Wrong facing data on loot chest: " + facing);
                 }
 
                 if (supplyChest.getItems() != null) {
@@ -214,7 +214,7 @@ public class Room {
                                 addLootToInventory(chestInventory, item);
                             }
                         } else {
-                            Logger.logError("No chest found.", "UnitedDungeons");
+                            United.logger().error("No chest found.");
                         }
                     }
                 }
@@ -238,7 +238,7 @@ public class Room {
                 try {
                     material = Material.valueOf(materialName);
                 } catch (Exception ignore) {
-                    Logger.logError("Loot chest material not found: " + materialName, "UnitedDungeons");
+                    United.logger().error("Loot chest material not found: " + materialName);
                 }
 
                 var block = lootChest.getLocation().getBlock();
@@ -250,7 +250,7 @@ public class Room {
                     directional.setFacing(face);
                     block.setBlockData(directional);
                 } catch (Exception ex) {
-                    Logger.logError("Wrong facing data on loot chest: " + facing, "UnitedDungeons");
+                    United.logger().error("Wrong facing data on loot chest: " + facing);
                 }
 
                 List<UUID> playerUUIDs = new ArrayList<>();
@@ -305,7 +305,7 @@ public class Room {
                     }
                 }
 
-                Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+                Bukkit.getScheduler().runTaskLater(UnitedDungeons.instance(), () -> {
 
                     lootChest.getLocation().getWorld().playSound(lootChest.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 1);
                     new ParticleBuilder(Particle.WAX_OFF)
@@ -351,7 +351,7 @@ public class Room {
                     directional.setFacing(face);
                     block.setBlockData(directional);
                 } catch (Exception ex) {
-                    Logger.logError("Wrong facing data on lock chest " + lockChest.getUuid(), "UnitedDungeons");
+                    United.logger().error("Wrong facing data on lock chest " + lockChest.getUuid());
                 }
             }
         }
@@ -392,12 +392,12 @@ public class Room {
                                     directional.setFacing(face);
                                     block.setBlockData(directional);
                                 } catch (Exception ex) {
-                                    Logger.logError("Wrong facing data on barrier " + barrier.getUuid(), "UnitedDungeons");
+                                    United.logger().error("Wrong facing data on barrier " + barrier.getUuid());
                                 }
                             }
 
                             // Update the connections one tick later
-                            Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+                            Bukkit.getScheduler().runTaskLater(UnitedDungeons.instance(), () -> {
                                 updateConnections(block);
                             }, 1);
                         }
@@ -446,11 +446,11 @@ public class Room {
                                 directional.setFacing(face);
                                 block.setBlockData(directional);
                             } catch (Exception ex) {
-                                Logger.logError("Wrong facing data on barrier " + barrier.getUuid(), "UnitedDungeons");
+                                United.logger().error("Wrong facing data on barrier " + barrier.getUuid());
                             }
                         }
                         // Update the connections one tick later
-                        Bukkit.getScheduler().runTaskLater(UnitedDungeons.getInstance(), () -> {
+                        Bukkit.getScheduler().runTaskLater(UnitedDungeons.instance(), () -> {
                             updateConnections(block);
                         }, 1);
                     }
@@ -749,9 +749,9 @@ public class Room {
                 inv.setItem(slotIndex, subStack);
             }
         } else {
-            Logger.logError("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
+            United.logger().error("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
                     + lootSet.getMaxAmount()
-                    + " for chest in room " + this.uuid, "UnitedDungeons");
+                    + " for chest in room " + this.uuid);
         }
     }
 
@@ -797,9 +797,9 @@ public class Room {
                 inv.setItem(slotIndex, subStack);
             }
         } else {
-            Logger.logError("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
+            United.logger().error("Could not generate ItemStack " + lootSet.getItem() + ":" + lootSet.getMinAmount() + "-"
                     + lootSet.getMaxAmount()
-                    + " for chest in room " + this.uuid, "UnitedDungeons");
+                    + " for chest in room " + this.uuid);
         }
     }
 

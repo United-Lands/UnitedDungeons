@@ -14,7 +14,7 @@ import org.unitedlands.dungeons.utils.serializers.BoundingBoxDeserializer;
 import org.unitedlands.dungeons.utils.serializers.BoundingBoxSerializer;
 import org.unitedlands.dungeons.utils.serializers.LocationDeserializer;
 import org.unitedlands.dungeons.utils.serializers.LocationSerializer;
-import org.unitedlands.utils.Logger;
+import org.unitedlands.utils.United;
 
 public class JsonUtils {
 
@@ -30,7 +30,7 @@ public class JsonUtils {
     public static boolean saveObjectToFile(Object obj, File file) throws IOException {
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(obj, writer);
-            Logger.log("JSON written.", "UnitedDungeons");
+            United.logger().info("JSON written.");
             return true;
         } catch (IOException e) {
             throw e;

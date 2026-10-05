@@ -4,11 +4,10 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.unitedlands.dungeons.UnitedDungeons;
+import org.unitedlands.dungeons.managers.MobManager;
 import org.unitedlands.dungeons.utils.annotations.Info;
 
 import com.google.gson.annotations.Expose;
@@ -47,8 +46,6 @@ public class Spawner {
     @Expose
     private int currentKillCount;
 
-    private final UnitedDungeons plugin = getPlugin();
-
     public Spawner() {
 
     }
@@ -76,14 +73,14 @@ public class Spawner {
     public void prepareSpawn(Dungeon dungeon) {
         if (System.currentTimeMillis() - lastSpawnTime >= this.spawnFrequency) {
             lastSpawnTime = System.currentTimeMillis();
-            var currentMobCount = plugin.getMobManager().getMobCount(this);
+            var currentMobCount = MobManager.instance().getMobCount(this);
             if (currentMobCount < this.maxMobs) {
                 if (!this.isGroupSpawn) {
-                    plugin.getMobManager().createMob(dungeon, this);
+                    MobManager.instance().createMob(dungeon, this);
                 } else {
                     var num = this.maxMobs - currentMobCount;
                     for (int i = 0; i < num; i++) {
-                        plugin.getMobManager().createMob(dungeon, this);
+                        MobManager.instance().createMob(dungeon, this);
                     }
                 }
             }
@@ -101,10 +98,6 @@ public class Spawner {
     }
 
     // #region Getters & Setters
-
-    private UnitedDungeons getPlugin() {
-        return (UnitedDungeons) Bukkit.getPluginManager().getPlugin("UnitedDungeons");
-    }
 
     public UUID getUuid() {
         return uuid;

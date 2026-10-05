@@ -5,19 +5,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.unitedlands.dungeons.UnitedDungeons;
 import org.unitedlands.dungeons.classes.Dungeon;
 import org.unitedlands.dungeons.classes.LootChest;
+import org.unitedlands.utils.United;
 
 public class LootChestManager {
 
-
-    private final UnitedDungeons plugin;
+    private static  LootChestManager instance;
+    public static LootChestManager instance() {
+        return instance;
+    }
 
     private Set<LootChest> lootChests;
 
-    public LootChestManager(UnitedDungeons plugin) {
-        this.plugin = plugin;
+    public LootChestManager() {
+        instance = this;
     }
 
     public void loadLootChests(Collection<Dungeon> dungeons) {
@@ -27,7 +29,7 @@ public class LootChestManager {
                 lootChests.addAll(room.getLootChests());
             }
         }
-        plugin.getLogger().info("Loaded " + lootChests.size() + " loot chests.");
+        United.logger().info("Loaded " + lootChests.size() + " loot chests.");
     }
 
     public void registerLootChest(LootChest chest) {
