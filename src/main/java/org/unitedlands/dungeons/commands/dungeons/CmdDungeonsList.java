@@ -9,6 +9,7 @@ import org.unitedlands.annotations.UnitedSubCommand;
 import org.unitedlands.dungeons.commands.CmdDungeons;
 import org.unitedlands.dungeons.managers.DungeonManager;
 import org.unitedlands.registrars.command.UnitedCommandExecutor;
+import org.unitedlands.utils.United;
 
 @UnitedSubCommand (
     parent = CmdDungeons.class,
@@ -35,9 +36,9 @@ public class CmdDungeonsList implements UnitedCommandExecutor {
             dungeonList = DungeonManager.instance().getPublicDungeonNames();
         }
 
-        // TODO: wtf?
+
         var msg = String.join(", ", dungeonList);
-        //United.messenger().send(sender, msg);
+        United.messenger().sendRaw(sender, msg);
     }
 
 }

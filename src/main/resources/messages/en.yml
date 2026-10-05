@@ -161,3 +161,9 @@ dungeon-info:
 elytra-disabled: "<red>A spell in this dungeon has disabled your Elytra!"
 enderpearl-disabled: "<red>A spell in this dungeon has rendered your Ender pearls useless!"
 windcharge-disabled: "<red>A spell in this dungeon has rendered your wind charges useless!"
+
+town-screen:
+  header: "<gold> .]|[.</gold>                            <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>                             <gold>.]|[.</gold>"
+  name:  "<gold><bold>{dungeon-name}"
+  description: "<gray>{dungeon-description}"
+  status:  "<white><bold>Status:</bold></white> {dungeon-status}"

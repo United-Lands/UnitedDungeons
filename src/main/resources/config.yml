@@ -44,13 +44,8 @@ general:
 # Valid placeholders are:
 # {dungeon-name} {dungeon-description} {dungeon-status}
 
-towny:
-  show-custom-town-screen: true
-  custom-town-screen:
-  - "<gold> .]|[.</gold>                            <gradient:#757575:#D7D7D7><bold>DUNGEON</gradient>                             <gold>.]|[.</gold>"
-  - "<gold><bold>{dungeon-name}"
-  - "<gray>{dungeon-description}"
-  - "<white><bold>Status:</bold></white> {dungeon-status}"
+town-screen:
+  enabled: true
 
 ###################################################
 # +---------------------------------------------+ #

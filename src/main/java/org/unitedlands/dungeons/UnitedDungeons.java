@@ -11,7 +11,7 @@ import org.unitedlands.dungeons.managers.DungeonManager;
 import org.unitedlands.dungeons.managers.EffectsManager;
 import org.unitedlands.dungeons.managers.LootChestManager;
 import org.unitedlands.dungeons.managers.MobManager;
-
+import org.unitedlands.dungeons.utils.integrations.UnitedLandsIntegration;
 import org.unitedlands.utils.United;
 
 public class UnitedDungeons extends JavaPlugin {
@@ -20,9 +20,10 @@ public class UnitedDungeons extends JavaPlugin {
 
     private DungeonManager dungeonManager;
 
-    // private TownyIntegration townyIntegration;
-    // private MapTownyIntegration mapTownyIntegration;
+    private boolean usingUnitedLands;
 
+    private UnitedLandsIntegration unitedLandsIntegration;
+    // private MapTownyIntegration mapTownyIntegration;
 
     @Override
     public void onEnable() {
@@ -58,15 +59,16 @@ public class UnitedDungeons extends JavaPlugin {
     }
 
     private void loadIntegrations() {
-        // Plugin towny = Bukkit.getPluginManager().getPlugin("Towny");
-        // if (towny != null && towny.isEnabled()) {
-        //     United.logger().info("Towny found, enabling integration.");
-        //     townyIntegration = new TownyIntegration(this);
-        // }
+        Plugin ul = Bukkit.getPluginManager().getPlugin("UnitedLands");
+        if (ul != null && ul.isEnabled()) {
+            United.logger().info("UnitedLands found, enabling integration.");
+            usingUnitedLands = true;
+            unitedLandsIntegration = new UnitedLandsIntegration();
+        }
         // Plugin mapTowny = Bukkit.getPluginManager().getPlugin("MapTowny");
         // if (mapTowny != null && mapTowny.isEnabled()) {
-        //     United.logger().info("MapTowny found, enabling integration.");
-        //     mapTownyIntegration = new MapTownyIntegration(this);
+        // United.logger().info("MapTowny found, enabling integration.");
+        // mapTownyIntegration = new MapTownyIntegration(this);
         // }
     }
 
@@ -76,17 +78,16 @@ public class UnitedDungeons extends JavaPlugin {
         super.onDisable();
     }
 
-    // public TownyIntegration getTownyIntegration() {
-    //     return townyIntegration;
-    // }
+    public boolean isUsingUnitedLands() {
+        return usingUnitedLands;
+    }
 
-    // public MapTownyIntegration getMapTownyIntegration() {
-    //     return mapTownyIntegration;
-    // }
+    public UnitedLandsIntegration getUnitedLandsIntegration() {
+        return unitedLandsIntegration;
+    }
 
     public static UnitedDungeons instance() {
         return instance;
     }
-
 
 }
